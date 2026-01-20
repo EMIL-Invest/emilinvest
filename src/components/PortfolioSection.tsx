@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, ExternalLink, RefreshCw } from "lucide-react";
+import { ExternalLink, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,69 +6,29 @@ import { Button } from "@/components/ui/button";
 // Mock data - In production, this would fetch from OSEBX API
 const stocks = [
   {
-    ticker: "NEL",
-    name: "Nel ASA",
-    shares: 150,
-    avgPrice: 12.5,
-    currentPrice: 14.2,
-    sector: "Hydrogen",
-  },
-  {
-    ticker: "SCATC",
-    name: "Scatec ASA",
-    shares: 50,
-    avgPrice: 78.0,
-    currentPrice: 82.5,
-    sector: "Solenergi",
-  },
-  {
-    ticker: "ORK",
-    name: "Orkla ASA",
-    shares: 30,
-    avgPrice: 85.0,
-    currentPrice: 82.0,
-    sector: "Forbruksvarer",
-  },
-  {
     ticker: "EQNR",
     name: "Equinor ASA",
-    shares: 25,
-    avgPrice: 290.0,
-    currentPrice: 305.0,
+    value: 2000,
     sector: "Energi",
+  },
+  {
+    ticker: "PLT",
+    name: "poLight ASA",
+    value: 1000,
+    sector: "Teknologi",
   },
 ];
 
 const funds = [
   {
-    name: "KLP AksjeGlobal Mer Samfunnsansvar",
-    value: 45000,
-    return: 8.5,
-    category: "Global ESG",
-  },
-  {
-    name: "Storebrand Global ESG Plus",
-    value: 35000,
-    return: 7.2,
-    category: "Global ESG",
-  },
-  {
-    name: "DNB Grønt Norden",
-    value: 28000,
-    return: 5.8,
-    category: "Nordisk Grønn",
+    name: "DNB Global Indeks A",
+    value: 82000,
+    category: "Global Indeks",
   },
 ];
 
 const PortfolioSection = () => {
-  const calculateReturn = (avgPrice: number, currentPrice: number) => {
-    return ((currentPrice - avgPrice) / avgPrice) * 100;
-  };
-
-  const totalStockValue = stocks.reduce(
-    (sum, stock) => sum + stock.shares * stock.currentPrice,
-    0
-  );
+  const totalStockValue = stocks.reduce((sum, stock) => sum + stock.value, 0);
   const totalFundValue = funds.reduce((sum, fund) => sum + fund.value, 0);
   const totalValue = totalStockValue + totalFundValue;
   const stockPercentage = (totalStockValue / totalValue) * 100;
@@ -153,80 +113,40 @@ const PortfolioSection = () => {
                       Sektor
                     </th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Antall
-                    </th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Kurs
-                    </th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Avkastning
-                    </th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
                       Verdi
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {stocks.map((stock) => {
-                    const returnPct = calculateReturn(
-                      stock.avgPrice,
-                      stock.currentPrice
-                    );
-                    const isPositive = returnPct >= 0;
-                    return (
-                      <tr
-                        key={stock.ticker}
-                        className="border-b border-border/50 hover:bg-muted/30 transition-colors"
-                      >
-                        <td className="py-4 px-4">
-                          <a
-                            href={`https://www.oslobors.no/markedsaktivitet/#/details/${stock.ticker}.OSE/overview`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 font-medium text-primary hover:underline"
-                          >
-                            {stock.ticker}
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        </td>
-                        <td className="py-4 px-4 text-foreground">
-                          {stock.name}
-                        </td>
-                        <td className="py-4 px-4">
-                          <Badge variant="outline" className="text-xs">
-                            {stock.sector}
-                          </Badge>
-                        </td>
-                        <td className="py-4 px-4 text-right text-foreground">
-                          {stock.shares}
-                        </td>
-                        <td className="py-4 px-4 text-right text-foreground">
-                          {stock.currentPrice.toFixed(2)} kr
-                        </td>
-                        <td className="py-4 px-4 text-right">
-                          <span
-                            className={`inline-flex items-center gap-1 font-medium ${
-                              isPositive ? "stock-positive" : "stock-negative"
-                            }`}
-                          >
-                            {isPositive ? (
-                              <TrendingUp className="w-4 h-4" />
-                            ) : (
-                              <TrendingDown className="w-4 h-4" />
-                            )}
-                            {isPositive ? "+" : ""}
-                            {returnPct.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 text-right font-medium text-foreground">
-                          {(stock.shares * stock.currentPrice).toLocaleString(
-                            "no-NO"
-                          )}{" "}
-                          kr
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {stocks.map((stock) => (
+                    <tr
+                      key={stock.ticker}
+                      className="border-b border-border/50 hover:bg-muted/30 transition-colors"
+                    >
+                      <td className="py-4 px-4">
+                        <a
+                          href={`https://www.oslobors.no/markedsaktivitet/#/details/${stock.ticker}.OSE/overview`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 font-medium text-primary hover:underline"
+                        >
+                          {stock.ticker}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </td>
+                      <td className="py-4 px-4 text-foreground">
+                        {stock.name}
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge variant="outline" className="text-xs">
+                          {stock.sector}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4 text-right font-medium text-foreground">
+                        {stock.value.toLocaleString("no-NO")} kr
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -251,16 +171,9 @@ const PortfolioSection = () => {
                   <h4 className="font-medium text-foreground mb-2 text-sm">
                     {fund.name}
                   </h4>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-lg font-serif font-bold text-foreground">
-                        {fund.value.toLocaleString("no-NO")} kr
-                      </p>
-                    </div>
-                    <span className="stock-positive font-medium text-sm flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />+{fund.return}%
-                    </span>
-                  </div>
+                  <p className="text-lg font-serif font-bold text-foreground">
+                    {fund.value.toLocaleString("no-NO")} kr
+                  </p>
                 </div>
               ))}
             </div>
