@@ -27,14 +27,9 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
             <img src={emilLogo} alt="EMIL Invest" className="h-10 w-auto" />
-            <div className="flex flex-col">
-              <span className="font-serif font-semibold text-foreground">
-                EMIL Invest
-              </span>
-              <span className="text-xs text-muted-foreground">
-                NTNU Energi & Miljø
-              </span>
-            </div>
+            <span className="font-serif font-semibold text-foreground">
+              EMIL Invest
+            </span>
           </div>
 
           {/* Desktop Navigation */}
