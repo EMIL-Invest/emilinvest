@@ -7,29 +7,23 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
             <img src={emilLogo} alt="EMIL Invest" className="h-8 w-auto" />
-            <div>
-              <span className="font-serif font-semibold text-foreground text-sm">
-                EMIL Invest
-              </span>
-              <span className="text-xs text-muted-foreground block">
-                NTNU Energi & Miljø
-              </span>
-            </div>
+            <span className="font-serif font-semibold text-foreground text-sm">
+              EMIL Invest
+            </span>
           </div>
 
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} EMIL Invest NTNU. Alle
-            rettigheter reservert.
+            © {new Date().getFullYear()} EMIL Invest. Alle rettigheter reservert.
           </p>
 
           <div className="flex gap-6">
             <a
-              href="https://www.ntnu.no"
+              href="https://www.oslobors.no"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              NTNU
+              Oslo Børs
             </a>
             <a
               href="https://www.oslobors.no"
