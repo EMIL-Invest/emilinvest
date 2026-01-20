@@ -1,17 +1,15 @@
-import { Leaf } from "lucide-react";
+import emilLogo from "@/assets/emil-invest-logo.png";
 
 const Footer = () => {
   return (
     <footer className="py-12 border-t border-border">
       <div className="section-container">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-primary-foreground" />
-            </div>
+          <div className="flex items-center gap-3">
+            <img src={emilLogo} alt="EMIL Invest" className="h-8 w-auto" />
             <div>
               <span className="font-serif font-semibold text-foreground text-sm">
-                Investeringskomiteen
+                EMIL Invest
               </span>
               <span className="text-xs text-muted-foreground block">
                 NTNU Energi & Miljø
@@ -20,7 +18,7 @@ const Footer = () => {
           </div>
 
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} Investeringskomiteen NTNU. Alle
+            © {new Date().getFullYear()} EMIL Invest NTNU. Alle
             rettigheter reservert.
           </p>
 

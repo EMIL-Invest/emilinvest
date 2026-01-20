@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, X, Leaf } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import emilLogo from "@/assets/emil-invest-logo.png";
 
 const navLinks = [
   { href: "#home", label: "Hjem" },
@@ -24,13 +25,11 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="section-container">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <Leaf className="w-6 h-6 text-primary-foreground" />
-            </div>
+          <div className="flex items-center gap-3">
+            <img src={emilLogo} alt="EMIL Invest" className="h-10 w-auto" />
             <div className="flex flex-col">
               <span className="font-serif font-semibold text-foreground">
-                Investeringskomiteen
+                EMIL Invest
               </span>
               <span className="text-xs text-muted-foreground">
                 NTNU Energi & Miljø
