@@ -36,7 +36,7 @@ const HeroSection = () => {
           </div>
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-            Investeringskomiteen
+            EMIL Invest
             <br />
             <span className="gradient-text">NTNU Gløshaugen</span>
           </h1>
