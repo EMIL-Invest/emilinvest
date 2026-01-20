@@ -5,43 +5,24 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const teamMembers = [
   {
-    name: "Emma Nordahl",
+    name: "Kristian Hove",
     role: "Leder",
-    study: "Energi og miljøteknikk, 4. år",
-    initials: "EN",
-    email: "emma@stud.ntnu.no",
+    initials: "KH",
+    email: "kristian@stud.ntnu.no",
     linkedin: "#",
   },
   {
-    name: "Lars Eriksen",
-    role: "Økonomiansvarlig",
-    study: "Energi og miljøteknikk, 3. år",
-    initials: "LE",
-    email: "lars@stud.ntnu.no",
+    name: "Henrik Heierstad",
+    role: "Nestleder",
+    initials: "HH",
+    email: "henrik@stud.ntnu.no",
     linkedin: "#",
   },
   {
-    name: "Ingrid Solberg",
-    role: "Analytiker",
-    study: "Energi og miljøteknikk, 4. år",
-    initials: "IS",
-    email: "ingrid@stud.ntnu.no",
-    linkedin: "#",
-  },
-  {
-    name: "Magnus Haugen",
-    role: "Analytiker",
-    study: "Energi og miljøteknikk, 3. år",
-    initials: "MH",
-    email: "magnus@stud.ntnu.no",
-    linkedin: "#",
-  },
-  {
-    name: "Sofia Andersen",
-    role: "Kommunikasjonsansvarlig",
-    study: "Energi og miljøteknikk, 2. år",
-    initials: "SA",
-    email: "sofia@stud.ntnu.no",
+    name: "Andreas Jørgensen",
+    role: "Medlem",
+    initials: "AJ",
+    email: "andreas@stud.ntnu.no",
     linkedin: "#",
   },
 ];
@@ -78,12 +59,9 @@ const TeamSection = () => {
                 <h3 className="text-lg font-serif font-semibold text-foreground mb-1">
                   {member.name}
                 </h3>
-                <Badge variant="outline" className="mb-2">
+                <Badge variant="outline" className="mb-4">
                   {member.role}
                 </Badge>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {member.study}
-                </p>
                 <div className="flex justify-center gap-3">
                   <a
                     href={`mailto:${member.email}`}
