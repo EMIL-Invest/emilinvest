@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, Lock, User } from "lucide-react";
+import { ArrowLeft, Mail, Lock, User, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import emilLogo from "@/assets/emil-invest-logo.png";
 
@@ -16,6 +16,8 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingInvitation, setCheckingInvitation] = useState(false);
+  const [isInvited, setIsInvited] = useState<boolean | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,6 +36,35 @@ const Auth = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const checkInvitation = async (emailToCheck: string) => {
+    if (!emailToCheck || isLogin) return;
+    
+    setCheckingInvitation(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-invitation", {
+        body: { email: emailToCheck },
+      });
+
+      if (error) {
+        console.error("Error checking invitation:", error);
+        setIsInvited(false);
+      } else {
+        setIsInvited(data?.invited || false);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setIsInvited(false);
+    } finally {
+      setCheckingInvitation(false);
+    }
+  };
+
+  const handleEmailBlur = () => {
+    if (!isLogin && email) {
+      checkInvitation(email);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +98,17 @@ const Auth = () => {
           });
         }
       } else {
+        // Check invitation before signup
+        if (!isInvited) {
+          toast({
+            title: "Ikke invitert",
+            description: "Du må ha en invitasjon fra en administrator for å opprette konto.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
         const redirectUrl = `${window.location.origin}/`;
         
         const { error } = await supabase.auth.signUp({
@@ -112,6 +154,11 @@ const Auth = () => {
     }
   };
 
+  const handleModeSwitch = () => {
+    setIsLogin(!isLogin);
+    setIsInvited(null);
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -133,8 +180,8 @@ const Auth = () => {
             </CardTitle>
             <CardDescription>
               {isLogin 
-                ? "Logg inn for å laste opp kvartalsrapporter" 
-                : "Registrer deg for å bli medlem"}
+                ? "Logg inn for å administrere kvartalsrapporter" 
+                : "Registrer deg med en gyldig invitasjon"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -166,11 +213,30 @@ const Auth = () => {
                     type="email"
                     placeholder="din@epost.no"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (!isLogin) setIsInvited(null);
+                    }}
+                    onBlur={handleEmailBlur}
                     className="pl-10"
                     required
                   />
                 </div>
+                {!isLogin && email && isInvited !== null && (
+                  <div className={`flex items-center gap-2 text-sm ${isInvited ? "text-emerald-600" : "text-destructive"}`}>
+                    {isInvited ? (
+                      <>✓ E-posten har en gyldig invitasjon</>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-4 h-4" />
+                        Ingen gyldig invitasjon funnet for denne e-posten
+                      </>
+                    )}
+                  </div>
+                )}
+                {checkingInvitation && (
+                  <p className="text-sm text-muted-foreground">Sjekker invitasjon...</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -190,7 +256,11 @@ const Auth = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={loading || (!isLogin && !isInvited)}
+              >
                 {loading 
                   ? "Vennligst vent..." 
                   : isLogin 
@@ -201,16 +271,23 @@ const Auth = () => {
 
             <div className="mt-6 text-center text-sm">
               <span className="text-muted-foreground">
-                {isLogin ? "Har du ikke konto? " : "Har du allerede konto? "}
+                {isLogin ? "Har du en invitasjon? " : "Har du allerede konto? "}
               </span>
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={handleModeSwitch}
                 className="text-primary hover:underline font-medium"
               >
                 {isLogin ? "Registrer deg" : "Logg inn"}
               </button>
             </div>
+
+            {!isLogin && (
+              <p className="mt-4 text-xs text-center text-muted-foreground">
+                For å få tilgang må du bli invitert av en administrator.
+                Kontakt Kristian Hove eller en annen admin.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
