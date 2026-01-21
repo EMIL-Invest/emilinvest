@@ -40,7 +40,7 @@ const HeroSection = () => {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            Vi er studenter ved Energi- og miljøingeniør som forvalter våre
+            Vi er studenter ved Energi og miljø som forvalter våre
             investeringer med fokus på bærekraft og langsiktig vekst.
           </p>
 
