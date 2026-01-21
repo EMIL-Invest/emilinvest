@@ -6,6 +6,7 @@ import emilLogo from "@/assets/emil-invest-logo.png";
 const navLinks = [
   { href: "#home", label: "Hjem" },
   { href: "#portfolio", label: "Portefølje" },
+  { href: "#reports", label: "Rapporter" },
   { href: "#guidelines", label: "Retningslinjer" },
   { href: "#team", label: "Medlemmer" },
 ];

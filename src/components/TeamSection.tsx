@@ -8,22 +8,22 @@ const teamMembers = [
     name: "Kristian Hove",
     role: "Leder",
     initials: "KH",
-    email: "kristian@stud.ntnu.no",
-    linkedin: "#",
+    email: "kristian.austad.hove@gmail.com",
+    linkedin: "https://www.linkedin.com/in/kristian-austad-hove-6515a12b4/",
   },
   {
     name: "Henrik Heierstad",
     role: "Nestleder",
     initials: "HH",
-    email: "henrik@stud.ntnu.no",
-    linkedin: "#",
+    email: "Henrikb.heierstad@gmail.com",
+    linkedin: "https://www.linkedin.com/in/heierstad",
   },
   {
     name: "Andreas Jørgensen",
     role: "Medlem",
     initials: "AJ",
-    email: "andreas@stud.ntnu.no",
-    linkedin: "#",
+    email: "",
+    linkedin: "https://www.linkedin.com/in/andreas-dahl-jørgensen/",
   },
 ];
 
