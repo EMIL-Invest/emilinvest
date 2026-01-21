@@ -44,6 +44,69 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_history: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          osebx_value: number | null
+          portfolio_value: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          osebx_value?: number | null
+          portfolio_value: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          osebx_value?: number | null
+          portfolio_value?: number
+        }
+        Relationships: []
+      }
+      portfolio_holdings: {
+        Row: {
+          created_at: string
+          exchange: string | null
+          holding_type: string
+          id: string
+          name: string
+          purchase_price: number
+          quantity: number
+          sector: string | null
+          ticker: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          exchange?: string | null
+          holding_type?: string
+          id?: string
+          name: string
+          purchase_price?: number
+          quantity?: number
+          sector?: string | null
+          ticker: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          exchange?: string | null
+          holding_type?: string
+          id?: string
+          name?: string
+          purchase_price?: number
+          quantity?: number
+          sector?: string | null
+          ticker?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -104,6 +167,30 @@ export type Database = {
           title?: string
           uploaded_by?: string
           year?: number
+        }
+        Relationships: []
+      }
+      report_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          subscribed: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          subscribed?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          subscribed?: boolean
+          user_id?: string
         }
         Relationships: []
       }
