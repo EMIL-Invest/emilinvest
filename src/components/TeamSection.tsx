@@ -89,7 +89,7 @@ const TeamSection = () => {
             Vil du bli med?
           </h3>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Er du student ved Energi- og miljøingeniør og interessert i
+            Er du student på Energi og miljø og interessert i
             bærekraftige investeringer? Ta kontakt med oss!
           </p>
           <a

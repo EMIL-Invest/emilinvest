@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Upload, Download, LogIn, LogOut, Trash2 } from "lucide-react";
+import { FileText, Upload, Download, LogIn, LogOut, Trash2, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 
@@ -25,6 +25,8 @@ interface Report {
 
 const ReportsSection = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [hasRole, setHasRole] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -41,16 +43,40 @@ const ReportsSection = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      } else {
+        setHasRole(false);
+        setIsAdmin(false);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      }
     });
 
     fetchReports();
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkUserRole = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+
+    if (!error && data && data.length > 0) {
+      setHasRole(true);
+      setIsAdmin(data.some(r => r.role === "admin"));
+    } else {
+      setHasRole(false);
+      setIsAdmin(false);
+    }
+  };
 
   const fetchReports = async () => {
     try {
@@ -197,30 +223,48 @@ const ReportsSection = () => {
         </div>
 
         {/* Auth status and upload button */}
-        <div className="flex justify-center gap-4 mb-8">
-          {user ? (
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {user && hasRole ? (
             <>
               <Button onClick={() => setShowUploadForm(!showUploadForm)}>
                 <Upload className="w-4 h-4 mr-2" />
                 Last opp rapport
               </Button>
+              {isAdmin && (
+                <Link to="/admin">
+                  <Button variant="outline">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Administrasjon
+                  </Button>
+                </Link>
+              )}
               <Button variant="outline" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logg ut
               </Button>
             </>
+          ) : user ? (
+            <div className="text-center">
+              <p className="text-muted-foreground mb-2">
+                Du har ikke tilgang til å laste opp rapporter.
+              </p>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Logg ut
+              </Button>
+            </div>
           ) : (
             <Link to="/auth">
               <Button variant="outline">
                 <LogIn className="w-4 h-4 mr-2" />
-                Logg inn for å laste opp
+                Logg inn for medlemmer
               </Button>
             </Link>
           )}
         </div>
 
         {/* Upload form */}
-        {showUploadForm && user && (
+        {showUploadForm && user && hasRole && (
           <Card className="glass-card mb-8 max-w-xl mx-auto">
             <CardHeader>
               <CardTitle className="font-serif">Last opp kvartalsrapport</CardTitle>
