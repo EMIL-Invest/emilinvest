@@ -218,19 +218,20 @@ const PerformanceSection = () => {
                         type="monotone"
                         dataKey="portfolio"
                         name="EMIL Invest"
-                        stroke="hsl(var(--primary))"
-                        strokeWidth={2}
+                        stroke="hsl(158 64% 35%)"
+                        strokeWidth={3}
                         dot={false}
-                        activeDot={{ r: 4 }}
+                        activeDot={{ r: 5, fill: "hsl(158 64% 35%)" }}
                       />
                       <Line
                         type="monotone"
                         dataKey="osebx"
                         name="OSEBX"
-                        stroke="hsl(var(--muted-foreground))"
+                        stroke="hsl(200 65% 50%)"
                         strokeWidth={2}
+                        strokeDasharray="5 5"
                         dot={false}
-                        activeDot={{ r: 4 }}
+                        activeDot={{ r: 4, fill: "hsl(200 65% 50%)" }}
                         connectNulls
                       />
                     </LineChart>
