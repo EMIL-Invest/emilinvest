@@ -70,7 +70,7 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
                   Kurs
                 </th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
-                  Endring
+                  Avkastning siden kjøp
                 </th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
                   Verdi
@@ -124,10 +124,16 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
                     </td>
                     <td className="py-4 px-4 text-right">
                       {quote ? (
-                        <span className={`flex items-center justify-end gap-1 font-medium ${isPositive ? "text-emerald-600" : "text-red-600"}`}>
-                          {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                          {isPositive ? "+" : ""}{quote.changePercent.toFixed(2)}%
-                        </span>
+                        (() => {
+                          const returnSincePurchase = ((quote.price - stock.purchase_price) / stock.purchase_price) * 100;
+                          const isReturnPositive = returnSincePurchase >= 0;
+                          return (
+                            <span className={`flex items-center justify-end gap-1 font-medium ${isReturnPositive ? "text-emerald-600" : "text-red-600"}`}>
+                              {isReturnPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                              {isReturnPositive ? "+" : ""}{returnSincePurchase.toFixed(2)}%
+                            </span>
+                          );
+                        })()
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
