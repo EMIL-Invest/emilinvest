@@ -20,6 +20,7 @@ interface HistoryPoint {
   date: string;
   portfolio_value: number;
   osebx_value: number | null;
+  invested_capital: number | null;
 }
 
 const PerformanceSection = () => {
@@ -82,21 +83,30 @@ const PerformanceSection = () => {
     
     if (filtered.length === 0) return [];
 
-    // Normalize to 100 at start for comparison
-    const firstPortfolio = filtered[0].portfolio_value;
-    const firstOsebx = filtered[0].osebx_value || filtered[0].portfolio_value;
+    // Calculate returns based on invested capital (not just portfolio value)
+    // This ensures new purchases don't artificially inflate returns
+    const firstInvestedCapital = filtered[0].invested_capital || filtered[0].portfolio_value;
+    const firstOsebxCapital = filtered[0].osebx_value || firstInvestedCapital;
 
-    return filtered.map(h => ({
-      date: new Date(h.date).toLocaleDateString("no-NO", { 
-        day: "2-digit", 
-        month: "short",
-        year: timeFilter === "ALL" || timeFilter === "1Y" ? "2-digit" : undefined
-      }),
-      portfolio: Math.round((h.portfolio_value / firstPortfolio) * 100 * 100) / 100,
-      osebx: h.osebx_value 
-        ? Math.round((h.osebx_value / firstOsebx) * 100 * 100) / 100
-        : null,
-    }));
+    return filtered.map(h => {
+      const investedCapital = h.invested_capital || h.portfolio_value;
+      const osebxCapital = h.osebx_value || investedCapital;
+      
+      // Calculate return: (current_value / invested_capital - 1) * 100
+      // Then normalize so first point = 100
+      const portfolioReturn = ((h.portfolio_value / investedCapital) / (filtered[0].portfolio_value / firstInvestedCapital)) * 100;
+      const osebxReturn = ((osebxCapital / firstInvestedCapital) / (firstOsebxCapital / firstInvestedCapital)) * 100;
+
+      return {
+        date: new Date(h.date).toLocaleDateString("no-NO", { 
+          day: "2-digit", 
+          month: "short",
+          year: timeFilter === "ALL" || timeFilter === "1Y" ? "2-digit" : undefined
+        }),
+        portfolio: Math.round(portfolioReturn * 100) / 100,
+        osebx: h.osebx_value ? Math.round(osebxReturn * 100) / 100 : null,
+      };
+    });
   }, [history, timeFilter]);
 
   const returns = useMemo(() => {
