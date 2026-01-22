@@ -70,6 +70,7 @@ export type Database = {
       }
       portfolio_holdings: {
         Row: {
+          cost_basis: number | null
           created_at: string
           exchange: string | null
           holding_type: string
@@ -82,6 +83,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cost_basis?: number | null
           created_at?: string
           exchange?: string | null
           holding_type?: string
@@ -94,6 +96,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cost_basis?: number | null
           created_at?: string
           exchange?: string | null
           holding_type?: string
