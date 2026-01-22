@@ -125,7 +125,9 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
                     <td className="py-4 px-4 text-right">
                       {quote ? (
                         (() => {
-                          const returnSincePurchase = ((quote.price - stock.purchase_price) / stock.purchase_price) * 100;
+                          const currentPrice = Number(quote.price);
+                          const purchasePrice = Number(stock.purchase_price);
+                          const returnSincePurchase = ((currentPrice - purchasePrice) / purchasePrice) * 100;
                           const isReturnPositive = returnSincePurchase >= 0;
                           return (
                             <span className={`flex items-center justify-end gap-1 font-medium ${isReturnPositive ? "text-emerald-600" : "text-red-600"}`}>
