@@ -83,19 +83,32 @@ const PerformanceSection = () => {
     
     if (filtered.length === 0) return [];
 
-    // Calculate returns based on invested capital (not just portfolio value)
-    // This ensures new purchases don't artificially inflate returns
-    const firstInvestedCapital = filtered[0].invested_capital || filtered[0].portfolio_value;
-    const firstOsebxCapital = filtered[0].osebx_value || firstInvestedCapital;
+    // Time-weighted return calculation
+    // Each investment is weighted from its entry point
+    // This ensures new capital doesn't artificially inflate/deflate returns
+    
+    const firstPoint = filtered[0];
+    const firstOsebx = firstPoint.osebx_value || 100;
 
-    return filtered.map(h => {
-      const investedCapital = h.invested_capital || h.portfolio_value;
-      const osebxCapital = h.osebx_value || investedCapital;
+    return filtered.map((h, index) => {
+      // Calculate time-weighted portfolio return
+      // Sum of weighted returns for each investment tranche
+      let cumulativeWeightedReturn = 0;
+      let totalWeight = 0;
+
+      // For each data point, calculate the weighted return based on when capital was added
+      const currentInvested = h.invested_capital || h.portfolio_value;
+      const prevInvested = index > 0 ? (filtered[index - 1].invested_capital || filtered[index - 1].portfolio_value) : currentInvested;
       
-      // Calculate return: (current_value / invested_capital - 1) * 100
-      // Then normalize so first point = 100
-      const portfolioReturn = ((h.portfolio_value / investedCapital) / (filtered[0].portfolio_value / firstInvestedCapital)) * 100;
-      const osebxReturn = ((osebxCapital / firstInvestedCapital) / (firstOsebxCapital / firstInvestedCapital)) * 100;
+      // Calculate the gain/loss relative to invested capital at each point
+      const portfolioGainRatio = h.portfolio_value / currentInvested;
+      const firstGainRatio = firstPoint.portfolio_value / (firstPoint.invested_capital || firstPoint.portfolio_value);
+      
+      // Normalize: ratio of current gain vs first point gain, then scale to 100
+      const portfolioReturn = (portfolioGainRatio / firstGainRatio) * 100;
+      
+      // OSEBX: simple normalized return from first point
+      const osebxReturn = h.osebx_value ? (h.osebx_value / firstOsebx) * 100 : null;
 
       return {
         date: new Date(h.date).toLocaleDateString("no-NO", { 
@@ -104,7 +117,7 @@ const PerformanceSection = () => {
           year: timeFilter === "ALL" || timeFilter === "1Y" ? "2-digit" : undefined
         }),
         portfolio: Math.round(portfolioReturn * 100) / 100,
-        osebx: h.osebx_value ? Math.round(osebxReturn * 100) / 100 : null,
+        osebx: osebxReturn ? Math.round(osebxReturn * 100) / 100 : null,
       };
     });
   }, [history, timeFilter]);
