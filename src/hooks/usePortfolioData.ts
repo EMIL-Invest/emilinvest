@@ -7,6 +7,7 @@ export interface Holding {
   name: string;
   quantity: number;
   purchase_price: number;
+  cost_basis: number | null;
   holding_type: string;
   sector: string | null;
   exchange: string | null;
