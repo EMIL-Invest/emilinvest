@@ -49,6 +49,7 @@ export type Database = {
           created_at: string
           date: string
           id: string
+          invested_capital: number | null
           osebx_value: number | null
           portfolio_value: number
         }
@@ -56,6 +57,7 @@ export type Database = {
           created_at?: string
           date: string
           id?: string
+          invested_capital?: number | null
           osebx_value?: number | null
           portfolio_value: number
         }
@@ -63,6 +65,7 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          invested_capital?: number | null
           osebx_value?: number | null
           portfolio_value?: number
         }
@@ -76,6 +79,7 @@ export type Database = {
           holding_type: string
           id: string
           name: string
+          purchase_date: string | null
           purchase_price: number
           quantity: number
           sector: string | null
@@ -89,6 +93,7 @@ export type Database = {
           holding_type?: string
           id?: string
           name: string
+          purchase_date?: string | null
           purchase_price?: number
           quantity?: number
           sector?: string | null
@@ -102,6 +107,7 @@ export type Database = {
           holding_type?: string
           id?: string
           name?: string
+          purchase_date?: string | null
           purchase_price?: number
           quantity?: number
           sector?: string | null
