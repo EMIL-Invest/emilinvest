@@ -25,6 +25,7 @@ export interface HistoryPoint {
   date: string;
   portfolio_value: number;
   osebx_value: number | null;
+  invested_capital: number | null;
 }
 
 export const usePortfolioData = () => {
