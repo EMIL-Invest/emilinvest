@@ -99,6 +99,29 @@ export const usePortfolioData = () => {
     return {};
   }, [holdings]);
 
+  // Exchange rates to NOK (approximate)
+  const getExchangeRate = (currency: string): number => {
+    const rates: Record<string, number> = {
+      'NOK': 1,
+      'USD': 11.0,  // 1 USD ≈ 11 NOK
+      'DKK': 1.55,  // 1 DKK ≈ 1.55 NOK
+      'EUR': 11.6,  // 1 EUR ≈ 11.6 NOK
+    };
+    return rates[currency] || 1;
+  };
+
+  const calculateHoldingValue = useCallback((
+    holding: Holding,
+    quote: StockQuote | undefined
+  ): number => {
+    if (quote && quote.price > 0) {
+      const exchangeRate = getExchangeRate(quote.currency);
+      return quote.price * holding.quantity * exchangeRate;
+    }
+    // Use cost_basis as fallback (already in NOK)
+    return holding.cost_basis || (holding.purchase_price * holding.quantity);
+  }, []);
+
   const calculatePortfolioValue = useCallback((
     holdingsList: Holding[],
     quotesMap: Record<string, StockQuote>
@@ -107,18 +130,12 @@ export const usePortfolioData = () => {
 
     for (const holding of holdingsList) {
       if (holding.holding_type === "stock") {
-        const quote = quotesMap[holding.ticker];
-        if (quote) {
-          totalValue += quote.price * holding.quantity;
-        } else {
-          // Use purchase price as fallback
-          totalValue += holding.purchase_price * holding.quantity;
-        }
+        totalValue += calculateHoldingValue(holding, quotesMap[holding.ticker]);
       }
     }
 
     return totalValue;
-  }, []);
+  }, [calculateHoldingValue]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -145,5 +162,7 @@ export const usePortfolioData = () => {
     fetchQuotes,
     refresh,
     calculatePortfolioValue,
+    calculateHoldingValue,
+    getExchangeRate,
   };
 };
