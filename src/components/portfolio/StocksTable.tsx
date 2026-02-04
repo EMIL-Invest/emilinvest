@@ -81,9 +81,22 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
               {stocks.map((stock) => {
                 const quote = quotes[stock.ticker];
                 const isPositive = quote ? quote.changePercent >= 0 : true;
-                const currentValue = quote 
-                  ? quote.price * stock.quantity 
-                  : stock.purchase_price * stock.quantity;
+                
+                // Exchange rates to NOK
+                const getExchangeRate = (currency: string): number => {
+                  const rates: Record<string, number> = {
+                    'NOK': 1,
+                    'USD': 11.0,
+                    'DKK': 1.55,
+                    'EUR': 11.6,
+                  };
+                  return rates[currency] || 1;
+                };
+                
+                // Calculate value in NOK
+                const currentValue = quote && quote.price > 0
+                  ? quote.price * stock.quantity * getExchangeRate(quote.currency)
+                  : stock.cost_basis || (stock.purchase_price * stock.quantity);
                 
                 return (
                   <tr
@@ -123,7 +136,7 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
                       )}
                     </td>
                     <td className="py-4 px-4 text-right">
-                      {quote ? (
+                      {quote && quote.price > 0 ? (
                         (() => {
                           const currentPrice = Number(quote.price);
                           const purchasePrice = Number(stock.purchase_price);
@@ -137,7 +150,7 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
                           );
                         })()
                       ) : (
-                        <span className="text-muted-foreground">-</span>
+                        <span className="text-muted-foreground">0.00%</span>
                       )}
                     </td>
                     <td className="py-4 px-4 text-right font-medium text-foreground">
