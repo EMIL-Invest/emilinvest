@@ -13,14 +13,32 @@ interface StockQuote {
   currency: string;
 }
 
+// Map database tickers to Yahoo Finance format
+function getYahooTicker(ticker: string, exchange?: string): string {
+  const tickerMappings: Record<string, string> = {
+    // Oslo Børs (OSE) - suffix .OL
+    "EQNR": "EQNR.OL",
+    "AKERBP": "AKRBP.OL",  // Aker BP uses AKRBP on Yahoo
+    "KOG": "KOG.OL",       // Kongsberg Gruppen
+    
+    // Copenhagen (CPH) - suffix .CO
+    "NOVO-B": "NOVO-B.CO", // Novo Nordisk B shares
+    
+    // US stocks - no suffix needed
+    "AAPL": "AAPL",
+    "AMZN": "AMZN",
+    "JPM": "JPM",
+    "TSM": "TSM",
+    "CCJ": "CCJ",
+    "TTWO": "TTWO",
+  };
+
+  return tickerMappings[ticker] || ticker;
+}
+
 async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
   try {
-    // Map tickers to Yahoo Finance format
-    const yahooTicker = ticker.endsWith(".OSE") ? ticker : 
-                        ticker === "AKRBP" ? "AKRBP.OL" :
-                        ticker === "EQNR" ? "EQNR.OL" :
-                        ticker;
-
+    const yahooTicker = getYahooTicker(ticker);
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooTicker}?interval=1d&range=1d`;
     
     const response = await fetch(url, {
@@ -30,7 +48,7 @@ async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
     });
 
     if (!response.ok) {
-      console.error(`Failed to fetch ${ticker}: ${response.status}`);
+      console.error(`Failed to fetch ${ticker} (${yahooTicker}): ${response.status}`);
       return null;
     }
 
@@ -38,7 +56,7 @@ async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
     const result = data.chart?.result?.[0];
     
     if (!result) {
-      console.error(`No result for ${ticker}`);
+      console.error(`No result for ${ticker} (${yahooTicker})`);
       return null;
     }
 
@@ -49,7 +67,7 @@ async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
     const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
 
     return {
-      ticker: ticker,
+      ticker: ticker, // Return original ticker for frontend mapping
       price: Math.round(price * 100) / 100,
       change: Math.round(change * 100) / 100,
       changePercent: Math.round(changePercent * 100) / 100,
