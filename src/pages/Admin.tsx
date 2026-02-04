@@ -9,11 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, UserPlus, Trash2, Users, Shield, Briefcase, LineChart } from "lucide-react";
+import { ArrowLeft, UserPlus, Trash2, Users, Shield, Briefcase, LineChart, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import PortfolioAdmin from "@/components/admin/PortfolioAdmin";
 import HistoryAdmin from "@/components/admin/HistoryAdmin";
+import InstagramAdmin from "@/components/admin/InstagramAdmin";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 
 interface Invitation {
@@ -260,7 +261,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Portefølje
@@ -268,6 +269,10 @@ const Admin = () => {
             <TabsTrigger value="history" className="flex items-center gap-2">
               <LineChart className="w-4 h-4" />
               Historikk
+            </TabsTrigger>
+            <TabsTrigger value="instagram" className="flex items-center gap-2">
+              <Instagram className="w-4 h-4" />
+              Instagram
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -287,6 +292,10 @@ const Admin = () => {
               history={portfolioData.history} 
               onRefresh={portfolioData.refresh} 
             />
+          </TabsContent>
+
+          <TabsContent value="instagram">
+            <InstagramAdmin userId={user?.id || ""} />
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6">

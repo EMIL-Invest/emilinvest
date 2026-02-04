@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      instagram_posts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          created_by: string
+          id: string
+          image_url: string
+          instagram_url: string
+          posted_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          image_url: string
+          instagram_url: string
+          posted_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          image_url?: string
+          instagram_url?: string
+          posted_at?: string
+        }
+        Relationships: []
+      }
       invitations: {
         Row: {
           created_at: string
