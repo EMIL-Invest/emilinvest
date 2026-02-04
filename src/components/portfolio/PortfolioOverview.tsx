@@ -57,7 +57,7 @@ const PortfolioOverview = ({ holdings, quotes, calculatePortfolioValue }: Portfo
             {fundPercentage.toFixed(1)}%
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Min. anbefalt: 90%
+            Min: 90%
           </p>
         </CardContent>
       </Card>

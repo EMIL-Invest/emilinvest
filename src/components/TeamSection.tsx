@@ -2,29 +2,24 @@ import { Linkedin, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import teamPhoto from "@/assets/team-photo.jpg";
 
 const teamMembers = [
-  {
-    name: "Kristian Hove",
-    role: "Leder",
-    initials: "KH",
-    email: "kristian.austad.hove@gmail.com",
-    linkedin: "https://www.linkedin.com/in/kristian-austad-hove-6515a12b4/",
-  },
-  {
-    name: "Henrik Heierstad",
-    role: "Nestleder",
-    initials: "HH",
-    email: "Henrikb.heierstad@gmail.com",
-    linkedin: "https://www.linkedin.com/in/heierstad",
-  },
-  {
-    name: "Andreas Jørgensen",
-    role: "Medlem",
-    initials: "AJ",
-    email: "",
-    linkedin: "https://www.linkedin.com/in/andreas-dahl-jørgensen/",
-  },
+  { name: "Kristian Hove", role: "Leder", initials: "KH" },
+  { name: "Henrik Heierstad", role: "Nestleder", initials: "HH" },
+  { name: "Tom-Vegar Moen", role: "Analytiker", initials: "TM" },
+  { name: "Sondre Pettersen", role: "Analytiker", initials: "SP" },
+  { name: "Anne Håkanes", role: "SOME-ansvarlig", initials: "AH" },
+  { name: "Andreas Dahl Jørgensen", role: "Analytiker", initials: "AJ" },
+  { name: "Erik Munch-Finne", role: "Analytiker", initials: "EM" },
+  { name: "Adrian Andersen", role: "Analytiker", initials: "AA" },
+  { name: "Henrik Kvennås", role: "Analytiker", initials: "HK" },
+  { name: "Jakob Wigulf Christensen", role: "Økonomiansvarlig", initials: "JC" },
+  { name: "Vinh Diep", role: "Logistikk-ansvarlig", initials: "VD" },
+  { name: "Erik Nysæther", role: "Bedriftskontakt", initials: "EN" },
+  { name: "Gustav Stockholm", role: "Forvalter", initials: "GS" },
+  { name: "Julie Aspelund", role: "Støttemedlem", initials: "JA" },
+  { name: "Marie Rogn Kværnes", role: "Støttemedlem", initials: "MK" },
 ];
 
 const TeamSection = () => {
@@ -44,40 +39,36 @@ const TeamSection = () => {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Team Photo */}
+        <div className="mb-16">
+          <div className="max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-elevated">
+            <img 
+              src={teamPhoto} 
+              alt="EMIL Invest teamet samlet" 
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Team Members Grid */}
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {teamMembers.map((member, index) => (
             <Card
               key={index}
               className="glass-card group hover:shadow-elevated transition-all duration-300"
             >
               <CardContent className="pt-6 text-center">
-                <Avatar className="w-20 h-20 mx-auto mb-4 bg-primary text-primary-foreground">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xl font-serif font-semibold">
+                <Avatar className="w-14 h-14 mx-auto mb-3 bg-primary text-primary-foreground">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-sm font-serif font-semibold">
                     {member.initials}
                   </AvatarFallback>
                 </Avatar>
-                <h3 className="text-lg font-serif font-semibold text-foreground mb-1">
+                <h3 className="text-sm font-serif font-semibold text-foreground mb-1">
                   {member.name}
                 </h3>
-                <Badge variant="outline" className="mb-4">
+                <Badge variant="outline" className="text-xs">
                   {member.role}
                 </Badge>
-                <div className="flex justify-center gap-3">
-                  <a
-                    href={`mailto:${member.email}`}
-                    className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-                  >
-                    <Mail className="w-4 h-4" />
-                  </a>
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                </div>
               </CardContent>
             </Card>
           ))}

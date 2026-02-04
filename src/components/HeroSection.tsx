@@ -65,14 +65,10 @@ const HeroSection = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-border/50 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+          <div className="grid grid-cols-2 gap-8 mt-20 pt-10 border-t border-border/50 animate-fade-up" style={{ animationDelay: "0.4s" }}>
             <div>
-              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">15</p>
+              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">14</p>
               <p className="text-sm text-muted-foreground mt-1">Aktive medlemmer</p>
-            </div>
-            <div>
-              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">100%</p>
-              <p className="text-sm text-muted-foreground mt-1">Grønne investeringer</p>
             </div>
             <div>
               <p className="text-3xl md:text-4xl font-serif font-bold text-primary">2024</p>
