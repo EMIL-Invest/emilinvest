@@ -1,7 +1,12 @@
 import { TrendingUp, Leaf, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePortfolioData } from "@/hooks/usePortfolioData";
 
 const HeroSection = () => {
+  const { holdings, quotes, loading, calculatePortfolioValue } = usePortfolioData();
+  
+  const portfolioValue = calculatePortfolioValue(holdings, quotes);
+
   const scrollToPortfolio = () => {
     const element = document.querySelector("#portfolio");
     if (element) {
@@ -40,7 +45,7 @@ const HeroSection = () => {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            Vi er studenter ved Energi og miljø som forvalter våre
+            Vi er studenter ved energi og miljø NTNU som forvalter våre
             investeringer med fokus på bærekraft og langsiktig vekst.
           </p>
 
@@ -65,10 +70,16 @@ const HeroSection = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-8 mt-20 pt-10 border-t border-border/50 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+          <div className="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-border/50 animate-fade-up" style={{ animationDelay: "0.4s" }}>
             <div>
-              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">14</p>
+              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">16</p>
               <p className="text-sm text-muted-foreground mt-1">Aktive medlemmer</p>
+            </div>
+            <div>
+              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">
+                {loading ? "..." : `${portfolioValue.toLocaleString("no-NO", { maximumFractionDigits: 0 })} kr`}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">Porteføljeverdi</p>
             </div>
             <div>
               <p className="text-3xl md:text-4xl font-serif font-bold text-primary">2024</p>
