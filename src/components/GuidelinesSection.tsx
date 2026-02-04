@@ -1,7 +1,6 @@
 import {
   Leaf,
   PieChart,
-  Shield,
   Clock,
   Target,
   AlertCircle,
@@ -12,25 +11,9 @@ import { Badge } from "@/components/ui/badge";
 const guidelines = [
   {
     icon: Leaf,
-    title: "Kun miljøvennlige investeringer",
+    title: "Bærekraftige investeringer",
     description:
-      "Vi investerer utelukkende i selskaper som bidrar positivt til miljøet og bærekraftig utvikling. Fossile brensel og skadelige industrier er ekskludert.",
-    color: "text-primary",
-    bgColor: "bg-primary/10",
-  },
-  {
-    icon: PieChart,
-    title: "Maks 10% i aksjer",
-    description:
-      "For å minimere risiko holder vi maksimalt 10% av porteføljen i enkeltaksjer. Resten plasseres i diversifiserte fond.",
-    color: "text-accent",
-    bgColor: "bg-accent/10",
-  },
-  {
-    icon: Shield,
-    title: "ESG-screening",
-    description:
-      "Alle investeringer må bestå vår ESG-screening (Environmental, Social, Governance) før de inkluderes i porteføljen.",
+      "Vi fokuserer på selskaper med sterke ESG-profiler som bidrar til bærekraftig utvikling og positiv miljøpåvirkning.",
     color: "text-primary",
     bgColor: "bg-primary/10",
   },
@@ -38,7 +21,7 @@ const guidelines = [
     icon: Clock,
     title: "Langsiktig horisont",
     description:
-      "Vi fokuserer på langsiktig verdiskaping, ikke kortsiktig spekulasjon. Minimum investeringshorisont er 5 år.",
+      "Vi investerer med langsiktig perspektiv og unngår kortsiktig spekulasjon. Tålmodighet og tid i markedet er nøkkelen.",
     color: "text-accent",
     bgColor: "bg-accent/10",
   },
@@ -46,15 +29,15 @@ const guidelines = [
     icon: Target,
     title: "Diversifisering",
     description:
-      "Porteføljen skal være godt diversifisert på tvers av sektorer, geografier og aktivaklasser.",
+      "Porteføljen er diversifisert på tvers av sektorer og geografier for å redusere risiko og sikre stabil avkastning.",
     color: "text-primary",
     bgColor: "bg-primary/10",
   },
   {
-    icon: AlertCircle,
-    title: "Kvartalsvis evaluering",
+    icon: PieChart,
+    title: "Månedlig evaluering",
     description:
-      "Komiteen møtes hver kvartal for å evaluere porteføljen, diskutere endringer og sikre at vi følger retningslinjene.",
+      "Komiteen møtes månedlig for å evaluere porteføljen, diskutere markedsutviklingen og vurdere eventuelle justeringer.",
     color: "text-accent",
     bgColor: "bg-accent/10",
   },

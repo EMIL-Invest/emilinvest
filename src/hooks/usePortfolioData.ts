@@ -114,9 +114,6 @@ export const usePortfolioData = () => {
           // Use purchase price as fallback
           totalValue += holding.purchase_price * holding.quantity;
         }
-      } else {
-        // For funds, use the stored value (purchase_price * quantity represents total value)
-        totalValue += holding.purchase_price * holding.quantity;
       }
     }
 
