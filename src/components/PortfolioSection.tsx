@@ -2,7 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import PortfolioOverview from "@/components/portfolio/PortfolioOverview";
 import StocksTable from "@/components/portfolio/StocksTable";
-import FundsGrid from "@/components/portfolio/FundsGrid";
 
 const PortfolioSection = () => {
   const {
@@ -38,7 +37,7 @@ const PortfolioSection = () => {
             Våre investeringer
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Følg utviklingen av våre bærekraftige investeringer med live markedsdata
+            Følg utviklingen av våre bærekraftige aksjeinvesteringer med live markedsdata
           </p>
         </div>
 
@@ -55,8 +54,6 @@ const PortfolioSection = () => {
           lastUpdated={lastUpdated}
           onRefresh={() => fetchQuotes()}
         />
-
-        <FundsGrid holdings={holdings} />
       </div>
     </section>
   );
