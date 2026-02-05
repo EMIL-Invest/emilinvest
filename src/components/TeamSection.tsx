@@ -88,21 +88,12 @@ const TeamSection = () => {
             bærekraftige investeringer? Ta kontakt med oss!
           </p>
           <a
-            href="mailto:emilinvest@stud.ntnu.no"
+            href="mailto:Henrikb.heierstad@gmail.com"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
           >
             <Mail className="w-4 h-4" />
             Kontakt oss
           </a>
-          <p className="mt-4 text-sm text-muted-foreground">
-            eller kontakt Henrik direkte:{" "}
-            <a
-              href="mailto:Henrikb.heierstad@gmail.com"
-              className="text-primary hover:underline"
-            >
-              Henrikb.heierstad@gmail.com
-            </a>
-          </p>
         </div>
       </div>
     </section>
