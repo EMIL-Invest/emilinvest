@@ -1,12 +1,13 @@
 import { Linkedin, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import teamPhoto from "@/assets/team-photo.jpg";
+import henrikPhoto from "@/assets/henrik-heierstad.png";
 
 const teamMembers = [
   { name: "Kristian Hove", role: "Leder", initials: "KH" },
-  { name: "Henrik Heierstad", role: "Nestleder", initials: "HH" },
+  { name: "Henrik Heierstad", role: "Nestleder", initials: "HH", image: henrikPhoto },
   { name: "Tom-Vegar Moen", role: "Analytiker", initials: "TM" },
   { name: "Sondre Pettersen", role: "Analytiker", initials: "SP" },
   { name: "Anne Håkanes", role: "SOME-ansvarlig", initials: "AH" },
@@ -59,6 +60,9 @@ const TeamSection = () => {
             >
               <CardContent className="pt-6 text-center">
                 <Avatar className="w-14 h-14 mx-auto mb-3 bg-primary text-primary-foreground">
+                  {member.image && (
+                    <AvatarImage src={member.image} alt={member.name} className="object-cover" />
+                  )}
                   <AvatarFallback className="bg-primary text-primary-foreground text-sm font-serif font-semibold">
                     {member.initials}
                   </AvatarFallback>
@@ -90,6 +94,15 @@ const TeamSection = () => {
             <Mail className="w-4 h-4" />
             Kontakt oss
           </a>
+          <p className="mt-4 text-sm text-muted-foreground">
+            eller kontakt Henrik direkte:{" "}
+            <a
+              href="mailto:Henrikb.heierstad@gmail.com"
+              className="text-primary hover:underline"
+            >
+              Henrikb.heierstad@gmail.com
+            </a>
+          </p>
         </div>
       </div>
     </section>
