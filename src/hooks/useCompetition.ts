@@ -478,19 +478,21 @@ export const useCompetition = () => {
     loadData();
   }, [fetchStocks, fetchParticipant]);
 
-  // Fetch quotes when stocks are loaded
+  // Fetch quotes when stocks are loaded, then every 30 seconds
   useEffect(() => {
     if (availableStocks.length > 0) {
       fetchQuotes();
+      const interval = setInterval(() => fetchQuotes(), 30 * 1000); // Every 30 seconds
+      return () => clearInterval(interval);
     }
-  }, [availableStocks, fetchQuotes]);
+  }, [availableStocks.length]); // Only depend on length, not the function
 
-  // Fetch leaderboard periodically
+  // Fetch leaderboard periodically (less often since it uses cached quotes)
   useEffect(() => {
     fetchLeaderboard();
-    const interval = setInterval(fetchLeaderboard, 5 * 60 * 1000); // Every 5 minutes
+    const interval = setInterval(fetchLeaderboard, 60 * 1000); // Every 60 seconds
     return () => clearInterval(interval);
-  }, [fetchLeaderboard]);
+  }, []);
 
   return {
     user,
