@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Mail, Lock, User, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import BrandLogo from "@/components/BrandLogo";
+import emilLogo from "@/assets/emil-invest-logo.png";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -173,7 +173,7 @@ const Auth = () => {
         <Card className="glass-card">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <BrandLogo className="h-16 w-auto" />
+              <img src={emilLogo} alt="EMIL Invest" className="h-16 w-auto" />
             </div>
             <CardTitle className="font-serif text-2xl">
               {isLogin ? "Logg inn" : "Opprett konto"}

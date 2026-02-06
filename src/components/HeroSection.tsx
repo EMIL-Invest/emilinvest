@@ -1,7 +1,6 @@
 import { TrendingUp, Leaf, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import BrandLogo from "@/components/BrandLogo";
 
 const HeroSection = () => {
   const { holdings, quotes, loading, calculatePortfolioValue } = usePortfolioData();
@@ -41,9 +40,9 @@ const HeroSection = () => {
             </span>
           </div>
 
-          <div className="animate-fade-up" style={{ animationDelay: "0.1s" }}>
-            <BrandLogo className="h-16 md:h-20 lg:h-24 w-auto mx-auto" />
-          </div>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+            <span className="gradient-text">EMIL Invest</span>
+          </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.2s" }}>
             Vi er studenter ved energi og miljø NTNU som forvalter våre

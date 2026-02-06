@@ -1,12 +1,15 @@
-import BrandLogo from "@/components/BrandLogo";
+import emilLogo from "@/assets/emil-invest-logo.png";
 
 const Footer = () => {
   return (
     <footer className="py-12 border-t border-border">
       <div className="section-container">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center">
-            <BrandLogo className="h-6 w-auto" />
+          <div className="flex items-center gap-3">
+            <img src={emilLogo} alt="EMIL Invest" className="h-8 w-auto" />
+            <span className="font-serif font-semibold text-foreground text-sm">
+              EMIL Invest
+            </span>
           </div>
 
           <p className="text-sm text-muted-foreground text-center">
