@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Mail, Lock, User, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import emilLogo from "@/assets/emil-invest-logo.png";
+import emilLogo from "@/assets/emil-invest-logo-dark.png";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
