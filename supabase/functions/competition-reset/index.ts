@@ -1,15 +1,18 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Allowed origins for CORS - restrict to known domains
+const ALLOWED_ORIGINS = [
+  "https://emilinvest.lovable.app",
+  "https://id-preview--3ff7494c-b252-4fda-b060-04c40f323061.lovable.app",
+];
 
-interface PortfolioHolding {
-  participant_id: string;
-  ticker: string;
-  quantity: number;
-  average_purchase_price: number;
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Credentials': 'true',
+  };
 }
 
 interface StockQuote {
@@ -17,6 +20,10 @@ interface StockQuote {
   price: number;
   currency: string;
 }
+
+// Valid reset types
+const VALID_RESET_TYPES = ["monthly", "yearly", "both"] as const;
+type ResetType = typeof VALID_RESET_TYPES[number];
 
 // Exchange rates to NOK
 const getExchangeRate = (currency: string): number => {
@@ -67,7 +74,42 @@ async function fetchQuotes(tickers: string[]): Promise<Record<string, StockQuote
   return quotesMap;
 }
 
+async function validateAdminAuth(supabase: ReturnType<typeof createClient>, authHeader: string | null): Promise<boolean> {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return false;
+  }
+
+  try {
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (error || !user) {
+      return false;
+    }
+
+    // Check if user is admin
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    return !!roleData;
+  } catch (error) {
+    console.error('Auth validation error:', error);
+    return false;
+  }
+}
+
+function isValidResetType(value: unknown): value is ResetType {
+  return typeof value === "string" && VALID_RESET_TYPES.includes(value as ResetType);
+}
+
 Deno.serve(async (req) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -77,10 +119,23 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse reset type from request body
-    const { reset_type } = await req.json().catch(() => ({ reset_type: "monthly" }));
+    // Validate authentication - require admin role for this administrative function
+    const authHeader = req.headers.get('Authorization');
+    const isAdmin = await validateAdminAuth(supabase, authHeader);
     
-    if (!["monthly", "yearly", "both"].includes(reset_type)) {
+    if (!isAdmin) {
+      console.log('Unauthorized access attempt to competition-reset');
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - Admin access required" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Parse and validate reset type from request body
+    const body = await req.json().catch(() => ({}));
+    const reset_type = body.reset_type ?? "monthly";
+    
+    if (!isValidResetType(reset_type)) {
       return new Response(
         JSON.stringify({ error: "Invalid reset_type. Use 'monthly', 'yearly', or 'both'" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -202,8 +257,8 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("Competition reset error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: "An error occurred during competition reset" }),
+      { status: 500, headers: { ...getCorsHeaders(req.headers.get('Origin')), "Content-Type": "application/json" } }
     );
   }
 });

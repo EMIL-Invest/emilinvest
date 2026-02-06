@@ -13,6 +13,10 @@ interface StockQuote {
   currency: string;
 }
 
+// Validation constants
+const MAX_TICKERS = 50;
+const TICKER_REGEX = /^[A-Za-z0-9.-]{1,20}$/;
+
 // Map database tickers to Yahoo Finance format
 function getYahooTicker(ticker: string, exchange?: string): string {
   const tickerMappings: Record<string, string> = {
@@ -39,7 +43,7 @@ function getYahooTicker(ticker: string, exchange?: string): string {
 async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
   try {
     const yahooTicker = getYahooTicker(ticker);
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooTicker}?interval=1d&range=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooTicker)}?interval=1d&range=1d`;
     
     const response = await fetch(url, {
       headers: {
@@ -86,8 +90,10 @@ serve(async (req) => {
   }
 
   try {
-    const { tickers } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { tickers } = body;
 
+    // Validate tickers array exists and is an array
     if (!tickers || !Array.isArray(tickers)) {
       return new Response(
         JSON.stringify({ error: "Invalid tickers array" }),
@@ -95,15 +101,50 @@ serve(async (req) => {
       );
     }
 
-    console.log("Fetching prices for:", tickers);
+    // Validate array length to prevent resource exhaustion
+    if (tickers.length > MAX_TICKERS) {
+      return new Response(
+        JSON.stringify({ error: `Maximum ${MAX_TICKERS} tickers allowed per request` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (tickers.length === 0) {
+      return new Response(
+        JSON.stringify({ quotes: [], timestamp: new Date().toISOString() }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate each ticker format
+    const validTickers: string[] = [];
+    for (const ticker of tickers) {
+      if (typeof ticker !== "string") {
+        return new Response(
+          JSON.stringify({ error: "All tickers must be strings" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      const trimmedTicker = ticker.trim().toUpperCase();
+      if (!TICKER_REGEX.test(trimmedTicker)) {
+        return new Response(
+          JSON.stringify({ error: `Invalid ticker format: ${ticker}` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      validTickers.push(trimmedTicker);
+    }
+
+    console.log("Fetching prices for:", validTickers);
 
     const quotes = await Promise.all(
-      tickers.map((ticker: string) => fetchYahooQuote(ticker))
+      validTickers.map((ticker: string) => fetchYahooQuote(ticker))
     );
 
     const validQuotes = quotes.filter((q): q is StockQuote => q !== null);
 
-    console.log("Fetched quotes:", validQuotes);
+    console.log("Fetched quotes:", validQuotes.length);
 
     return new Response(
       JSON.stringify({ quotes: validQuotes, timestamp: new Date().toISOString() }),
@@ -111,9 +152,8 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "An error occurred while fetching stock prices" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

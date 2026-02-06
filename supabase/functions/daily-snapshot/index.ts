@@ -1,9 +1,19 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Allowed origins for CORS - restrict to known domains
+const ALLOWED_ORIGINS = [
+  "https://emilinvest.lovable.app",
+  "https://id-preview--3ff7494c-b252-4fda-b060-04c40f323061.lovable.app",
+];
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+}
 
 interface StockQuote {
   ticker: string;
@@ -49,7 +59,7 @@ function getExchangeRate(currency: string): number {
 async function fetchStockPrice(ticker: string): Promise<StockQuote | null> {
   try {
     const yahooTicker = getYahooTicker(ticker);
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooTicker}?interval=1d&range=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooTicker)}?interval=1d&range=1d`;
     
     const response = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
@@ -106,7 +116,38 @@ async function fetchOSEBX(): Promise<number | null> {
   }
 }
 
+async function validateAdminAuth(supabase: ReturnType<typeof createClient>, authHeader: string | null): Promise<boolean> {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return false;
+  }
+
+  try {
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (error || !user) {
+      return false;
+    }
+
+    // Check if user is admin
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    return !!roleData;
+  } catch (error) {
+    console.error('Auth validation error:', error);
+    return false;
+  }
+}
+
 Deno.serve(async (req) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -119,6 +160,18 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Validate authentication - require admin role for this administrative function
+    const authHeader = req.headers.get('Authorization');
+    const isAdmin = await validateAdminAuth(supabase, authHeader);
+    
+    if (!isAdmin) {
+      console.log('Unauthorized access attempt to daily-snapshot');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Admin access required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Get today's date
     const today = new Date().toISOString().split('T')[0];
@@ -212,10 +265,9 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Snapshot error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: 'An error occurred while creating snapshot' }),
+      { status: 500, headers: { ...getCorsHeaders(req.headers.get('Origin')), 'Content-Type': 'application/json' } }
     );
   }
 });
