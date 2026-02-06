@@ -9,26 +9,70 @@ const corsHeaders = {
 // Email validation regex
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Simple in-memory rate limiting (resets on function cold start)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 10; // max requests
-const RATE_WINDOW = 60000; // 1 minute in milliseconds
+// Enhanced rate limiting with exponential backoff
+interface RateLimitRecord {
+  count: number;
+  resetTime: number;
+  blockedUntil: number;
+  violations: number;
+}
 
-function isRateLimited(identifier: string): boolean {
+const rateLimitMap = new Map<string, RateLimitRecord>();
+const BASE_RATE_LIMIT = 5; // Initial max requests per window
+const RATE_WINDOW = 60000; // 1 minute in milliseconds
+const MAX_BACKOFF = 3600000; // Maximum block time: 1 hour
+
+function getRateLimitInfo(identifier: string): { limited: boolean; retryAfter: number } {
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
   
+  // No record or window expired - reset
   if (!record || now > record.resetTime) {
-    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_WINDOW });
-    return false;
+    rateLimitMap.set(identifier, { 
+      count: 1, 
+      resetTime: now + RATE_WINDOW,
+      blockedUntil: 0,
+      violations: record?.violations || 0
+    });
+    return { limited: false, retryAfter: 0 };
   }
   
-  if (record.count >= RATE_LIMIT) {
-    return true;
+  // Currently blocked due to previous violations
+  if (record.blockedUntil > now) {
+    const retryAfter = Math.ceil((record.blockedUntil - now) / 1000);
+    return { limited: true, retryAfter };
+  }
+  
+  // Calculate dynamic limit based on violations (exponential backoff)
+  const dynamicLimit = Math.max(2, BASE_RATE_LIMIT - record.violations);
+  
+  if (record.count >= dynamicLimit) {
+    // Exceeded limit - apply exponential backoff
+    record.violations = Math.min(record.violations + 1, 10);
+    const backoffTime = Math.min(RATE_WINDOW * Math.pow(2, record.violations), MAX_BACKOFF);
+    record.blockedUntil = now + backoffTime;
+    const retryAfter = Math.ceil(backoffTime / 1000);
+    console.log(`Rate limit violation #${record.violations} for IP, blocked for ${retryAfter}s`);
+    return { limited: true, retryAfter };
   }
   
   record.count++;
-  return false;
+  return { limited: false, retryAfter: 0 };
+}
+
+// Clean up old records periodically (every 100 requests)
+let requestCount = 0;
+function cleanupRateLimitMap() {
+  requestCount++;
+  if (requestCount % 100 === 0) {
+    const now = Date.now();
+    for (const [key, record] of rateLimitMap.entries()) {
+      // Remove records that are expired and not blocked
+      if (now > record.resetTime && now > record.blockedUntil) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
 }
 
 serve(async (req) => {
@@ -42,12 +86,23 @@ serve(async (req) => {
                      req.headers.get("x-real-ip") || 
                      "unknown";
     
-    // Check rate limit
-    if (isRateLimited(clientIP)) {
-      console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    // Cleanup old rate limit records
+    cleanupRateLimitMap();
+    
+    // Check rate limit with exponential backoff
+    const rateLimitResult = getRateLimitInfo(clientIP);
+    if (rateLimitResult.limited) {
+      console.log(`Rate limit exceeded for IP: ${clientIP}, retry after: ${rateLimitResult.retryAfter}s`);
       return new Response(
         JSON.stringify({ error: "Too many requests. Please try again later.", invited: false }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": String(rateLimitResult.retryAfter)
+          } 
+        }
       );
     }
 
