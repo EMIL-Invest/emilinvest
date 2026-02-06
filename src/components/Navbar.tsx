@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Menu, X, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import emilLogo from "@/assets/emil-invest-logo.png";
+import emilLogo from "@/assets/emil-invest-logo-dark.png";
 
 const navLinks = [
   { href: "#home", label: "Hjem" },
@@ -28,12 +28,9 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="section-container">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <img src={emilLogo} alt="EMIL Invest" className="h-10 w-auto" />
-            <span className="font-serif font-semibold text-foreground">
-              EMIL Invest
-            </span>
-          </div>
+          <Link to="/" className="flex items-center gap-3">
+            <img src={emilLogo} alt="EMIL Invest" className="h-8 w-auto" />
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
