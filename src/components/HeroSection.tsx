@@ -66,7 +66,7 @@ const HeroSection = () => {
           animationDelay: "0.4s"
         }}>
             <div>
-              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">16</p>
+              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">15</p>
               <p className="text-sm text-muted-foreground mt-1">Aktive medlemmer</p>
             </div>
             <div>
