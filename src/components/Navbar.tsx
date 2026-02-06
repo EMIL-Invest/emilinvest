@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link, useLocation } from "react-router-dom";
 import emilLogo from "@/assets/emil-invest-logo.png";
 
 const navLinks = [
@@ -13,7 +14,8 @@ const navLinks = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
@@ -35,7 +37,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {isHomePage && navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
@@ -44,6 +46,21 @@ const Navbar = () => {
                 {link.label}
               </button>
             ))}
+            {!isHomePage && (
+              <Link
+                to="/"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              >
+                Hjem
+              </Link>
+            )}
+            <Link
+              to="/konkurranse"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <Trophy className="w-4 h-4" />
+              Konkurranse
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -60,7 +77,7 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 border-t border-border/50 animate-fade-in">
-            {navLinks.map((link) => (
+            {isHomePage && navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
@@ -69,6 +86,23 @@ const Navbar = () => {
                 {link.label}
               </button>
             ))}
+            {!isHomePage && (
+              <Link
+                to="/"
+                onClick={() => setIsOpen(false)}
+                className="block w-full text-left py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              >
+                Hjem
+              </Link>
+            )}
+            <Link
+              to="/konkurranse"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Trophy className="w-4 h-4" />
+              Konkurranse
+            </Link>
           </div>
         )}
       </div>
