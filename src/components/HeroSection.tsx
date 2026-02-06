@@ -1,7 +1,7 @@
 import { TrendingUp, Leaf, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import emilLogo from "@/assets/emil-invest-logo-dark.png";
+import BrandLogo from "@/components/BrandLogo";
 
 const HeroSection = () => {
   const { holdings, quotes, loading, calculatePortfolioValue } = usePortfolioData();
@@ -42,7 +42,7 @@ const HeroSection = () => {
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: "0.1s" }}>
-            <img src={emilLogo} alt="EMIL Invest" className="h-16 md:h-20 lg:h-24 w-auto mx-auto" />
+            <BrandLogo className="h-16 md:h-20 lg:h-24 w-auto mx-auto" />
           </div>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.2s" }}>

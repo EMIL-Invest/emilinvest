@@ -1,4 +1,4 @@
-import emilLogo from "@/assets/emil-invest-logo-dark.png";
+import BrandLogo from "@/components/BrandLogo";
 
 const Footer = () => {
   return (
@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="section-container">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center">
-            <img src={emilLogo} alt="EMIL Invest" className="h-6 w-auto" />
+            <BrandLogo className="h-6 w-auto" />
           </div>
 
           <p className="text-sm text-muted-foreground text-center">

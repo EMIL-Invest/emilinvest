@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Menu, X, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import emilLogo from "@/assets/emil-invest-logo-dark.png";
+import BrandLogo from "@/components/BrandLogo";
 
 const navLinks = [
   { href: "#home", label: "Hjem" },
@@ -29,7 +29,7 @@ const Navbar = () => {
       <div className="section-container">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-3">
-            <img src={emilLogo} alt="EMIL Invest" className="h-8 w-auto" />
+            <BrandLogo className="h-8 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
