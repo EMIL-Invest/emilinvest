@@ -8,6 +8,7 @@ import henrikPhoto from "@/assets/henrik-heierstad.png";
 const teamMembers = [
   { name: "Kristian Hove", role: "Leder", initials: "KH" },
   { name: "Henrik Heierstad", role: "Nestleder", initials: "HH", image: henrikPhoto },
+  { name: "Daniel Dowsett", role: "Ex. Nestleder", initials: "DD" },
   { name: "Tom-Vegar Moen", role: "Analytiker", initials: "TM" },
   { name: "Sondre Pettersen", role: "Analytiker", initials: "SP" },
   { name: "Anne Håkanes", role: "SOME-ansvarlig", initials: "AH" },
@@ -19,7 +20,6 @@ const teamMembers = [
   { name: "Vinh Diep", role: "Logistikk-ansvarlig", initials: "VD" },
   { name: "Erik Nysæther", role: "Bedriftskontakt", initials: "EN" },
   { name: "Gustav Stockholm", role: "Forvalter", initials: "GS" },
-  { name: "Julie Aspelund", role: "Støttemedlem", initials: "JA" },
   { name: "Marie Rogn Kværnes", role: "Støttemedlem", initials: "MK" },
 ];
 
@@ -84,7 +84,7 @@ const TeamSection = () => {
             Vil du bli med?
           </h3>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Er du student på Energi og miljø og interessert i
+            Er du student på energi og miljø og interessert i
             bærekraftige investeringer? Ta kontakt med oss!
           </p>
           <a

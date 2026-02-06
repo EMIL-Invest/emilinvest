@@ -16,6 +16,7 @@ interface StockTraderProps {
   holdings: PortfolioHolding[];
   cashBalance: number;
   onBuy: (ticker: string, quantity: number, price: number) => Promise<{ error: Error | null }>;
+  onSell: (ticker: string, quantity: number, price: number) => Promise<{ error: Error | null }>;
   onRefreshQuotes: () => void;
   quotesLoading: boolean;
 }
@@ -25,7 +26,8 @@ const StockTrader = ({
   quotes, 
   holdings,
   cashBalance,
-  onBuy, 
+  onBuy,
+  onSell,
   onRefreshQuotes,
   quotesLoading 
 }: StockTraderProps) => {
@@ -33,9 +35,13 @@ const StockTrader = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [sectorFilter, setSectorFilter] = useState<string>("all");
   const [buyDialogOpen, setBuyDialogOpen] = useState(false);
+  const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState<OsloStock | null>(null);
+  const [selectedHolding, setSelectedHolding] = useState<PortfolioHolding | null>(null);
   const [buyQuantity, setBuyQuantity] = useState("");
+  const [sellQuantity, setSellQuantity] = useState("");
   const [isBuying, setIsBuying] = useState(false);
+  const [isSelling, setIsSelling] = useState(false);
 
   const sectors = useMemo(() => {
     const uniqueSectors = new Set(availableStocks.map(s => s.sector).filter(Boolean));
@@ -120,6 +126,63 @@ const StockTrader = ({
         description: `Kjøpte ${quantity} ${selectedStock.ticker} for ${totalCost.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr`,
       });
       setBuyDialogOpen(false);
+    }
+  };
+
+  const handleSellClick = (holding: PortfolioHolding) => {
+    setSelectedHolding(holding);
+    setSellQuantity("");
+    setSellDialogOpen(true);
+  };
+
+  const handleSell = async () => {
+    if (!selectedHolding) return;
+
+    const quantity = parseInt(sellQuantity);
+    if (isNaN(quantity) || quantity <= 0) {
+      toast({
+        title: "Ugyldig antall",
+        description: "Angi et gyldig antall aksjer å selge",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (quantity > Number(selectedHolding.quantity)) {
+      toast({
+        title: "For mange aksjer",
+        description: "Du kan ikke selge flere aksjer enn du eier",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const quote = quotes[selectedHolding.ticker];
+    if (!quote) {
+      toast({
+        title: "Mangler pris",
+        description: "Kunne ikke hente aktuell pris. Prøv igjen.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSelling(true);
+    const { error } = await onSell(selectedHolding.ticker, quantity, quote.price);
+    setIsSelling(false);
+
+    if (error) {
+      toast({
+        title: "Kunne ikke selge",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Salg gjennomført",
+        description: `Solgte ${quantity} ${selectedHolding.ticker} for ${(quantity * quote.price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr`,
+      });
+      setSellDialogOpen(false);
     }
   };
 
@@ -245,14 +308,25 @@ const StockTrader = ({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="default" 
-                          size="sm"
-                          onClick={() => handleBuyClick(stock)}
-                          disabled={!quote}
-                        >
-                          {owned ? 'Kjøp mer' : 'Kjøp'}
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          {owned && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleSellClick(owned)}
+                            >
+                              Selg
+                            </Button>
+                          )}
+                          <Button 
+                            variant="default" 
+                            size="sm"
+                            onClick={() => handleBuyClick(stock)}
+                            disabled={!quote}
+                          >
+                            Kjøp
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -317,6 +391,53 @@ const StockTrader = ({
             </Button>
             <Button onClick={handleBuy} disabled={isBuying}>
               {isBuying ? "Kjøper..." : "Bekreft kjøp"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Sell dialog */}
+      <Dialog open={sellDialogOpen} onOpenChange={setSellDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Selg {selectedHolding?.ticker.replace('.OL', '')}</DialogTitle>
+            <DialogDescription>
+              Du eier {selectedHolding ? Number(selectedHolding.quantity).toLocaleString('nb-NO') : 0} aksjer.
+              Nåværende kurs: {selectedHolding && quotes[selectedHolding.ticker] 
+                ? quotes[selectedHolding.ticker].price.toFixed(2) 
+                : '-'} kr
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Antall å selge</label>
+              <Input
+                type="number"
+                placeholder="Antall aksjer"
+                value={sellQuantity}
+                onChange={(e) => setSellQuantity(e.target.value)}
+                min={1}
+                max={selectedHolding ? Number(selectedHolding.quantity) : undefined}
+              />
+            </div>
+
+            {sellQuantity && selectedHolding && quotes[selectedHolding.ticker] && (
+              <div className="p-4 bg-secondary/50 rounded-lg">
+                <p className="text-sm text-muted-foreground">Estimert salgsverdi:</p>
+                <p className="text-2xl font-bold">
+                  {(parseInt(sellQuantity) * quotes[selectedHolding.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSellDialogOpen(false)}>
+              Avbryt
+            </Button>
+            <Button onClick={handleSell} disabled={isSelling}>
+              {isSelling ? "Selger..." : "Bekreft salg"}
             </Button>
           </DialogFooter>
         </DialogContent>

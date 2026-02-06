@@ -245,6 +245,7 @@ const Competition = () => {
                       entries={leaderboard.monthly} 
                       currentParticipantId={participant?.id}
                       periodLabel="denne måneden"
+                      quotes={quotes}
                     />
                   </TabsContent>
 
@@ -253,6 +254,7 @@ const Competition = () => {
                       entries={leaderboard.yearly} 
                       currentParticipantId={participant?.id}
                       periodLabel="i år"
+                      quotes={quotes}
                     />
                   </TabsContent>
 
@@ -261,6 +263,7 @@ const Competition = () => {
                       entries={leaderboard.all_time} 
                       currentParticipantId={participant?.id}
                       periodLabel="totalt"
+                      quotes={quotes}
                     />
                   </TabsContent>
                 </Tabs>
@@ -284,6 +287,7 @@ const Competition = () => {
                     holdings={holdings}
                     cashBalance={getCashBalance()}
                     onBuy={buyStock}
+                    onSell={sellStock}
                     onRefreshQuotes={fetchQuotes}
                     quotesLoading={quotesLoading}
                   />
