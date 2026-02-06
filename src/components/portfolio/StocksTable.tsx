@@ -138,9 +138,11 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
                     <td className="py-4 px-4 text-right">
                       {quote && quote.price > 0 ? (
                         (() => {
-                          const currentPrice = Number(quote.price);
-                          const purchasePrice = Number(stock.purchase_price);
-                          const returnSincePurchase = ((currentPrice - purchasePrice) / purchasePrice) * 100;
+                          // Current value in NOK (quote.price is already in NOK from edge function)
+                          const currentValueNOK = Number(quote.price) * stock.quantity;
+                          // Cost basis is stored in NOK
+                          const costBasisNOK = stock.cost_basis || (Number(stock.purchase_price) * stock.quantity);
+                          const returnSincePurchase = ((currentValueNOK - costBasisNOK) / costBasisNOK) * 100;
                           const isReturnPositive = returnSincePurchase >= 0;
                           return (
                             <span className={`flex items-center justify-end gap-1 font-medium ${isReturnPositive ? "text-emerald-600" : "text-red-600"}`}>
