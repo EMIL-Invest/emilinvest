@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Upload, Download, Trash2 } from "lucide-react";
+import { FileText, Upload, Eye, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 
 interface Report {
@@ -323,17 +324,15 @@ const ReportsSection = () => {
                     </p>
                   )}
                   <div className="flex gap-2">
-                    <a
-                      href={report.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      to={`/rapport?url=${encodeURIComponent(report.file_url)}&title=${encodeURIComponent(report.title)}`}
                       className="flex-1"
                     >
                       <Button variant="outline" className="w-full" size="sm">
-                        <Download className="w-4 h-4 mr-2" />
-                        Last ned
+                        <Eye className="w-4 h-4 mr-2" />
+                        Åpne
                       </Button>
-                    </a>
+                    </Link>
                     {user && user.id === report.uploaded_by && (
                       <Button
                         variant="outline"
