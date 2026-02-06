@@ -14,36 +14,93 @@ interface StockQuote {
 }
 
 // Validation constants
-const MAX_TICKERS = 50;
-const TICKER_REGEX = /^[A-Za-z0-9.-]{1,20}$/;
+const MAX_TICKERS = 100;
+const TICKER_REGEX = /^[A-Za-z0-9.-]{1,25}$/;
 
-// Map database tickers to Yahoo Finance format
-function getYahooTicker(ticker: string, exchange?: string): string {
-  const tickerMappings: Record<string, string> = {
-    // Oslo Børs (OSE) - suffix .OL
+// Convert NOK price based on currency
+function convertToNOK(price: number, currency: string): number {
+  const rates: Record<string, number> = {
+    "NOK": 1,
+    "USD": 11.0,
+    "DKK": 1.55,
+    "EUR": 11.6,
+    "SEK": 1.05,
+    "GBP": 13.5,
+    "JPY": 0.073,
+    "TWD": 0.34,
+    "CAD": 7.7,
+  };
+  return price * (rates[currency] || 1);
+}
+
+// Map ticker to Yahoo Finance format
+function getYahooTicker(ticker: string): string {
+  // Remove existing suffix to normalize, then apply correct mapping
+  const baseTicker = ticker.replace(/\.(OL|CO|ST|HE|L|PA|DE)$/i, "");
+  
+  const yahooMappings: Record<string, string> = {
+    // Oslo Børs special cases
+    "AKRBP": "AKRBP.OL",
     "EQNR": "EQNR.OL",
-    "AKERBP": "AKRBP.OL",  // Aker BP uses AKRBP on Yahoo
-    "KOG": "KOG.OL",       // Kongsberg Gruppen
+    "KOG": "KOG.OL",
+    "DNB": "DNB.OL",
+    "TEL": "TEL.OL",
+    "MOWI": "MOWI.OL",
+    "ORK": "ORK.OL",
+    "YAR": "YAR.OL",
+    "SALM": "SALM.OL",
+    "SUBC": "SUBC.OL",
+    "NHY": "NHY.OL",
+    "BAKKA": "BAKKA.OL",
+    "SCATC": "SCATC.OL",
+    "AKER": "AKER.OL",
+    "FRO": "FRO.OL",
+    "PGS": "PGS.OL",
+    "AUSS": "AUSS.OL",
+    "GJF": "GJF.OL",
+    "STB": "STB.OL",
+    "VEI": "VEI.OL",
     
-    // Copenhagen (CPH) - suffix .CO
-    "NOVO-B": "NOVO-B.CO", // Novo Nordisk B shares
+    // Copenhagen
+    "NOVO-B": "NOVO-B.CO",
     
-    // US stocks - no suffix needed
+    // US stocks - no suffix
     "AAPL": "AAPL",
     "AMZN": "AMZN",
+    "GOOGL": "GOOGL",
+    "MSFT": "MSFT",
+    "NVDA": "NVDA",
+    "TSLA": "TSLA",
+    "META": "META",
     "JPM": "JPM",
     "TSM": "TSM",
     "CCJ": "CCJ",
     "TTWO": "TTWO",
+    
+    // Crypto
+    "BTC-USD": "BTC-USD",
+    "ETH-USD": "ETH-USD",
+    "SOL-USD": "SOL-USD",
   };
 
-  return tickerMappings[ticker] || ticker;
+  // Check if we have a specific mapping
+  if (yahooMappings[baseTicker]) {
+    return yahooMappings[baseTicker];
+  }
+
+  // If ticker already has a known suffix, use as-is
+  if (ticker.includes(".")) {
+    return ticker;
+  }
+
+  // Default: assume it's already in Yahoo format
+  return ticker;
 }
 
-async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
+async function fetchYahooQuote(originalTicker: string): Promise<StockQuote | null> {
   try {
-    const yahooTicker = getYahooTicker(ticker);
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooTicker)}?interval=1d&range=1d`;
+    const yahooTicker = getYahooTicker(originalTicker);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooTicker)}?interval=1d&range=5d`;
     
     const response = await fetch(url, {
       headers: {
@@ -52,7 +109,7 @@ async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
     });
 
     if (!response.ok) {
-      console.error(`Failed to fetch ${ticker} (${yahooTicker}): ${response.status}`);
+      console.error(`Failed to fetch ${originalTicker} (${yahooTicker}): ${response.status}`);
       return null;
     }
 
@@ -60,25 +117,53 @@ async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
     const result = data.chart?.result?.[0];
     
     if (!result) {
-      console.error(`No result for ${ticker} (${yahooTicker})`);
+      console.error(`No result for ${originalTicker} (${yahooTicker})`);
       return null;
     }
 
     const meta = result.meta;
-    const price = meta.regularMarketPrice || 0;
-    const previousClose = meta.previousClose || price;
+    
+    // Use regularMarketPrice first, fallback to last close in the data
+    let price = meta.regularMarketPrice;
+    
+    // If market is closed or price is 0, get the last available close price
+    if (!price || price === 0) {
+      const closes = result.indicators?.quote?.[0]?.close;
+      if (closes && closes.length > 0) {
+        // Find last non-null close price
+        for (let i = closes.length - 1; i >= 0; i--) {
+          if (closes[i] !== null && closes[i] > 0) {
+            price = closes[i];
+            break;
+          }
+        }
+      }
+    }
+    
+    // Still no price? Use chartPreviousClose
+    if (!price || price === 0) {
+      price = meta.chartPreviousClose || meta.previousClose || 0;
+    }
+
+    const previousClose = meta.previousClose || meta.chartPreviousClose || price;
     const change = price - previousClose;
     const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
+    
+    const currency = meta.currency || "NOK";
+    const priceInNOK = convertToNOK(price, currency);
+    const changeInNOK = convertToNOK(change, currency);
+    
+    console.log(`${originalTicker}: price=${price} ${currency} -> ${priceInNOK} NOK`);
 
     return {
-      ticker: ticker, // Return original ticker for frontend mapping
-      price: Math.round(price * 100) / 100,
-      change: Math.round(change * 100) / 100,
+      ticker: originalTicker, // Return the ORIGINAL ticker for frontend mapping
+      price: Math.round(priceInNOK * 100) / 100,
+      change: Math.round(changeInNOK * 100) / 100,
       changePercent: Math.round(changePercent * 100) / 100,
-      currency: meta.currency || "NOK",
+      currency: "NOK", // All prices converted to NOK
     };
   } catch (error) {
-    console.error(`Error fetching ${ticker}:`, error);
+    console.error(`Error fetching ${originalTicker}:`, error);
     return null;
   }
 }
@@ -138,13 +223,14 @@ serve(async (req) => {
 
     console.log("Fetching prices for:", validTickers);
 
+    // Fetch all quotes in parallel
     const quotes = await Promise.all(
       validTickers.map((ticker: string) => fetchYahooQuote(ticker))
     );
 
-    const validQuotes = quotes.filter((q): q is StockQuote => q !== null);
+    const validQuotes = quotes.filter((q): q is StockQuote => q !== null && q.price > 0);
 
-    console.log("Fetched quotes:", validQuotes.length);
+    console.log("Fetched quotes:", validQuotes.length, "of", validTickers.length);
 
     return new Response(
       JSON.stringify({ quotes: validQuotes, timestamp: new Date().toISOString() }),
