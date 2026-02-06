@@ -14,6 +14,171 @@ export type Database = {
   }
   public: {
     Tables: {
+      competition_leaderboard: {
+        Row: {
+          created_at: string
+          id: string
+          participant_id: string
+          period_type: string
+          portfolio_value: number
+          rank: number | null
+          return_percentage: number
+          snapshot_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          participant_id: string
+          period_type: string
+          portfolio_value: number
+          rank?: number | null
+          return_percentage: number
+          snapshot_date?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          participant_id?: string
+          period_type?: string
+          portfolio_value?: number
+          rank?: number | null
+          return_percentage?: number
+          snapshot_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_leaderboard_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "competition_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competition_participants: {
+        Row: {
+          all_time_start_date: string
+          all_time_start_value: number
+          created_at: string
+          display_name: string
+          id: string
+          is_active: boolean
+          joined_at: string
+          monthly_start_date: string
+          monthly_start_value: number
+          user_id: string
+          yearly_start_date: string
+          yearly_start_value: number
+        }
+        Insert: {
+          all_time_start_date?: string
+          all_time_start_value?: number
+          created_at?: string
+          display_name: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          monthly_start_date?: string
+          monthly_start_value?: number
+          user_id: string
+          yearly_start_date?: string
+          yearly_start_value?: number
+        }
+        Update: {
+          all_time_start_date?: string
+          all_time_start_value?: number
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          monthly_start_date?: string
+          monthly_start_value?: number
+          user_id?: string
+          yearly_start_date?: string
+          yearly_start_value?: number
+        }
+        Relationships: []
+      }
+      competition_portfolios: {
+        Row: {
+          average_purchase_price: number
+          created_at: string
+          id: string
+          participant_id: string
+          quantity: number
+          ticker: string
+          updated_at: string
+        }
+        Insert: {
+          average_purchase_price?: number
+          created_at?: string
+          id?: string
+          participant_id: string
+          quantity?: number
+          ticker: string
+          updated_at?: string
+        }
+        Update: {
+          average_purchase_price?: number
+          created_at?: string
+          id?: string
+          participant_id?: string
+          quantity?: number
+          ticker?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_portfolios_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "competition_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competition_transactions: {
+        Row: {
+          executed_at: string
+          id: string
+          participant_id: string
+          price_per_share: number
+          quantity: number
+          ticker: string
+          total_amount: number
+          transaction_type: string
+        }
+        Insert: {
+          executed_at?: string
+          id?: string
+          participant_id: string
+          price_per_share: number
+          quantity: number
+          ticker: string
+          total_amount: number
+          transaction_type: string
+        }
+        Update: {
+          executed_at?: string
+          id?: string
+          participant_id?: string
+          price_per_share?: number
+          quantity?: number
+          ticker?: string
+          total_amount?: number
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_transactions_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "competition_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       instagram_posts: {
         Row: {
           caption: string | null
@@ -71,6 +236,33 @@ export type Database = {
           invited_by?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           used?: boolean
+        }
+        Relationships: []
+      }
+      oslo_stocks: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          sector: string | null
+          ticker: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          sector?: string | null
+          ticker: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          sector?: string | null
+          ticker?: string
         }
         Relationships: []
       }

@@ -1,0 +1,328 @@
+import { useState, useMemo } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart } from "lucide-react";
+import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
+
+interface StockTraderProps {
+  availableStocks: OsloStock[];
+  quotes: Record<string, StockQuote>;
+  holdings: PortfolioHolding[];
+  cashBalance: number;
+  onBuy: (ticker: string, quantity: number, price: number) => Promise<{ error: Error | null }>;
+  onRefreshQuotes: () => void;
+  quotesLoading: boolean;
+}
+
+const StockTrader = ({ 
+  availableStocks, 
+  quotes, 
+  holdings,
+  cashBalance,
+  onBuy, 
+  onRefreshQuotes,
+  quotesLoading 
+}: StockTraderProps) => {
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sectorFilter, setSectorFilter] = useState<string>("all");
+  const [buyDialogOpen, setBuyDialogOpen] = useState(false);
+  const [selectedStock, setSelectedStock] = useState<OsloStock | null>(null);
+  const [buyQuantity, setBuyQuantity] = useState("");
+  const [isBuying, setIsBuying] = useState(false);
+
+  const sectors = useMemo(() => {
+    const uniqueSectors = new Set(availableStocks.map(s => s.sector).filter(Boolean));
+    return Array.from(uniqueSectors).sort();
+  }, [availableStocks]);
+
+  const filteredStocks = useMemo(() => {
+    return availableStocks.filter(stock => {
+      const matchesSearch = 
+        stock.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        stock.ticker.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSector = sectorFilter === "all" || stock.sector === sectorFilter;
+      return matchesSearch && matchesSector;
+    });
+  }, [availableStocks, searchTerm, sectorFilter]);
+
+  const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
+
+  const handleBuyClick = (stock: OsloStock) => {
+    setSelectedStock(stock);
+    setBuyQuantity("");
+    setBuyDialogOpen(true);
+  };
+
+  const handleBuy = async () => {
+    if (!selectedStock) return;
+
+    const quantity = parseInt(buyQuantity);
+    if (isNaN(quantity) || quantity <= 0) {
+      toast({
+        title: "Ugyldig antall",
+        description: "Angi et gyldig antall aksjer å kjøpe",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const quote = quotes[selectedStock.ticker];
+    if (!quote) {
+      toast({
+        title: "Mangler pris",
+        description: "Kunne ikke hente aktuell pris. Prøv å oppdatere prisene.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const totalCost = quantity * quote.price;
+    if (totalCost > cashBalance) {
+      toast({
+        title: "Ikke nok penger",
+        description: `Dette kjøpet koster ${totalCost.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr, men du har bare ${cashBalance.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr tilgjengelig.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if adding new stock would exceed limit
+    const existingHolding = stockHoldings.find(h => h.ticker === selectedStock.ticker);
+    if (!existingHolding && stockHoldings.length >= 10) {
+      toast({
+        title: "Maksimalt antall aksjer",
+        description: "Du kan ha maksimalt 10 ulike aksjer i porteføljen. Selg en aksje først.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsBuying(true);
+    const { error } = await onBuy(selectedStock.ticker, quantity, quote.price);
+    setIsBuying(false);
+
+    if (error) {
+      toast({
+        title: "Kunne ikke kjøpe",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Kjøp gjennomført",
+        description: `Kjøpte ${quantity} ${selectedStock.ticker} for ${totalCost.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr`,
+      });
+      setBuyDialogOpen(false);
+    }
+  };
+
+  const getMaxBuyable = (price: number): number => {
+    if (price <= 0) return 0;
+    return Math.floor(cashBalance / price);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Cash balance reminder */}
+      <Card className="bg-primary/5 border-primary/20">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Tilgjengelig kapital</p>
+              <p className="text-2xl font-bold">{cashBalance.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr</p>
+            </div>
+            <Badge variant="outline">
+              {stockHoldings.length}/10 aksjer i porteføljen
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShoppingCart className="w-5 h-5" />
+            Kjøp aksjer
+          </CardTitle>
+          <CardDescription>
+            Velg aksjer fra Oslo Børs å legge til i porteføljen din
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Søk etter aksje..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={sectorFilter} onValueChange={setSectorFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Alle sektorer" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle sektorer</SelectItem>
+                {sectors.map((sector) => (
+                  <SelectItem key={sector} value={sector!}>
+                    {sector}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button 
+              variant="outline" 
+              onClick={onRefreshQuotes}
+              disabled={quotesLoading}
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${quotesLoading ? 'animate-spin' : ''}`} />
+              Oppdater
+            </Button>
+          </div>
+
+          {/* Stock list */}
+          <div className="rounded-md border max-h-[500px] overflow-auto">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background">
+                <TableRow>
+                  <TableHead>Aksje</TableHead>
+                  <TableHead>Sektor</TableHead>
+                  <TableHead className="text-right">Kurs</TableHead>
+                  <TableHead className="text-right">Endring</TableHead>
+                  <TableHead className="text-right">Handling</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredStocks.map((stock) => {
+                  const quote = quotes[stock.ticker];
+                  const owned = stockHoldings.find(h => h.ticker === stock.ticker);
+
+                  return (
+                    <TableRow key={stock.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{stock.ticker.replace('.OL', '')}</div>
+                          <div className="text-sm text-muted-foreground">{stock.name}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="text-xs">
+                          {stock.sector || 'Annet'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        {quote ? (
+                          `${quote.price.toFixed(2)} kr`
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {quote ? (
+                          <div className={`flex items-center justify-end gap-1 ${
+                            quote.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {quote.changePercent >= 0 ? (
+                              <TrendingUp className="w-4 h-4" />
+                            ) : (
+                              <TrendingDown className="w-4 h-4" />
+                            )}
+                            {quote.changePercent >= 0 ? '+' : ''}
+                            {quote.changePercent.toFixed(2)}%
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={() => handleBuyClick(stock)}
+                          disabled={!quote}
+                        >
+                          {owned ? 'Kjøp mer' : 'Kjøp'}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Buy dialog */}
+      <Dialog open={buyDialogOpen} onOpenChange={setBuyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Kjøp {selectedStock?.name}</DialogTitle>
+            <DialogDescription>
+              Ticker: {selectedStock?.ticker} | 
+              Kurs: {selectedStock && quotes[selectedStock.ticker] 
+                ? quotes[selectedStock.ticker].price.toFixed(2) 
+                : '-'} kr
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Antall aksjer</label>
+              <Input
+                type="number"
+                placeholder="Antall aksjer"
+                value={buyQuantity}
+                onChange={(e) => setBuyQuantity(e.target.value)}
+                min={1}
+              />
+              {selectedStock && quotes[selectedStock.ticker] && (
+                <p className="text-xs text-muted-foreground">
+                  Maks du kan kjøpe: {getMaxBuyable(quotes[selectedStock.ticker].price).toLocaleString('nb-NO')} aksjer
+                </p>
+              )}
+            </div>
+
+            {buyQuantity && selectedStock && quotes[selectedStock.ticker] && (
+              <div className="p-4 bg-secondary/50 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total kostnad:</span>
+                  <span className="font-bold">
+                    {(parseInt(buyQuantity) * quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Gjenstående kapital:</span>
+                  <span>
+                    {(cashBalance - (parseInt(buyQuantity) * quotes[selectedStock.ticker].price)).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBuyDialogOpen(false)}>
+              Avbryt
+            </Button>
+            <Button onClick={handleBuy} disabled={isBuying}>
+              {isBuying ? "Kjøper..." : "Bekreft kjøp"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default StockTrader;
