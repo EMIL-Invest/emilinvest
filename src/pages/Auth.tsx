@@ -10,8 +10,11 @@ import { ArrowLeft, Mail, Lock, User, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import emilLogo from "@/assets/emil-invest-logo.png";
 
+type SignupType = "competition" | "admin";
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [signupType, setSignupType] = useState<SignupType>("competition");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -20,7 +23,6 @@ const Auth = () => {
   const [isInvited, setIsInvited] = useState<boolean | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
@@ -38,7 +40,7 @@ const Auth = () => {
   }, [navigate]);
 
   const checkInvitation = async (emailToCheck: string) => {
-    if (!emailToCheck || isLogin) return;
+    if (!emailToCheck || isLogin || signupType === "competition") return;
     
     setCheckingInvitation(true);
     try {
@@ -61,7 +63,7 @@ const Auth = () => {
   };
 
   const handleEmailBlur = () => {
-    if (!isLogin && email) {
+    if (!isLogin && signupType === "admin" && email) {
       checkInvitation(email);
     }
   };
@@ -98,18 +100,20 @@ const Auth = () => {
           });
         }
       } else {
-        // Check invitation before signup
-        if (!isInvited) {
+        // Check invitation before signup for admin accounts
+        if (signupType === "admin" && !isInvited) {
           toast({
             title: "Ikke invitert",
-            description: "Du må ha en invitasjon fra en administrator for å opprette konto.",
+            description: "Du må ha en invitasjon fra en administrator for å opprette admin-konto.",
             variant: "destructive",
           });
           setLoading(false);
           return;
         }
 
-        const redirectUrl = `${window.location.origin}/`;
+        const redirectUrl = signupType === "competition" 
+          ? `${window.location.origin}/konkurranse`
+          : `${window.location.origin}/`;
         
         const { error } = await supabase.auth.signUp({
           email,
@@ -118,6 +122,7 @@ const Auth = () => {
             emailRedirectTo: redirectUrl,
             data: {
               full_name: fullName,
+              signup_type: signupType,
             },
           },
         });
@@ -138,8 +143,8 @@ const Auth = () => {
           }
         } else {
           toast({
-            title: "Konto opprettet!",
-            description: "Du er nå registrert og logget inn.",
+            title: "Sjekk e-posten din!",
+            description: "Vi har sendt deg en bekreftelseslenke. Klikk på lenken for å aktivere kontoen din.",
           });
         }
       }
@@ -157,6 +162,13 @@ const Auth = () => {
   const handleModeSwitch = () => {
     setIsLogin(!isLogin);
     setIsInvited(null);
+    setSignupType("competition");
+  };
+
+  const isSignupDisabled = () => {
+    if (loading) return true;
+    if (signupType === "admin" && !isInvited) return true;
+    return false;
   };
 
   return (
@@ -180,28 +192,65 @@ const Auth = () => {
             </CardTitle>
             <CardDescription>
               {isLogin 
-                ? "Logg inn for å administrere kvartalsrapporter" 
-                : "Registrer deg med en gyldig invitasjon"}
+                ? "Logg inn for å delta i konkurransen eller administrere" 
+                : signupType === "competition"
+                  ? "Registrer deg for å delta i aksjekonkurransen"
+                  : "Registrer deg med en gyldig invitasjon"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Fullt navn</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Ola Nordmann"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="pl-10"
-                      required={!isLogin}
-                    />
+                <>
+                  <div className="space-y-2">
+                    <Label>Kontotype</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant={signupType === "competition" ? "default" : "outline"}
+                        className="w-full"
+                        onClick={() => {
+                          setSignupType("competition");
+                          setIsInvited(null);
+                        }}
+                      >
+                        🏆 Konkurranse
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={signupType === "admin" ? "default" : "outline"}
+                        className="w-full"
+                        onClick={() => {
+                          setSignupType("admin");
+                          if (email) checkInvitation(email);
+                        }}
+                      >
+                        🔐 Administrator
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {signupType === "competition" 
+                        ? "Delta i aksjekonkurransen med virtuell portefølje"
+                        : "Krever invitasjon fra administrator"}
+                    </p>
                   </div>
-                </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Fullt navn</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="fullName"
+                        type="text"
+                        placeholder="Ola Nordmann"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="pl-10"
+                        required={!isLogin}
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">
@@ -222,7 +271,7 @@ const Auth = () => {
                     required
                   />
                 </div>
-                {!isLogin && email && isInvited !== null && (
+                {!isLogin && signupType === "admin" && email && isInvited !== null && (
                   <div className={`flex items-center gap-2 text-sm ${isInvited ? "text-emerald-600" : "text-destructive"}`}>
                     {isInvited ? (
                       <>✓ E-posten har en gyldig invitasjon</>
@@ -234,7 +283,7 @@ const Auth = () => {
                     )}
                   </div>
                 )}
-                {checkingInvitation && (
+                {checkingInvitation && signupType === "admin" && (
                   <p className="text-sm text-muted-foreground">Sjekker invitasjon...</p>
                 )}
               </div>
@@ -259,13 +308,15 @@ const Auth = () => {
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={loading || (!isLogin && !isInvited)}
+                disabled={isSignupDisabled()}
               >
                 {loading 
                   ? "Vennligst vent..." 
                   : isLogin 
                     ? "Logg inn" 
-                    : "Opprett konto"}
+                    : signupType === "competition"
+                      ? "Registrer for konkurranse"
+                      : "Opprett admin-konto"}
               </Button>
             </form>
 
@@ -282,10 +333,16 @@ const Auth = () => {
               </button>
             </div>
 
-            {!isLogin && (
+            {!isLogin && signupType === "admin" && (
               <p className="mt-4 text-xs text-center text-muted-foreground">
-                For å få tilgang må du bli invitert av en administrator.
+                For admin-tilgang må du bli invitert av en administrator.
                 Kontakt Kristian Hove eller en annen admin.
+              </p>
+            )}
+            {!isLogin && signupType === "competition" && (
+              <p className="mt-4 text-xs text-center text-muted-foreground">
+                Du vil motta en e-post med en bekreftelseslenke.
+                Klikk på lenken for å aktivere kontoen din.
               </p>
             )}
           </CardContent>
