@@ -1,10 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Target, Calendar, Leaf, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
- 
- const AboutSection = () => {
-   return (
-    <section id="om-oss" className="py-24 bg-secondary/30">
+const AboutSection = () => {
+  return <section id="om-oss" className="py-24 bg-secondary/30">
        <div className="section-container">
         {/* Header */}
         <div className="text-center mb-16">
@@ -15,11 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
             En investeringskomité for{" "}
             <span className="gradient-text">studenter</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            EMIL Invest er en studentdrevet investeringskomité under linjeforeningen Energi og Miljø ved NTNU. 
-            Vi forvalter en reell aksjeportefølje med mål om å slå Oslo Børs over tid, samtidig som vi 
-            gir medlemmene praktisk erfaring med investeringer og bærekraft.
-          </p>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">EMIL Invest er en studentdrevet investeringskomité under energi- og miljøingeniørenes linjeforening - EMIL. Vi forvalter en reell aksjeportefølje med mål om å slå Oslo Børs over tid, samtidig som vi gir medlemmene praktisk erfaring med investeringer og bærekraft.</p>
         </div>
 
         {/* Info cards */}
@@ -81,8 +75,6 @@ import { Card, CardContent } from "@/components/ui/card";
           </Card>
          </div>
        </div>
-     </section>
-   );
- };
- 
- export default AboutSection;
+     </section>;
+};
+export default AboutSection;
