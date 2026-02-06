@@ -81,8 +81,8 @@ async function fetchStockPrice(ticker: string): Promise<StockQuote | null> {
 
 async function fetchOSEBX(): Promise<number | null> {
   try {
-    // OSEBX is the Oslo Børs Benchmark Index
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/%5EOSEAX?interval=1d&range=1d`;
+    // OSEBX is the Oslo Børs Benchmark Index (OBX)
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/OBX.OL?interval=1d&range=5d`;
     
     const response = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
