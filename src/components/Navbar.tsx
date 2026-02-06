@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { Menu, X, Trophy } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Trophy, LogIn, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 import emilLogo from "@/assets/emil-invest-logo.png";
 
 const navLinks = [
@@ -14,8 +16,51 @@ const navLinks = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        setTimeout(() => {
+          checkUserRole(session.user.id);
+        }, 0);
+      } else {
+        setIsAdmin(false);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const checkUserRole = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+
+    if (!error && data && data.length > 0) {
+      setIsAdmin(data.some(r => r.role === "admin"));
+    } else {
+      setIsAdmin(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsOpen(false);
+  };
+
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
@@ -36,7 +81,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {isHomePage && navLinks.map((link) => (
               <button
                 key={link.href}
@@ -61,6 +106,31 @@ const Navbar = () => {
               <Trophy className="w-4 h-4" />
               Konkurranse
             </Link>
+            
+            {/* Auth buttons */}
+            {user ? (
+              <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button variant="ghost" size="sm">
+                      <Shield className="w-4 h-4 mr-1" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 mr-1" />
+                  Logg ut
+                </Button>
+              </div>
+            ) : (
+              <Link to="/auth">
+                <Button variant="ghost" size="sm">
+                  <LogIn className="w-4 h-4 mr-1" />
+                  Logg inn
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -103,6 +173,38 @@ const Navbar = () => {
               <Trophy className="w-4 h-4" />
               Konkurranse
             </Link>
+            
+            {/* Mobile Auth buttons */}
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Shield className="w-4 h-4" />
+                    Administrasjon
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logg ut
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              >
+                <LogIn className="w-4 h-4" />
+                Logg inn
+              </Link>
+            )}
           </div>
         )}
       </div>

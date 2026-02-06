@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Upload, Download, LogIn, LogOut, Trash2, Shield } from "lucide-react";
-import { Link } from "react-router-dom";
+import { FileText, Upload, Download, Trash2 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Report {
@@ -26,7 +25,6 @@ interface Report {
 const ReportsSection = () => {
   const [user, setUser] = useState<User | null>(null);
   const [hasRole, setHasRole] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -44,10 +42,11 @@ const ReportsSection = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkUserRole(session.user.id);
+        setTimeout(() => {
+          checkUserRole(session.user.id);
+        }, 0);
       } else {
         setHasRole(false);
-        setIsAdmin(false);
       }
     });
 
@@ -71,10 +70,8 @@ const ReportsSection = () => {
 
     if (!error && data && data.length > 0) {
       setHasRole(true);
-      setIsAdmin(data.some(r => r.role === "admin"));
     } else {
       setHasRole(false);
-      setIsAdmin(false);
     }
   };
 
@@ -95,14 +92,6 @@ const ReportsSection = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logget ut",
-      description: "Du er nå logget ut.",
-    });
-  };
-
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !user) return;
@@ -110,8 +99,6 @@ const ReportsSection = () => {
     setUploading(true);
 
     try {
-      // Upload file to storage
-      const fileExt = file.name.split(".").pop();
       const fileName = `${Date.now()}-${file.name}`;
       
       const { error: uploadError } = await supabase.storage
@@ -120,12 +107,10 @@ const ReportsSection = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from("reports")
         .getPublicUrl(fileName);
 
-      // Insert report record
       const { error: insertError } = await supabase
         .from("quarterly_reports")
         .insert({
@@ -145,7 +130,6 @@ const ReportsSection = () => {
         description: "Kvartalsrapporten er nå tilgjengelig.",
       });
 
-      // Reset form
       setTitle("");
       setDescription("");
       setQuarter("");
@@ -168,13 +152,11 @@ const ReportsSection = () => {
     if (!user || user.id !== report.uploaded_by) return;
 
     try {
-      // Delete from storage
       const fileName = report.file_url.split("/").pop();
       if (fileName) {
         await supabase.storage.from("reports").remove([fileName]);
       }
 
-      // Delete record
       const { error } = await supabase
         .from("quarterly_reports")
         .delete()
@@ -197,16 +179,6 @@ const ReportsSection = () => {
     }
   };
 
-  const getQuarterLabel = (q: string) => {
-    const labels: Record<string, string> = {
-      Q1: "Q1 (Jan-Mar)",
-      Q2: "Q2 (Apr-Jun)",
-      Q3: "Q3 (Jul-Sep)",
-      Q4: "Q4 (Okt-Des)",
-    };
-    return labels[q] || q;
-  };
-
   return (
     <section id="reports" className="py-24">
       <div className="section-container">
@@ -222,46 +194,15 @@ const ReportsSection = () => {
           </p>
         </div>
 
-        {/* Auth status and upload button */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
-          {user && hasRole ? (
-            <>
-              <Button onClick={() => setShowUploadForm(!showUploadForm)}>
-                <Upload className="w-4 h-4 mr-2" />
-                Last opp rapport
-              </Button>
-              {isAdmin && (
-                <Link to="/admin">
-                  <Button variant="outline">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Administrasjon
-                  </Button>
-                </Link>
-              )}
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logg ut
-              </Button>
-            </>
-          ) : user ? (
-            <div className="text-center">
-              <p className="text-muted-foreground mb-2">
-                Du har ikke tilgang til å laste opp rapporter.
-              </p>
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logg ut
-              </Button>
-            </div>
-          ) : (
-            <Link to="/auth">
-              <Button variant="outline">
-                <LogIn className="w-4 h-4 mr-2" />
-                Logg inn for medlemmer
-              </Button>
-            </Link>
-          )}
-        </div>
+        {/* Upload button for members */}
+        {user && hasRole && (
+          <div className="flex justify-center mb-8">
+            <Button onClick={() => setShowUploadForm(!showUploadForm)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Last opp rapport
+            </Button>
+          </div>
+        )}
 
         {/* Upload form */}
         {showUploadForm && user && hasRole && (
