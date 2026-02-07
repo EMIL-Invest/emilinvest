@@ -96,7 +96,7 @@ const Competition = () => {
         <div className="section-container">
           {/* Header */}
           <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-4">
+            <Badge className="mb-4 bg-competition text-competition-foreground">
               <Trophy className="w-3 h-3 mr-1" />
               Aksjekonkurranse
             </Badge>
@@ -119,7 +119,7 @@ const Competition = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center">
-                <Button asChild>
+                <Button asChild className="bg-competition hover:bg-competition/90 text-competition-foreground">
                   <Link to="/auth">
                     <LogIn className="w-4 h-4 mr-2" />
                     Logg inn
@@ -152,7 +152,7 @@ const Competition = () => {
                 <Button 
                   onClick={handleJoin} 
                   disabled={isJoining} 
-                  className="w-full"
+                  className="w-full bg-competition hover:bg-competition/90 text-competition-foreground"
                 >
                   {isJoining ? "Melder på..." : "Meld meg på"}
                 </Button>
