@@ -106,6 +106,7 @@ function getYahooTicker(ticker: string): string {
   
   const yahooMappings: Record<string, string> = {
     // Oslo Børs special cases
+    "AKERBP": "AKRBP.OL",
     "AKRBP": "AKRBP.OL",
     "EQNR": "EQNR.OL",
     "KOG": "KOG.OL",
