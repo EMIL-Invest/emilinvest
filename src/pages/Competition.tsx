@@ -119,7 +119,7 @@ const Competition = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center">
-                <Button asChild className="bg-competition hover:bg-competition/90 text-competition-foreground">
+                <Button asChild>
                   <Link to="/auth">
                     <LogIn className="w-4 h-4 mr-2" />
                     Logg inn
