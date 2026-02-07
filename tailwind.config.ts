@@ -56,6 +56,10 @@ export default {
           negative: "hsl(var(--stock-negative))",
           neutral: "hsl(var(--stock-neutral))",
         },
+        competition: {
+          DEFAULT: "hsl(var(--competition))",
+          foreground: "hsl(var(--competition-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

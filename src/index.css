@@ -55,6 +55,10 @@
     --stock-negative: 0 72% 51%;
     --stock-neutral: 200 65% 45%;
 
+    /* Competition gold */
+    --competition: 38 92% 50%;
+    --competition-foreground: 0 0% 100%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
