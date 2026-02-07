@@ -61,7 +61,7 @@ const HeroSection = () => {
               <Users className="w-5 h-5 mr-2" />
               Møt teamet
             </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/5" onClick={() => navigate("/konkurranse")}>
+            <Button size="lg" className="bg-competition hover:bg-competition/90 text-competition-foreground" onClick={() => navigate("/konkurranse")}>
               <Trophy className="w-5 h-5 mr-2" />
               Konkurranse
             </Button>
