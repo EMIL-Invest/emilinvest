@@ -41,7 +41,7 @@ const CompetitionBanner = () => {
                   </div>
                 </div>
                 
-                <Button asChild size="lg" className="group">
+                <Button asChild size="lg" className="group bg-competition hover:bg-competition/90 text-competition-foreground">
                   <Link to="/konkurranse">
                     Delta i konkurransen
                     <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
