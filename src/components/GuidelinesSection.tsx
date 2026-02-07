@@ -35,9 +35,9 @@ const guidelines = [
   },
   {
     icon: PieChart,
-    title: "Månedlig evaluering",
+    title: "Evaluering annenhver uke",
     description:
-      "Komiteen møtes månedlig for å evaluere porteføljen, diskutere markedsutviklingen og vurdere eventuelle justeringer.",
+      "Komiteen møtes annenhver uke for å evaluere porteføljen, diskutere markedsutviklingen og vurdere eventuelle justeringer.",
     color: "text-accent",
     bgColor: "bg-accent/10",
   },
