@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { isExchangeOpen, getExchangeFromTicker, getExchangeInfo, getExchangeName } from "@/lib/exchangeHours";
 
 export interface OsloStock {
   id: string;
@@ -8,6 +9,7 @@ export interface OsloStock {
   name: string;
   sector: string | null;
   is_active: boolean;
+  exchange?: string;
 }
 
 export interface Participant {
@@ -46,7 +48,7 @@ export interface StockQuote {
 }
 
 const STARTING_CAPITAL = 100000;
-
+const MAX_DAILY_TRANSACTIONS_PER_STOCK = 3;
 export const useCompetition = () => {
   const [user, setUser] = useState<User | null>(null);
   const [participant, setParticipant] = useState<Participant | null>(null);
@@ -80,7 +82,7 @@ export const useCompetition = () => {
   const fetchStocks = useCallback(async () => {
     const { data, error } = await supabase
       .from("oslo_stocks")
-      .select("*")
+      .select("*, exchange")
       .eq("is_active", true)
       .order("name");
 
@@ -318,10 +320,57 @@ export const useCompetition = () => {
     return { error: null };
   };
 
+  // Check daily transaction count for a specific stock
+  const getDailyTransactionCount = async (participantId: string, ticker: string): Promise<number> => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const { count, error } = await supabase
+      .from("competition_transactions")
+      .select("*", { count: "exact", head: true })
+      .eq("participant_id", participantId)
+      .eq("ticker", ticker)
+      .gte("executed_at", today.toISOString())
+      .lt("executed_at", tomorrow.toISOString());
+
+    if (error) {
+      console.error("Error counting transactions:", error);
+      return 0;
+    }
+
+    return count || 0;
+  };
+
+  // Get exchange for a stock
+  const getStockExchange = (ticker: string): string => {
+    const stock = availableStocks.find(s => s.ticker === ticker);
+    return stock?.exchange || getExchangeFromTicker(ticker);
+  };
+
   // Buy stock
   const buyStock = async (ticker: string, quantity: number, price: number): Promise<{ error: Error | null }> => {
     if (!participant) {
       return { error: new Error("Du må være påmeldt konkurransen") };
+    }
+
+    // Check if exchange is open
+    const exchange = getStockExchange(ticker);
+    if (!isExchangeOpen(exchange)) {
+      const info = getExchangeInfo(exchange);
+      const exchangeName = getExchangeName(exchange);
+      return { 
+        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} (${info.tradingDays})`) 
+      };
+    }
+
+    // Check daily transaction limit
+    const dailyCount = await getDailyTransactionCount(participant.id, ticker);
+    if (dailyCount >= MAX_DAILY_TRANSACTIONS_PER_STOCK) {
+      return { 
+        error: new Error(`Du har nådd maks ${MAX_DAILY_TRANSACTIONS_PER_STOCK} transaksjoner per aksje per dag for ${ticker}`) 
+      };
     }
 
     const totalCost = quantity * price;
@@ -408,6 +457,24 @@ export const useCompetition = () => {
       return { error: new Error("Du må være påmeldt konkurransen") };
     }
 
+    // Check if exchange is open
+    const exchange = getStockExchange(ticker);
+    if (!isExchangeOpen(exchange)) {
+      const info = getExchangeInfo(exchange);
+      const exchangeName = getExchangeName(exchange);
+      return { 
+        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} (${info.tradingDays})`) 
+      };
+    }
+
+    // Check daily transaction limit
+    const dailyCount = await getDailyTransactionCount(participant.id, ticker);
+    if (dailyCount >= MAX_DAILY_TRANSACTIONS_PER_STOCK) {
+      return { 
+        error: new Error(`Du har nådd maks ${MAX_DAILY_TRANSACTIONS_PER_STOCK} transaksjoner per aksje per dag for ${ticker}`) 
+      };
+    }
+
     const holding = holdings.find(h => h.ticker === ticker);
     if (!holding || Number(holding.quantity) < quantity) {
       return { error: new Error("Ikke nok aksjer å selge") };
@@ -466,6 +533,34 @@ export const useCompetition = () => {
     return { error: null };
   };
 
+  // Helper to check if trading is allowed for a stock
+  const checkTradingAllowed = async (ticker: string): Promise<{ allowed: boolean; reason?: string; dailyCount?: number }> => {
+    const exchange = getStockExchange(ticker);
+    
+    if (!isExchangeOpen(exchange)) {
+      const info = getExchangeInfo(exchange);
+      const exchangeName = getExchangeName(exchange);
+      return { 
+        allowed: false, 
+        reason: `${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} (${info.tradingDays})` 
+      };
+    }
+
+    if (participant) {
+      const dailyCount = await getDailyTransactionCount(participant.id, ticker);
+      if (dailyCount >= MAX_DAILY_TRANSACTIONS_PER_STOCK) {
+        return { 
+          allowed: false, 
+          reason: `Maks ${MAX_DAILY_TRANSACTIONS_PER_STOCK} transaksjoner per dag nådd`,
+          dailyCount
+        };
+      }
+      return { allowed: true, dailyCount };
+    }
+
+    return { allowed: true };
+  };
+
   // Initial data load
   useEffect(() => {
     const loadData = async () => {
@@ -509,6 +604,9 @@ export const useCompetition = () => {
     fetchQuotes,
     getCashBalance,
     calculatePortfolioValue,
+    checkTradingAllowed,
+    getStockExchange,
     STARTING_CAPITAL,
+    MAX_DAILY_TRANSACTIONS_PER_STOCK,
   };
 };

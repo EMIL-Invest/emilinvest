@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart } from "lucide-react";
+import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
+import { isExchangeOpen, getExchangeInfo, getExchangeName, getExchangeFromTicker } from "@/lib/exchangeHours";
 
 interface StockTraderProps {
   availableStocks: OsloStock[];
@@ -19,6 +21,8 @@ interface StockTraderProps {
   onSell: (ticker: string, quantity: number, price: number) => Promise<{ error: Error | null }>;
   onRefreshQuotes: () => void;
   quotesLoading: boolean;
+  checkTradingAllowed?: (ticker: string) => Promise<{ allowed: boolean; reason?: string; dailyCount?: number }>;
+  maxDailyTransactions?: number;
 }
 
 const StockTrader = ({ 
@@ -29,7 +33,9 @@ const StockTrader = ({
   onBuy,
   onSell,
   onRefreshQuotes,
-  quotesLoading 
+  quotesLoading,
+  checkTradingAllowed,
+  maxDailyTransactions = 3
 }: StockTraderProps) => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,6 +48,8 @@ const StockTrader = ({
   const [sellQuantity, setSellQuantity] = useState("");
   const [isBuying, setIsBuying] = useState(false);
   const [isSelling, setIsSelling] = useState(false);
+  const [tradingCheck, setTradingCheck] = useState<{ allowed: boolean; reason?: string; dailyCount?: number } | null>(null);
+  const [checkingTrading, setCheckingTrading] = useState(false);
 
   const sectors = useMemo(() => {
     const uniqueSectors = new Set(availableStocks.map(s => s.sector).filter(Boolean));
@@ -60,10 +68,19 @@ const StockTrader = ({
 
   const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
 
-  const handleBuyClick = (stock: OsloStock) => {
+  const handleBuyClick = async (stock: OsloStock) => {
     setSelectedStock(stock);
     setBuyQuantity("");
+    setTradingCheck(null);
     setBuyDialogOpen(true);
+    
+    // Check trading restrictions
+    if (checkTradingAllowed) {
+      setCheckingTrading(true);
+      const check = await checkTradingAllowed(stock.ticker);
+      setTradingCheck(check);
+      setCheckingTrading(false);
+    }
   };
 
   const handleBuy = async () => {
@@ -129,10 +146,19 @@ const StockTrader = ({
     }
   };
 
-  const handleSellClick = (holding: PortfolioHolding) => {
+  const handleSellClick = async (holding: PortfolioHolding) => {
     setSelectedHolding(holding);
     setSellQuantity("");
+    setTradingCheck(null);
     setSellDialogOpen(true);
+    
+    // Check trading restrictions
+    if (checkTradingAllowed) {
+      setCheckingTrading(true);
+      const check = await checkTradingAllowed(holding.ticker);
+      setTradingCheck(check);
+      setCheckingTrading(false);
+    }
   };
 
   const handleSell = async () => {
@@ -191,8 +217,24 @@ const StockTrader = ({
     return Math.floor(cashBalance / price);
   };
 
+  // Get exchange status for a stock
+  const getExchangeStatus = (ticker: string) => {
+    const exchange = availableStocks.find(s => s.ticker === ticker)?.exchange || getExchangeFromTicker(ticker);
+    const info = getExchangeInfo(exchange);
+    const name = getExchangeName(exchange);
+    return { ...info, name, exchange };
+  };
+
   return (
     <div className="space-y-6">
+      {/* Trading rules info */}
+      <Alert>
+        <Clock className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Handelsregler:</strong> Du kan kun handle når børsen er åpen, og du har maks {maxDailyTransactions} transaksjoner per aksje per dag.
+        </AlertDescription>
+      </Alert>
+
       {/* Cash balance reminder */}
       <Card className="bg-primary/5 border-primary/20">
         <CardContent className="py-4">
@@ -351,6 +393,28 @@ const StockTrader = ({
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            {/* Trading status */}
+            {checkingTrading ? (
+              <div className="text-sm text-muted-foreground">Sjekker handelsstatus...</div>
+            ) : tradingCheck && !tradingCheck.allowed ? (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{tradingCheck.reason}</AlertDescription>
+              </Alert>
+            ) : tradingCheck ? (
+              <div className="flex items-center gap-2 text-sm">
+                <Badge variant="outline" className="bg-accent/20 text-accent-foreground border-accent/30">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Børsen er åpen
+                </Badge>
+                {tradingCheck.dailyCount !== undefined && (
+                  <Badge variant="secondary">
+                    {tradingCheck.dailyCount}/{maxDailyTransactions} transaksjoner i dag
+                  </Badge>
+                )}
+              </div>
+            ) : null}
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Antall aksjer</label>
               <Input
@@ -359,6 +423,7 @@ const StockTrader = ({
                 value={buyQuantity}
                 onChange={(e) => setBuyQuantity(e.target.value)}
                 min={1}
+                disabled={tradingCheck && !tradingCheck.allowed}
               />
               {selectedStock && quotes[selectedStock.ticker] && (
                 <p className="text-xs text-muted-foreground">
@@ -389,7 +454,10 @@ const StockTrader = ({
             <Button variant="outline" onClick={() => setBuyDialogOpen(false)}>
               Avbryt
             </Button>
-            <Button onClick={handleBuy} disabled={isBuying}>
+            <Button 
+              onClick={handleBuy} 
+              disabled={isBuying || (tradingCheck && !tradingCheck.allowed)}
+            >
               {isBuying ? "Kjøper..." : "Bekreft kjøp"}
             </Button>
           </DialogFooter>
@@ -410,6 +478,28 @@ const StockTrader = ({
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            {/* Trading status */}
+            {checkingTrading ? (
+              <div className="text-sm text-muted-foreground">Sjekker handelsstatus...</div>
+            ) : tradingCheck && !tradingCheck.allowed ? (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{tradingCheck.reason}</AlertDescription>
+              </Alert>
+            ) : tradingCheck ? (
+              <div className="flex items-center gap-2 text-sm">
+                <Badge variant="outline" className="bg-accent/20 text-accent-foreground border-accent/30">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Børsen er åpen
+                </Badge>
+                {tradingCheck.dailyCount !== undefined && (
+                  <Badge variant="secondary">
+                    {tradingCheck.dailyCount}/{maxDailyTransactions} transaksjoner i dag
+                  </Badge>
+                )}
+              </div>
+            ) : null}
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Antall å selge</label>
               <Input
@@ -419,6 +509,7 @@ const StockTrader = ({
                 onChange={(e) => setSellQuantity(e.target.value)}
                 min={1}
                 max={selectedHolding ? Number(selectedHolding.quantity) : undefined}
+                disabled={tradingCheck && !tradingCheck.allowed}
               />
             </div>
 
@@ -436,7 +527,10 @@ const StockTrader = ({
             <Button variant="outline" onClick={() => setSellDialogOpen(false)}>
               Avbryt
             </Button>
-            <Button onClick={handleSell} disabled={isSelling}>
+            <Button 
+              onClick={handleSell} 
+              disabled={isSelling || (tradingCheck && !tradingCheck.allowed)}
+            >
               {isSelling ? "Selger..." : "Bekreft salg"}
             </Button>
           </DialogFooter>
