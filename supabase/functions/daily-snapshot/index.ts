@@ -116,7 +116,15 @@ async function fetchOSEBX(): Promise<number | null> {
   }
 }
 
-async function validateAdminAuth(supabase: ReturnType<typeof createClient>, authHeader: string | null): Promise<boolean> {
+async function validateAuth(supabase: ReturnType<typeof createClient>, authHeader: string | null, cronSecret: string | null): Promise<boolean> {
+  // Check for cron secret (for scheduled jobs)
+  const expectedCronSecret = Deno.env.get('CRON_SECRET');
+  if (cronSecret && expectedCronSecret && cronSecret === expectedCronSecret) {
+    console.log('Authenticated via cron secret');
+    return true;
+  }
+
+  // Check for admin user auth
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return false;
   }
@@ -161,14 +169,15 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validate authentication - require admin role for this administrative function
+    // Validate authentication - require admin role or cron secret
     const authHeader = req.headers.get('Authorization');
-    const isAdmin = await validateAdminAuth(supabase, authHeader);
+    const cronSecret = req.headers.get('x-cron-secret');
+    const isAuthorized = await validateAuth(supabase, authHeader, cronSecret);
     
-    if (!isAdmin) {
+    if (!isAuthorized) {
       console.log('Unauthorized access attempt to daily-snapshot');
       return new Response(
-        JSON.stringify({ error: 'Unauthorized - Admin access required' }),
+        JSON.stringify({ error: 'Unauthorized - Admin access or cron secret required' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
