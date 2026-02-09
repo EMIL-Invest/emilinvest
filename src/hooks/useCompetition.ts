@@ -222,22 +222,33 @@ export const useCompetition = () => {
     // Get unique tickers for quotes
     const tickers = [...new Set(allHoldings?.filter(h => h.ticker !== "ASK").map(h => h.ticker) || [])];
     
-    // Fetch quotes for all tickers
+    // Fetch quotes directly and use them immediately (avoid stale closure)
+    let freshQuotes: Record<string, StockQuote> = {};
     if (tickers.length > 0) {
-      await fetchQuotes(tickers);
+      try {
+        const { data, error: quotesError } = await supabase.functions.invoke("stock-prices", {
+          body: { tickers },
+        });
+
+        if (!quotesError && data?.quotes) {
+          data.quotes.forEach((q: StockQuote) => {
+            freshQuotes[q.ticker] = q;
+          });
+          // Also update the quotes state for other components
+          setQuotes(prev => ({ ...prev, ...freshQuotes }));
+        }
+      } catch (err) {
+        console.error("Error fetching quotes for leaderboard:", err);
+      }
     }
 
-    // Calculate values and returns for each participant
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const yearStart = new Date(now.getFullYear(), 0, 1);
-
+    // Calculate values and returns for each participant using fresh quotes
     const calculateEntries = (periodType: "monthly" | "yearly" | "all_time"): LeaderboardEntry[] => {
       const entries: LeaderboardEntry[] = [];
 
       for (const p of participants) {
         const participantHoldings = allHoldings?.filter(h => h.participant_id === p.id) || [];
-        const portfolioValue = calculatePortfolioValue(participantHoldings, quotes);
+        const portfolioValue = calculatePortfolioValue(participantHoldings, freshQuotes);
         
         let startValue: number;
         switch (periodType) {
@@ -280,7 +291,7 @@ export const useCompetition = () => {
       yearly: calculateEntries("yearly"),
       all_time: calculateEntries("all_time"),
     });
-  }, [calculatePortfolioValue, fetchQuotes, quotes]);
+  }, [calculatePortfolioValue]);
 
   // Join competition
   const joinCompetition = async (displayName: string): Promise<{ error: Error | null }> => {
