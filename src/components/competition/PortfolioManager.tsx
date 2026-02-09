@@ -143,9 +143,10 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                 <TableRow>
                   <TableHead>Aksje</TableHead>
                   <TableHead className="text-right">Antall</TableHead>
-                  <TableHead className="text-right">Kurs</TableHead>
+                  <TableHead className="text-right">Snitt kjøpskurs</TableHead>
+                  <TableHead className="text-right">Nåværende kurs</TableHead>
                   <TableHead className="text-right">Verdi</TableHead>
-                  <TableHead className="text-right">Avkastning</TableHead>
+                  <TableHead className="text-right">Total avkastning</TableHead>
                   <TableHead className="text-right">Handling</TableHead>
                 </TableRow>
               </TableHeader>
@@ -158,19 +159,17 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                   return (
                     <TableRow key={holding.id}>
                       <TableCell>
-                        <div className="font-medium">{holding.ticker}</div>
+                        <div className="font-medium">{holding.ticker.replace('.OL', '')}</div>
                       </TableCell>
                       <TableCell className="text-right font-mono">
                         {Number(holding.quantity).toLocaleString('nb-NO')}
                       </TableCell>
                       <TableCell className="text-right font-mono">
+                        {Number(holding.average_purchase_price).toFixed(2)} kr
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
                         {quote ? (
-                          <div className="flex flex-col items-end">
-                            <span>{quote.price.toFixed(2)} kr</span>
-                            <span className={`text-xs ${quote.changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {quote.changePercent >= 0 ? '+' : ''}{quote.changePercent.toFixed(2)}%
-                            </span>
-                          </div>
+                          `${quote.price.toFixed(2)} kr`
                         ) : (
                           <span className="text-muted-foreground">-</span>
                         )}
