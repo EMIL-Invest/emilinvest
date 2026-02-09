@@ -56,17 +56,24 @@ const StockTrader = ({
     return Array.from(uniqueSectors).sort();
   }, [availableStocks]);
 
+  const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
+
   const filteredStocks = useMemo(() => {
     return availableStocks.filter(stock => {
       const matchesSearch = 
         stock.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         stock.ticker.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Handle "mine" filter - only show stocks user owns
+      if (sectorFilter === "mine") {
+        const isOwned = stockHoldings.some(h => h.ticker === stock.ticker);
+        return matchesSearch && isOwned;
+      }
+      
       const matchesSector = sectorFilter === "all" || stock.sector === sectorFilter;
       return matchesSearch && matchesSector;
     });
-  }, [availableStocks, searchTerm, sectorFilter]);
-
-  const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
+  }, [availableStocks, searchTerm, sectorFilter, stockHoldings]);
 
   const handleBuyClick = async (stock: OsloStock) => {
     setSelectedStock(stock);
@@ -278,6 +285,9 @@ const StockTrader = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle sektorer</SelectItem>
+                <SelectItem value="mine" className="font-medium text-primary">
+                  ⭐ Mine aksjer ({stockHoldings.length})
+                </SelectItem>
                 {sectors.map((sector) => (
                   <SelectItem key={sector} value={sector!}>
                     {sector}
