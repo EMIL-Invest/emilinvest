@@ -143,7 +143,7 @@ export const useCompetition = () => {
       });
 
       if (error) {
-        console.error("Error fetching quotes:", error);
+        console.error("Error fetching quotes:", error?.message || "Unknown error");
         return;
       }
 
@@ -154,8 +154,9 @@ export const useCompetition = () => {
         });
         setQuotes(prev => ({ ...prev, ...quotesMap }));
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      console.error("Error fetching quotes:", errorMessage);
     } finally {
       setQuotesLoading(false);
     }
@@ -238,7 +239,8 @@ export const useCompetition = () => {
           setQuotes(prev => ({ ...prev, ...freshQuotes }));
         }
       } catch (err) {
-        console.error("Error fetching quotes for leaderboard:", err);
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        console.error("Error fetching quotes for leaderboard:", errorMessage);
       }
     }
 
