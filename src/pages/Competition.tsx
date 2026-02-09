@@ -32,7 +32,9 @@ const Competition = () => {
     fetchQuotes,
     getCashBalance,
     calculatePortfolioValue,
+    checkTradingAllowed,
     STARTING_CAPITAL,
+    MAX_DAILY_TRANSACTIONS_PER_STOCK,
   } = useCompetition();
 
   const [displayName, setDisplayName] = useState("");
@@ -290,6 +292,8 @@ const Competition = () => {
                     onSell={sellStock}
                     onRefreshQuotes={fetchQuotes}
                     quotesLoading={quotesLoading}
+                    checkTradingAllowed={checkTradingAllowed}
+                    maxDailyTransactions={MAX_DAILY_TRANSACTIONS_PER_STOCK}
                   />
                 </TabsContent>
               </>
