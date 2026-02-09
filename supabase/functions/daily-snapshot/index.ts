@@ -124,6 +124,21 @@ async function validateAuth(supabase: ReturnType<typeof createClient>, authHeade
     return true;
   }
 
+  // Check for service_role token (for cron jobs via pg_cron)
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    try {
+      // Decode JWT to check if it's a service_role token
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.role === 'service_role') {
+        console.log('Authenticated via service_role token');
+        return true;
+      }
+    } catch {
+      // Not a valid JWT, continue to user auth check
+    }
+  }
+
   // Check for admin user auth
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return false;
