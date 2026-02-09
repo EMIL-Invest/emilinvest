@@ -3,8 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, TrendingUp, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+
 const CompetitionBanner = () => {
-  return <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/20">
+  return (
+    <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/20">
       <div className="section-container">
         <Card className="border-2 border-primary/20 bg-gradient-to-r from-card via-card to-primary/5 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -23,7 +25,10 @@ const CompetitionBanner = () => {
                   Test dine investeringskunnskaper
                 </h2>
                 
-                <p className="text-lg text-muted-foreground mb-6 max-w-xl">Bygg din egen portefølje med 100.000 kr i virtuell kapital og konkurrer mot andre. Hvem klarer å oppnå høyest avkastning?</p>
+                <p className="text-lg text-muted-foreground mb-6 max-w-xl">
+                  Bygg din egen portefølje med 100.000 kr i virtuell kapital og konkurrer mot andre 
+                  medlemmer. Hvem klarer å oppnå høyest avkastning?
+                </p>
                 
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-8">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -74,9 +79,7 @@ const CompetitionBanner = () => {
                       <div className="w-14 h-14 rounded-full bg-accent/50 border-2 border-accent flex items-center justify-center mb-2">
                         <span className="text-xl">🥉</span>
                       </div>
-                      <div className="w-18 h-20 bg-gradient-to-t from-accent/60 to-accent/30 rounded-t-lg flex items-center justify-center" style={{
-                      width: '72px'
-                    }}>
+                      <div className="w-18 h-20 bg-gradient-to-t from-accent/60 to-accent/30 rounded-t-lg flex items-center justify-center" style={{ width: '72px' }}>
                         <span className="text-xl font-bold text-accent-foreground">3</span>
                       </div>
                     </div>
@@ -87,6 +90,8 @@ const CompetitionBanner = () => {
           </CardContent>
         </Card>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default CompetitionBanner;
