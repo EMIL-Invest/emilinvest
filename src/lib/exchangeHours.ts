@@ -190,6 +190,14 @@ export function getExchangeName(exchange: string): string {
     CPH: "Copenhagen Stock Exchange",
     NYSE: "New York Stock Exchange",
     NASDAQ: "NASDAQ",
+    XETRA: "Frankfurt Stock Exchange",
+    LSE: "London Stock Exchange",
+    EPA: "Euronext Paris",
+    STO: "Stockholm Stock Exchange",
+    HEL: "Helsinki Stock Exchange",
+    HKEX: "Hong Kong Stock Exchange",
+    TSE: "Tokyo Stock Exchange",
+    KRX: "Korea Exchange",
     CRYPTO: "Krypto (24/7)",
   };
   return names[exchange] || exchange;
@@ -199,16 +207,20 @@ export function getExchangeName(exchange: string): string {
  * Determine exchange from ticker
  */
 export function getExchangeFromTicker(ticker: string): string {
-  // Check suffix
   if (ticker.endsWith(".OL")) return "OSL";
   if (ticker.endsWith(".CO")) return "CPH";
+  if (ticker.endsWith(".ST")) return "STO";
+  if (ticker.endsWith(".DE")) return "XETRA";
+  if (ticker.endsWith(".L")) return "LSE";
+  if (ticker.endsWith(".PA")) return "EPA";
+  if (ticker.endsWith(".SW")) return "SWX";
+  if (ticker.endsWith(".AS")) return "AMS";
+  if (ticker.endsWith(".HE")) return "HEL";
+  if (ticker.endsWith(".HK")) return "HKEX";
+  if (ticker.endsWith(".T")) return "TSE";
+  if (ticker.endsWith(".KS")) return "KRX";
   if (ticker.includes("-USD")) return "CRYPTO";
   
-  // Known US stocks
-  const usStocks = ["AAPL", "AMZN", "GOOGL", "MSFT", "NVDA", "TSLA", "META", "JPM", "CCJ", "TTWO"];
-  if (usStocks.includes(ticker)) return "NYSE";
-  if (ticker === "TSM") return "NASDAQ";
-  
-  // Default to Oslo
-  return "OSL";
+  // Default to NYSE for US tickers without suffix
+  return "NYSE";
 }
