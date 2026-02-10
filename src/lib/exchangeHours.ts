@@ -213,6 +213,7 @@ export function getExchangeFromTicker(ticker: string): string {
   if (ticker.endsWith(".DE")) return "XETRA";
   if (ticker.endsWith(".L")) return "LSE";
   if (ticker.endsWith(".PA")) return "EPA";
+  if (ticker.endsWith(".BR")) return "EPA";
   if (ticker.endsWith(".SW")) return "SWX";
   if (ticker.endsWith(".AS")) return "AMS";
   if (ticker.endsWith(".HE")) return "HEL";
