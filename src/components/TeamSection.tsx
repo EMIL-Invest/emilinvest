@@ -21,6 +21,7 @@ const teamMembers = [
   { name: "Erik Nysæther", role: "Bedriftskontakt", initials: "EN" },
   { name: "Gustav Stockholm", role: "Forvalter", initials: "GS" },
   { name: "Marie Rogn Kværnes", role: "Støttemedlem", initials: "MK" },
+  { name: "Johannes Lyssand Mjelde", role: "IT-ansvarlig", initials: "JM" },
 ];
 
 const TeamSection = () => {
