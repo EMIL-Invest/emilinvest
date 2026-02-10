@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Trophy, LogIn, LogOut, Shield } from "lucide-react";
+import { Menu, X, Trophy, LogIn, LogOut, Shield, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
