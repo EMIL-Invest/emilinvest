@@ -12,7 +12,7 @@ const exchangeHours: Record<string, ExchangeHours> = {
     open: { hour: 9, minute: 0 },
     close: { hour: 16, minute: 20 },
     timezone: "Europe/Oslo",
-    weekdays: [1, 2, 3, 4, 5], // Mon-Fri
+    weekdays: [1, 2, 3, 4, 5],
   },
   CPH: {
     open: { hour: 9, minute: 0 },
@@ -32,12 +32,59 @@ const exchangeHours: Record<string, ExchangeHours> = {
     timezone: "America/New_York",
     weekdays: [1, 2, 3, 4, 5],
   },
+  XETRA: {
+    open: { hour: 9, minute: 0 },
+    close: { hour: 17, minute: 30 },
+    timezone: "Europe/Berlin",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  LSE: {
+    open: { hour: 8, minute: 0 },
+    close: { hour: 16, minute: 30 },
+    timezone: "Europe/London",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  EPA: {
+    open: { hour: 9, minute: 0 },
+    close: { hour: 17, minute: 30 },
+    timezone: "Europe/Paris",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  STO: {
+    open: { hour: 9, minute: 0 },
+    close: { hour: 17, minute: 30 },
+    timezone: "Europe/Stockholm",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  HEL: {
+    open: { hour: 10, minute: 0 },
+    close: { hour: 18, minute: 30 },
+    timezone: "Europe/Helsinki",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  HKEX: {
+    open: { hour: 9, minute: 30 },
+    close: { hour: 16, minute: 0 },
+    timezone: "Asia/Hong_Kong",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  TSE: {
+    open: { hour: 9, minute: 0 },
+    close: { hour: 15, minute: 0 },
+    timezone: "Asia/Tokyo",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  KRX: {
+    open: { hour: 9, minute: 0 },
+    close: { hour: 15, minute: 30 },
+    timezone: "Asia/Seoul",
+    weekdays: [1, 2, 3, 4, 5],
+  },
   CRYPTO: {
-    // 24/7 trading
     open: { hour: 0, minute: 0 },
     close: { hour: 23, minute: 59 },
     timezone: "UTC",
-    weekdays: [0, 1, 2, 3, 4, 5, 6], // All days
+    weekdays: [0, 1, 2, 3, 4, 5, 6],
   },
 };
 
