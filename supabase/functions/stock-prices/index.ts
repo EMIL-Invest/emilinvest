@@ -14,7 +14,7 @@ interface StockQuote {
 }
 
 // Validation constants
-const MAX_TICKERS = 100;
+const MAX_TICKERS = 250;
 const TICKER_REGEX = /^[A-Za-z0-9.-]{1,25}$/;
 
 // Rate limiting configuration
