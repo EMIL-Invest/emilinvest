@@ -193,6 +193,14 @@ const Navbar = () => {
                     Administrasjon
                   </Link>
                 )}
+                <Link
+                  to="/konto"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <UserCog className="w-4 h-4" />
+                  Min konto
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
