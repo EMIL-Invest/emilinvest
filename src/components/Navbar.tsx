@@ -118,6 +118,12 @@ const Navbar = () => {
                     </Button>
                   </Link>
                 )}
+                <Link to="/konto">
+                  <Button variant="ghost" size="sm">
+                    <UserCog className="w-4 h-4 mr-1" />
+                    Konto
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
                   <LogOut className="w-4 h-4 mr-1" />
                   Logg ut
