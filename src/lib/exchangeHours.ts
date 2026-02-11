@@ -56,6 +56,18 @@ const exchangeHours: Record<string, ExchangeHours> = {
     timezone: "Europe/Stockholm",
     weekdays: [1, 2, 3, 4, 5],
   },
+  AMS: {
+    open: { hour: 9, minute: 0 },
+    close: { hour: 17, minute: 30 },
+    timezone: "Europe/Amsterdam",
+    weekdays: [1, 2, 3, 4, 5],
+  },
+  SWX: {
+    open: { hour: 9, minute: 0 },
+    close: { hour: 17, minute: 30 },
+    timezone: "Europe/Zurich",
+    weekdays: [1, 2, 3, 4, 5],
+  },
   HEL: {
     open: { hour: 10, minute: 0 },
     close: { hour: 18, minute: 30 },
@@ -194,6 +206,8 @@ export function getExchangeName(exchange: string): string {
     LSE: "London Stock Exchange",
     EPA: "Euronext Paris",
     STO: "Stockholm Stock Exchange",
+    AMS: "Euronext Amsterdam",
+    SWX: "SIX Swiss Exchange",
     HEL: "Helsinki Stock Exchange",
     HKEX: "Hong Kong Stock Exchange",
     TSE: "Tokyo Stock Exchange",
