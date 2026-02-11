@@ -127,6 +127,8 @@ function getYahooTicker(ticker: string): string {
     "GJF": "GJF.OL",
     "STB": "STB.OL",
     "VEI": "VEI.OL",
+    "LOKOT": "LOKOT.OL",
+    "CADLR": "CADLR.OL",
     
     // Copenhagen
     "NOVO-B": "NOVO-B.CO",
