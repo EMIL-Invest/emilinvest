@@ -454,6 +454,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      competition_buy_stock: {
+        Args: {
+          _participant_id: string
+          _price: number
+          _quantity: number
+          _ticker: string
+        }
+        Returns: Json
+      }
+      competition_sell_stock: {
+        Args: {
+          _participant_id: string
+          _price: number
+          _quantity: number
+          _ticker: string
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

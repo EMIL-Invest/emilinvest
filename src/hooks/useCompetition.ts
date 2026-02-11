@@ -362,13 +362,13 @@ export const useCompetition = () => {
     return stock?.exchange || getExchangeFromTicker(ticker);
   };
 
-  // Buy stock
+  // Buy stock (atomic via database function)
   const buyStock = async (ticker: string, quantity: number, price: number): Promise<{ error: Error | null }> => {
     if (!participant) {
       return { error: new Error("Du må være påmeldt konkurransen") };
     }
 
-    // Check if exchange is open
+    // Check if exchange is open (client-side check for UX, server enforces atomicity)
     const exchange = getStockExchange(ticker);
     if (!isExchangeOpen(exchange)) {
       const info = getExchangeInfo(exchange);
@@ -378,99 +378,34 @@ export const useCompetition = () => {
       };
     }
 
-    // Check daily transaction limit
-    const dailyCount = await getDailyTransactionCount(participant.id, ticker);
-    if (dailyCount >= MAX_DAILY_TRANSACTIONS_PER_STOCK) {
-      return { 
-        error: new Error(`Du har nådd maks ${MAX_DAILY_TRANSACTIONS_PER_STOCK} transaksjoner per aksje per dag for ${ticker}`) 
-      };
-    }
-
-    const totalCost = quantity * price;
-    const cashBalance = getCashBalance();
-
-    if (totalCost > cashBalance) {
-      return { error: new Error("Ikke nok penger på ASK-kontoen") };
-    }
-
-    // Count current holdings (excluding ASK)
-    const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
-    const existingHolding = stockHoldings.find(h => h.ticker === ticker);
-    
-    if (!existingHolding && stockHoldings.length >= 10) {
-      return { error: new Error("Maksimalt 10 aksjer i porteføljen") };
-    }
-
-    // Update ASK balance
-    const newCashBalance = cashBalance - totalCost;
-    const { error: cashError } = await supabase
-      .from("competition_portfolios")
-      .update({ quantity: newCashBalance })
-      .eq("participant_id", participant.id)
-      .eq("ticker", "ASK");
-
-    if (cashError) {
-      console.error("Error updating cash:", cashError);
-      return { error: new Error("Kunne ikke oppdatere kontosaldo") };
-    }
-
-    // Update or insert stock holding
-    if (existingHolding) {
-      const newQuantity = Number(existingHolding.quantity) + quantity;
-      const newAvgPrice = (
-        (Number(existingHolding.average_purchase_price) * Number(existingHolding.quantity)) + 
-        (price * quantity)
-      ) / newQuantity;
-
-      const { error } = await supabase
-        .from("competition_portfolios")
-        .update({ 
-          quantity: newQuantity,
-          average_purchase_price: newAvgPrice,
-        })
-        .eq("id", existingHolding.id);
-
-      if (error) {
-        console.error("Error updating holding:", error);
-        return { error: new Error("Kunne ikke oppdatere beholdning") };
-      }
-    } else {
-      const { error } = await supabase
-        .from("competition_portfolios")
-        .insert({
-          participant_id: participant.id,
-          ticker,
-          quantity,
-          average_purchase_price: price,
-        });
-
-      if (error) {
-        console.error("Error inserting holding:", error);
-        return { error: new Error("Kunne ikke legge til aksje") };
-      }
-    }
-
-    // Record transaction
-    await supabase.from("competition_transactions").insert({
-      participant_id: participant.id,
-      ticker,
-      transaction_type: "buy",
-      quantity,
-      price_per_share: price,
-      total_amount: totalCost,
+    const { data, error } = await supabase.rpc("competition_buy_stock", {
+      _participant_id: participant.id,
+      _ticker: ticker,
+      _quantity: quantity,
+      _price: price,
     });
+
+    if (error) {
+      console.error("Error buying stock:", error);
+      return { error: new Error("Kunne ikke gjennomføre kjøp") };
+    }
+
+    const result = data as { success: boolean; error?: string };
+    if (!result.success) {
+      return { error: new Error(result.error || "Kjøp feilet") };
+    }
 
     await fetchParticipant();
     return { error: null };
   };
 
-  // Sell stock
+  // Sell stock (atomic via database function)
   const sellStock = async (ticker: string, quantity: number, price: number): Promise<{ error: Error | null }> => {
     if (!participant) {
       return { error: new Error("Du må være påmeldt konkurransen") };
     }
 
-    // Check if exchange is open
+    // Check if exchange is open (client-side check for UX, server enforces atomicity)
     const exchange = getStockExchange(ticker);
     if (!isExchangeOpen(exchange)) {
       const info = getExchangeInfo(exchange);
@@ -480,67 +415,22 @@ export const useCompetition = () => {
       };
     }
 
-    // Check daily transaction limit
-    const dailyCount = await getDailyTransactionCount(participant.id, ticker);
-    if (dailyCount >= MAX_DAILY_TRANSACTIONS_PER_STOCK) {
-      return { 
-        error: new Error(`Du har nådd maks ${MAX_DAILY_TRANSACTIONS_PER_STOCK} transaksjoner per aksje per dag for ${ticker}`) 
-      };
-    }
-
-    const holding = holdings.find(h => h.ticker === ticker);
-    if (!holding || Number(holding.quantity) < quantity) {
-      return { error: new Error("Ikke nok aksjer å selge") };
-    }
-
-    const totalValue = quantity * price;
-
-    // Update stock holding
-    const newQuantity = Number(holding.quantity) - quantity;
-    if (newQuantity > 0) {
-      const { error } = await supabase
-        .from("competition_portfolios")
-        .update({ quantity: newQuantity })
-        .eq("id", holding.id);
-
-      if (error) {
-        console.error("Error updating holding:", error);
-        return { error: new Error("Kunne ikke oppdatere beholdning") };
-      }
-    } else {
-      const { error } = await supabase
-        .from("competition_portfolios")
-        .delete()
-        .eq("id", holding.id);
-
-      if (error) {
-        console.error("Error deleting holding:", error);
-        return { error: new Error("Kunne ikke fjerne aksje") };
-      }
-    }
-
-    // Update ASK balance
-    const cashBalance = getCashBalance();
-    const { error: cashError } = await supabase
-      .from("competition_portfolios")
-      .update({ quantity: cashBalance + totalValue })
-      .eq("participant_id", participant.id)
-      .eq("ticker", "ASK");
-
-    if (cashError) {
-      console.error("Error updating cash:", cashError);
-      return { error: new Error("Kunne ikke oppdatere kontosaldo") };
-    }
-
-    // Record transaction
-    await supabase.from("competition_transactions").insert({
-      participant_id: participant.id,
-      ticker,
-      transaction_type: "sell",
-      quantity,
-      price_per_share: price,
-      total_amount: totalValue,
+    const { data, error } = await supabase.rpc("competition_sell_stock", {
+      _participant_id: participant.id,
+      _ticker: ticker,
+      _quantity: quantity,
+      _price: price,
     });
+
+    if (error) {
+      console.error("Error selling stock:", error);
+      return { error: new Error("Kunne ikke gjennomføre salg") };
+    }
+
+    const result = data as { success: boolean; error?: string };
+    if (!result.success) {
+      return { error: new Error(result.error || "Salg feilet") };
+    }
 
     await fetchParticipant();
     return { error: null };
