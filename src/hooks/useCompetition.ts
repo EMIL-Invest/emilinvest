@@ -374,7 +374,7 @@ export const useCompetition = () => {
       const info = getExchangeInfo(exchange);
       const exchangeName = getExchangeName(exchange);
       return { 
-        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} (${info.tradingDays})`) 
+        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}–${info.closeTime} norsk tid (${info.tradingDays})`) 
       };
     }
 
@@ -411,7 +411,7 @@ export const useCompetition = () => {
       const info = getExchangeInfo(exchange);
       const exchangeName = getExchangeName(exchange);
       return { 
-        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} (${info.tradingDays})`) 
+        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}–${info.closeTime} norsk tid (${info.tradingDays})`) 
       };
     }
 
@@ -445,7 +445,7 @@ export const useCompetition = () => {
       const exchangeName = getExchangeName(exchange);
       return { 
         allowed: false, 
-        reason: `${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} (${info.tradingDays})` 
+        reason: `${exchangeName} er stengt. Åpningstider: ${info.openTime}–${info.closeTime} norsk tid (${info.tradingDays})` 
       };
     }
 

@@ -161,7 +161,43 @@ export function isExchangeOpen(exchange: string): boolean {
 }
 
 /**
- * Get trading hours info for display
+ * Convert a time from one timezone to Oslo time
+ */
+function convertToOsloTime(hour: number, minute: number, fromTimezone: string): { hour: number; minute: number } {
+  // Create a reference date (use a known weekday to avoid DST edge cases)
+  const refDate = new Date();
+  const year = refDate.getFullYear();
+  const month = refDate.getMonth();
+  const day = refDate.getDate();
+
+  // Create a date in the source timezone at the given time
+  // We use a trick: set UTC time, then calculate offset differences
+  const sourceDate = new Date(Date.UTC(year, month, day, hour, minute, 0));
+  
+  // Get the offset for source timezone
+  const sourceStr = sourceDate.toLocaleString("en-US", { timeZone: fromTimezone });
+  const sourceLocal = new Date(sourceStr);
+  
+  // Get the offset for Oslo
+  const osloStr = sourceDate.toLocaleString("en-US", { timeZone: "Europe/Oslo" });
+  const osloLocal = new Date(osloStr);
+  
+  // The difference in minutes between the two interpretations
+  const diffMs = osloLocal.getTime() - sourceLocal.getTime();
+  const diffMinutes = diffMs / (1000 * 60);
+  
+  let totalMinutes = hour * 60 + minute + diffMinutes;
+  // Normalize to 0-1440
+  totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
+  
+  return {
+    hour: Math.floor(totalMinutes / 60),
+    minute: Math.round(totalMinutes % 60),
+  };
+}
+
+/**
+ * Get trading hours info for display (times shown in Oslo time)
  */
 export function getExchangeInfo(exchange: string): {
   isOpen: boolean;
@@ -184,11 +220,15 @@ export function getExchangeInfo(exchange: string): {
   const formatTime = (h: number, m: number) => 
     `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 
+  // Convert open/close times to Oslo time
+  const osloOpen = convertToOsloTime(hours.open.hour, hours.open.minute, hours.timezone);
+  const osloClose = convertToOsloTime(hours.close.hour, hours.close.minute, hours.timezone);
+
   return {
     isOpen: isExchangeOpen(exchange),
-    openTime: formatTime(hours.open.hour, hours.open.minute),
-    closeTime: formatTime(hours.close.hour, hours.close.minute),
-    timezone: hours.timezone.replace("_", " "),
+    openTime: formatTime(osloOpen.hour, osloOpen.minute),
+    closeTime: formatTime(osloClose.hour, osloClose.minute),
+    timezone: "norsk tid",
     tradingDays: exchange === "CRYPTO" ? "Alle dager" : "Man-Fre",
   };
 }
