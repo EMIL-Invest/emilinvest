@@ -146,7 +146,8 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                   <TableHead className="text-right">Snitt kjøpskurs</TableHead>
                   <TableHead className="text-right">Nåværende kurs</TableHead>
                   <TableHead className="text-right">Verdi</TableHead>
-                  <TableHead className="text-right">Total avkastning</TableHead>
+                  <TableHead className="text-right">Avkastning (kr)</TableHead>
+                  <TableHead className="text-right">Avkastning (%)</TableHead>
                   <TableHead className="text-right">Handling</TableHead>
                 </TableRow>
               </TableHeader>
@@ -176,6 +177,18 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                       </TableCell>
                       <TableCell className="text-right font-mono">
                         {currentValue.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {(() => {
+                          const currentVal = calculateHoldingValue(holding);
+                          const costBasis = Number(holding.average_purchase_price) * Number(holding.quantity);
+                          const returnKr = currentVal - costBasis;
+                          return (
+                            <div className={`font-mono ${returnKr >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {returnKr >= 0 ? '+' : ''}{returnKr.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className={`flex items-center justify-end gap-1 ${
