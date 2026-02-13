@@ -90,11 +90,17 @@ const StockTrader = ({
     }
   };
 
+  const isExpensiveStock = (ticker: string): boolean => {
+    const quote = quotes[ticker];
+    return quote ? quote.price > 30000 : false;
+  };
+
   const handleBuy = async () => {
     if (!selectedStock) return;
 
-    const quantity = parseInt(buyQuantity);
-    if (isNaN(quantity) || quantity <= 0) {
+    const allowFractional = isExpensiveStock(selectedStock.ticker);
+    const quantity = parseFloat(buyQuantity);
+    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
       toast({
         title: "Ugyldig antall",
         description: "Angi et gyldig antall aksjer å kjøpe",
@@ -171,8 +177,9 @@ const StockTrader = ({
   const handleSell = async () => {
     if (!selectedHolding) return;
 
-    const quantity = parseInt(sellQuantity);
-    if (isNaN(quantity) || quantity <= 0) {
+    const allowFractional = isExpensiveStock(selectedHolding.ticker);
+    const quantity = parseFloat(sellQuantity);
+    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
       toast({
         title: "Ugyldig antall",
         description: "Angi et gyldig antall aksjer å selge",
@@ -221,6 +228,7 @@ const StockTrader = ({
 
   const getMaxBuyable = (price: number): number => {
     if (price <= 0) return 0;
+    if (price > 30000) return Math.floor((cashBalance / price) * 100) / 100; // 2 decimals for expensive
     return Math.floor(cashBalance / price);
   };
 
@@ -429,16 +437,24 @@ const StockTrader = ({
               <label className="text-sm font-medium">Antall aksjer</label>
               <Input
                 type="number"
-                placeholder="Antall aksjer"
+                placeholder={selectedStock && isExpensiveStock(selectedStock.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
                 value={buyQuantity}
                 onChange={(e) => setBuyQuantity(e.target.value)}
-                min={1}
+                min={selectedStock && isExpensiveStock(selectedStock.ticker) ? 0.01 : 1}
+                step={selectedStock && isExpensiveStock(selectedStock.ticker) ? 0.01 : 1}
                 disabled={tradingCheck && !tradingCheck.allowed}
               />
               {selectedStock && quotes[selectedStock.ticker] && (
-                <p className="text-xs text-muted-foreground">
-                  Maks du kan kjøpe: {getMaxBuyable(quotes[selectedStock.ticker].price).toLocaleString('nb-NO')} aksjer
-                </p>
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    Maks du kan kjøpe: {getMaxBuyable(quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: isExpensiveStock(selectedStock.ticker) ? 4 : 0 })} {isExpensiveStock(selectedStock.ticker) ? 'enheter' : 'aksjer'}
+                  </p>
+                  {isExpensiveStock(selectedStock.ticker) && (
+                    <p className="text-xs text-primary">
+                      💡 Denne aksjen koster over 30 000 kr — du kan kjøpe deler av en aksje
+                    </p>
+                  )}
+                </>
               )}
             </div>
 
@@ -447,13 +463,13 @@ const StockTrader = ({
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Total kostnad:</span>
                   <span className="font-bold">
-                    {(parseInt(buyQuantity) * quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                    {(parseFloat(buyQuantity) * quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Gjenstående kapital:</span>
                   <span>
-                    {(cashBalance - (parseInt(buyQuantity) * quotes[selectedStock.ticker].price)).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                    {(cashBalance - (parseFloat(buyQuantity) * quotes[selectedStock.ticker].price)).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                   </span>
                 </div>
               </div>
@@ -514,20 +530,26 @@ const StockTrader = ({
               <label className="text-sm font-medium">Antall å selge</label>
               <Input
                 type="number"
-                placeholder="Antall aksjer"
+                placeholder={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
                 value={sellQuantity}
                 onChange={(e) => setSellQuantity(e.target.value)}
-                min={1}
+                min={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? 0.01 : 1}
+                step={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? 0.01 : 1}
                 max={selectedHolding ? Number(selectedHolding.quantity) : undefined}
                 disabled={tradingCheck && !tradingCheck.allowed}
               />
+              {selectedHolding && isExpensiveStock(selectedHolding.ticker) && (
+                <p className="text-xs text-primary">
+                  💡 Denne aksjen koster over 30 000 kr — du kan selge deler
+                </p>
+              )}
             </div>
 
             {sellQuantity && selectedHolding && quotes[selectedHolding.ticker] && (
               <div className="p-4 bg-secondary/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">Estimert salgsverdi:</p>
                 <p className="text-2xl font-bold">
-                  {(parseInt(sellQuantity) * quotes[selectedHolding.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                  {(parseFloat(sellQuantity) * quotes[selectedHolding.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                 </p>
               </div>
             )}
