@@ -193,15 +193,14 @@ async function fetchYahooQuote(originalTicker: string): Promise<StockQuote | nul
     }
 
     const meta = result.meta;
+    const closes = result.indicators?.quote?.[0]?.close;
     
     // Use regularMarketPrice first, fallback to last close in the data
     let price = meta.regularMarketPrice;
     
     // If market is closed or price is 0, get the last available close price
     if (!price || price === 0) {
-      const closes = result.indicators?.quote?.[0]?.close;
       if (closes && closes.length > 0) {
-        // Find last non-null close price
         for (let i = closes.length - 1; i >= 0; i--) {
           if (closes[i] !== null && closes[i] > 0) {
             price = closes[i];
@@ -216,7 +215,26 @@ async function fetchYahooQuote(originalTicker: string): Promise<StockQuote | nul
       price = meta.chartPreviousClose || meta.previousClose || 0;
     }
 
-    const previousClose = meta.previousClose || meta.chartPreviousClose || price;
+    // Calculate daily change from chart data (last two valid closes)
+    let previousClose = price; // fallback: no change
+    if (closes && closes.length >= 2) {
+      // Find last two non-null close values
+      const validCloses: number[] = [];
+      for (let i = closes.length - 1; i >= 0 && validCloses.length < 2; i--) {
+        if (closes[i] !== null && closes[i] > 0) {
+          validCloses.unshift(closes[i]);
+        }
+      }
+      if (validCloses.length === 2) {
+        previousClose = validCloses[0]; // second-to-last valid close
+      }
+    }
+    
+    // Fallback to meta previousClose only if chart data wasn't sufficient
+    if (previousClose === price) {
+      previousClose = meta.previousClose || meta.chartPreviousClose || price;
+    }
+
     const change = price - previousClose;
     const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
     
