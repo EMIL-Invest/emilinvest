@@ -341,6 +341,45 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_stock_snapshots: {
+        Row: {
+          created_at: string
+          currency: string
+          date: string
+          exchange_rate: number
+          id: string
+          name: string
+          price: number
+          quantity: number
+          ticker: string
+          value_nok: number
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          date: string
+          exchange_rate?: number
+          id?: string
+          name: string
+          price?: number
+          quantity?: number
+          ticker: string
+          value_nok?: number
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          date?: string
+          exchange_rate?: number
+          id?: string
+          name?: string
+          price?: number
+          quantity?: number
+          ticker?: string
+          value_nok?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
