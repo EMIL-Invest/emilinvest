@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, Shield, Briefcase, LineChart, Instagram } from "lucide-react";
+import { ArrowLeft, Users, Shield, Briefcase, LineChart, Instagram, FileSpreadsheet } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import PortfolioAdmin from "@/components/admin/PortfolioAdmin";
@@ -12,6 +12,7 @@ import HistoryAdmin from "@/components/admin/HistoryAdmin";
 import InstagramAdmin from "@/components/admin/InstagramAdmin";
 import UsersAdmin from "@/components/admin/UsersAdmin";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
+import ExcelExport from "@/components/admin/ExcelExport";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -113,7 +114,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Portefølje
@@ -121,6 +122,10 @@ const Admin = () => {
             <TabsTrigger value="history" className="flex items-center gap-2">
               <LineChart className="w-4 h-4" />
               Historikk
+            </TabsTrigger>
+            <TabsTrigger value="excel" className="flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4" />
+              Excel
             </TabsTrigger>
             <TabsTrigger value="instagram" className="flex items-center gap-2">
               <Instagram className="w-4 h-4" />
@@ -144,6 +149,10 @@ const Admin = () => {
               history={portfolioData.history} 
               onRefresh={portfolioData.refresh} 
             />
+          </TabsContent>
+
+          <TabsContent value="excel">
+            <ExcelExport />
           </TabsContent>
 
           <TabsContent value="instagram">

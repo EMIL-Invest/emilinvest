@@ -223,9 +223,30 @@ Deno.serve(async (req) => {
 
     console.log(`Found ${holdings?.length || 0} holdings`);
 
-    // Calculate total portfolio value
+    // Calculate total portfolio value and collect per-stock data
     let portfolioValue = 0;
     let totalInvestedCapital = 0;
+    const stockSnapshots: Array<{
+      date: string;
+      ticker: string;
+      name: string;
+      price: number;
+      currency: string;
+      exchange_rate: number;
+      quantity: number;
+      value_nok: number;
+    }> = [];
+
+    // Fetch holding names for snapshots
+    const { data: holdingsWithNames } = await supabase
+      .from('portfolio_holdings')
+      .select('ticker, name, quantity, cost_basis, exchange')
+      .eq('holding_type', 'stock');
+
+    const nameMap: Record<string, string> = {};
+    for (const h of holdingsWithNames || []) {
+      nameMap[h.ticker] = h.name;
+    }
 
     for (const holding of holdings || []) {
       const quote = await fetchStockPrice(holding.ticker);
@@ -234,16 +255,52 @@ Deno.serve(async (req) => {
         const value = quote.price * holding.quantity * exchangeRate;
         portfolioValue += value;
         console.log(`${holding.ticker}: ${quote.price} ${quote.currency} x ${holding.quantity} = ${value.toFixed(0)} NOK`);
+
+        stockSnapshots.push({
+          date: today,
+          ticker: holding.ticker,
+          name: nameMap[holding.ticker] || holding.ticker,
+          price: quote.price,
+          currency: quote.currency,
+          exchange_rate: exchangeRate,
+          quantity: holding.quantity,
+          value_nok: Math.round(value),
+        });
       } else {
         // Fallback to cost_basis
-        portfolioValue += holding.cost_basis || 0;
+        const fallbackValue = holding.cost_basis || 0;
+        portfolioValue += fallbackValue;
+
+        stockSnapshots.push({
+          date: today,
+          ticker: holding.ticker,
+          name: nameMap[holding.ticker] || holding.ticker,
+          price: 0,
+          currency: 'NOK',
+          exchange_rate: 1,
+          quantity: holding.quantity,
+          value_nok: Math.round(fallbackValue),
+        });
       }
       totalInvestedCapital += holding.cost_basis || 0;
     }
 
-    // Fetch OSEBX value
+    // Also add OSEBX as a snapshot row
     const osebxValue = await fetchOSEBX();
     console.log(`OSEBX value: ${osebxValue}`);
+
+    if (osebxValue) {
+      stockSnapshots.push({
+        date: today,
+        ticker: 'OSEBX',
+        name: 'Oslo Børs (OSEBX)',
+        price: osebxValue,
+        currency: 'NOK',
+        exchange_rate: 1,
+        quantity: 1,
+        value_nok: Math.round(osebxValue),
+      });
+    }
 
     // Round values
     portfolioValue = Math.round(portfolioValue);
@@ -251,7 +308,20 @@ Deno.serve(async (req) => {
     console.log(`Portfolio value: ${portfolioValue} NOK`);
     console.log(`Invested capital: ${totalInvestedCapital} NOK`);
 
-    // Insert or update today's snapshot
+    // Upsert per-stock snapshots
+    if (stockSnapshots.length > 0) {
+      const { error: snapError } = await supabase
+        .from('portfolio_stock_snapshots')
+        .upsert(stockSnapshots, { onConflict: 'date,ticker' });
+
+      if (snapError) {
+        console.error('Error saving stock snapshots:', snapError);
+      } else {
+        console.log(`Saved ${stockSnapshots.length} stock snapshots`);
+      }
+    }
+
+    // Insert or update today's portfolio history
     if (existingSnapshot) {
       const { error: updateError } = await supabase
         .from('portfolio_history')
