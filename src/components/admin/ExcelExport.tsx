@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 interface StockSnapshot {
   date: string;
@@ -24,7 +24,6 @@ const ExcelExport = () => {
   const handleExport = async () => {
     setLoading(true);
     try {
-      // Fetch all stock snapshots
       const { data: snapshots, error } = await supabase
         .from("portfolio_stock_snapshots")
         .select("*")
@@ -43,70 +42,57 @@ const ExcelExport = () => {
         return;
       }
 
-      // Get unique dates and tickers
       const dates = [...new Set(snapshots.map((s: StockSnapshot) => s.date))].sort();
       const tickers = [...new Set(snapshots.map((s: StockSnapshot) => s.ticker))];
 
-      // Build lookup: ticker+date -> snapshot
       const lookup: Record<string, StockSnapshot> = {};
       for (const s of snapshots as StockSnapshot[]) {
         lookup[`${s.ticker}_${s.date}`] = s;
       }
 
-      // Get names
       const nameMap: Record<string, string> = {};
       for (const s of snapshots as StockSnapshot[]) {
         nameMap[s.ticker] = s.name;
       }
 
-      // --- Sheet 1: Aksjekurser ---
-      const priceRows: Record<string, unknown>[] = [];
-      for (const ticker of tickers) {
-        const row: Record<string, unknown> = { Ticker: ticker, Navn: nameMap[ticker] };
-        for (const date of dates) {
-          const snap = lookup[`${ticker}_${date}`];
-          row[date] = snap ? snap.price : "";
+      const wb = new ExcelJS.Workbook();
+
+      const addSheet = (
+        sheetName: string,
+        getValue: (snap: StockSnapshot) => number
+      ) => {
+        const ws = wb.addWorksheet(sheetName);
+        ws.addRow(["Ticker", "Navn", ...dates]);
+
+        // Bold header row
+        ws.getRow(1).font = { bold: true };
+
+        for (const ticker of tickers) {
+          const row: (string | number)[] = [ticker, nameMap[ticker]];
+          for (const date of dates) {
+            const snap = lookup[`${ticker}_${date}`];
+            row.push(snap ? getValue(snap) : 0);
+          }
+          ws.addRow(row);
         }
-        priceRows.push(row);
-      }
+      };
 
-      // --- Sheet 2: Verdier i NOK ---
-      const valueRows: Record<string, unknown>[] = [];
-      for (const ticker of tickers) {
-        const row: Record<string, unknown> = { Ticker: ticker, Navn: nameMap[ticker] };
-        for (const date of dates) {
-          const snap = lookup[`${ticker}_${date}`];
-          row[date] = snap ? snap.value_nok : "";
-        }
-        valueRows.push(row);
-      }
+      addSheet("Aksjekurser", (s) => s.price);
+      addSheet("Verdier (NOK)", (s) => s.value_nok);
+      addSheet("Antall", (s) => s.quantity);
 
-      // --- Sheet 3: Antall aksjer ---
-      const qtyRows: Record<string, unknown>[] = [];
-      for (const ticker of tickers) {
-        const row: Record<string, unknown> = { Ticker: ticker, Navn: nameMap[ticker] };
-        for (const date of dates) {
-          const snap = lookup[`${ticker}_${date}`];
-          row[date] = snap ? snap.quantity : "";
-        }
-        qtyRows.push(row);
-      }
-
-      // Create workbook
-      const wb = XLSX.utils.book_new();
-
-      const ws1 = XLSX.utils.json_to_sheet(priceRows);
-      XLSX.utils.book_append_sheet(wb, ws1, "Aksjekurser");
-
-      const ws2 = XLSX.utils.json_to_sheet(valueRows);
-      XLSX.utils.book_append_sheet(wb, ws2, "Verdier (NOK)");
-
-      const ws3 = XLSX.utils.json_to_sheet(qtyRows);
-      XLSX.utils.book_append_sheet(wb, ws3, "Antall");
-
-      // Download
+      // Generate and download
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
       const today = new Date().toISOString().split("T")[0];
-      XLSX.writeFile(wb, `EMIL_Invest_Portefolje_${today}.xlsx`);
+      a.href = url;
+      a.download = `EMIL_Invest_Portefolje_${today}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
 
       toast({
         title: "Excel lastet ned!",
