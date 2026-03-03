@@ -119,11 +119,15 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validate authentication - require admin role for this administrative function
+    // Validate authentication - accept either admin JWT or CRON_SECRET
     const authHeader = req.headers.get('Authorization');
-    const isAdmin = await validateAdminAuth(supabase, authHeader);
+    const cronSecret = req.headers.get('x-cron-secret');
+    const expectedCronSecret = Deno.env.get("CRON_SECRET");
     
-    if (!isAdmin) {
+    const isCronAuth = cronSecret && expectedCronSecret && cronSecret === expectedCronSecret;
+    const isAdmin = !isCronAuth ? await validateAdminAuth(supabase, authHeader) : false;
+    
+    if (!isAdmin && !isCronAuth) {
       console.log('Unauthorized access attempt to competition-reset');
       return new Response(
         JSON.stringify({ error: "Unauthorized - Admin access required" }),
