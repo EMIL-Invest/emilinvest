@@ -6,45 +6,45 @@
 
 @layer base {
   :root {
-    /* Nordic Forest & Finance palette */
-    --background: 150 20% 98%;
-    --foreground: 160 30% 10%;
+    /* Deep Forest Green palette — matching EI logo */
+    --background: 150 15% 97%;
+    --foreground: 155 40% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 160 30% 10%;
+    --card-foreground: 155 40% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 160 30% 10%;
+    --popover-foreground: 155 40% 10%;
 
-    /* Deep forest green - sustainability */
-    --primary: 158 64% 28%;
-    --primary-foreground: 150 20% 98%;
+    /* Deep forest green from logo */
+    --primary: 155 42% 18%;
+    --primary-foreground: 150 15% 97%;
 
     /* Soft sage */
-    --secondary: 150 25% 94%;
-    --secondary-foreground: 158 64% 20%;
+    --secondary: 150 20% 93%;
+    --secondary-foreground: 155 42% 15%;
 
-    --muted: 150 15% 92%;
-    --muted-foreground: 160 15% 45%;
+    --muted: 150 12% 91%;
+    --muted-foreground: 155 12% 42%;
 
-    /* Nordic ocean blue accent */
-    --accent: 200 65% 45%;
+    /* Warm gold accent */
+    --accent: 38 85% 52%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 150 20% 88%;
-    --input: 150 20% 88%;
-    --ring: 158 64% 28%;
+    --border: 150 15% 87%;
+    --input: 150 15% 87%;
+    --ring: 155 42% 18%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --gradient-hero: linear-gradient(135deg, hsl(158 64% 28%) 0%, hsl(180 50% 25%) 50%, hsl(200 65% 35%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(150 25% 97%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(158 64% 28%) 100%);
-    --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(32 95% 44%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(155 42% 18%) 0%, hsl(155 35% 24%) 50%, hsl(150 30% 28%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(150 20% 97%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(155 42% 18%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(38 85% 52%) 0%, hsl(32 90% 44%) 100%);
     
     --shadow-soft: 0 4px 20px -4px hsl(160 30% 10% / 0.08);
     --shadow-card: 0 8px 30px -8px hsl(160 30% 10% / 0.12);
