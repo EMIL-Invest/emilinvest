@@ -2,7 +2,7 @@ import { TrendingUp, Leaf, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import eiLogo from "@/assets/ei-logo.png";
+import eiLogo from "@/assets/emil-invest-text-logo.png";
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -39,12 +39,11 @@ const HeroSection = () => {
             </span>
           </div>
 
-          <div className="flex items-center justify-center gap-4 mb-6 animate-fade-up" style={{
+          <div className="flex items-center justify-center mb-6 animate-fade-up" style={{
           animationDelay: "0.1s"
         }}>
-            <img src={eiLogo} alt="EMIL Invest" className="h-16 md:h-20 w-auto" />
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground">
-              <span className="gradient-text">EMIL Invest</span>
+            <h1>
+              <img src={eiLogo} alt="EMIL Invest" className="h-16 md:h-24 w-auto" />
             </h1>
           </div>
 

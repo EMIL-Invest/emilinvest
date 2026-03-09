@@ -1,15 +1,12 @@
-import eiLogo from "@/assets/ei-logo.png";
+import eiLogo from "@/assets/emil-invest-text-logo.png";
 
 const Footer = () => {
   return (
     <footer className="py-12 border-t border-border">
       <div className="section-container">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            <img src={eiLogo} alt="EMIL Invest" className="h-8 w-auto" />
-            <span className="font-serif font-semibold text-foreground text-sm">
-              EMIL Invest
-            </span>
+          <div className="flex items-center">
+            <img src={eiLogo} alt="EMIL Invest" className="h-6 w-auto" />
           </div>
 
           <p className="text-sm text-muted-foreground text-center">
