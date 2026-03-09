@@ -74,7 +74,7 @@ const Navbar = () => {
       <div className="section-container">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-3">
-            <img src={emilLogo} aliEMIL Invest" className="h-10 w-auto" />
+            <img src={eiLogo} alt="EMIL Invest" className="h-10 w-auto" />
             <span className="font-serif font-semibold text-foreground">
               EMIL Invest
             </span>
