@@ -2,7 +2,7 @@ import { TrendingUp, Leaf, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import eiLogo from "@/assets/emil-invest-text-logo.png";
+import BrandLogo from "@/components/BrandLogo";
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
