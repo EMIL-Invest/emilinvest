@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import eiLogo from "@/assets/ei-logo.png";
+import eiLogo from "@/assets/emil-invest-text-logo.png";
 
 const navLinks = [
   { href: "#home", label: "Hjem" },
