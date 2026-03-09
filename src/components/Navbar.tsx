@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import eiLogo from "@/assets/emil-invest-text-logo.png";
+import BrandLogo from "@/components/BrandLogo";
 
 const navLinks = [
   { href: "#home", label: "Hjem" },
@@ -74,7 +74,7 @@ const Navbar = () => {
       <div className="section-container">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
-            <img src={eiLogo} alt="EMIL Invest" className="h-8 w-auto" />
+            <BrandLogo size="sm" />
           </Link>
 
           {/* Desktop Navigation */}

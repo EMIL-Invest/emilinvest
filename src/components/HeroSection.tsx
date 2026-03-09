@@ -2,7 +2,7 @@ import { TrendingUp, Leaf, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import eiLogo from "@/assets/emil-invest-text-logo.png";
+import BrandLogo from "@/components/BrandLogo";
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -43,7 +43,7 @@ const HeroSection = () => {
           animationDelay: "0.1s"
         }}>
             <h1>
-              <img src={eiLogo} alt="EMIL Invest" className="h-16 md:h-24 w-auto" />
+              <BrandLogo size="xl" />
             </h1>
           </div>
 
