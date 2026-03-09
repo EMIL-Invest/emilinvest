@@ -2,6 +2,7 @@ import { TrendingUp, Leaf, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
+import eiLogo from "@/assets/ei-logo.png";
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
