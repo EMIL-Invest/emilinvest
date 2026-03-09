@@ -73,11 +73,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="section-container">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-3">
-            <img src={eiLogo} alt="EMIL Invest" className="h-10 w-auto" />
-            <span className="font-serif font-semibold text-foreground">
-              EMIL Invest
-            </span>
+          <Link to="/" className="flex items-center">
+            <img src={eiLogo} alt="EMIL Invest" className="h-8 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
