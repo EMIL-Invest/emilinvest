@@ -1,4 +1,4 @@
-import eiLogo from "@/assets/ei
+import eiLogo from "@/assets/ei-logo.png";
 
 const Footer = () => {
   return (
