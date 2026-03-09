@@ -43,7 +43,7 @@ const HeroSection = () => {
           animationDelay: "0.1s"
         }}>
             <h1>
-              <img src={eiLogo} alt="EMIL Invest" className="h-16 md:h-24 w-auto" />
+              <BrandLogo size="xl" />
             </h1>
           </div>
 
