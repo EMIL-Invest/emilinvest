@@ -129,6 +129,8 @@ function getYahooTicker(ticker: string): string {
     "VEI": "VEI.OL",
     "LOKO": "LOKO.OL",
     "CADLR": "CADLR.OL",
+    "PROT": "PROT.OL",
+    "SATS": "SATS.OL",
     "VEND": "VEND.OL",
     
     // Copenhagen
