@@ -13,7 +13,7 @@ const AboutSection = () => {
             En investeringskomité for{" "}
             <span className="gradient-text">studenter</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">EMIL Invest er en studentdrevet investeringskomité under energi- og miljøingeniørenes linjeforening - EMIL. Vi forvalter en reell aksjeportefølje med mål om å slå Oslo Børs over tid, samtidig som vi gir medlemmene praktisk erfaring med investeringer og bærekraft.</p>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">EMIL Invest er en studentdrevet investeringskomité under energi- og miljøingeniørenes linjeforening - EMIL. Vi forvalter en reell aksjeportefølje med mål om å slå Oslo Børs over tid, samtidig som vi gir medlemmene praktisk erfaring med investeringer og finansmarkedene.</p>
         </div>
 
         {/* Info cards */}
