@@ -35,7 +35,7 @@ const HeroSection = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary mb-8 animate-fade-up">
             <Leaf className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-secondary-foreground">
-              Bærekraftige investeringer for fremtiden
+              Investeringer for fremtiden
             </span>
           </div>
 
