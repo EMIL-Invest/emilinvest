@@ -52,10 +52,10 @@ const AboutSection = () => {
                 <Leaf className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-serif font-semibold text-foreground mb-2">
-                ESG-screening
+                Diversifisert portefølje
               </h3>
               <p className="text-sm text-muted-foreground">
-                Vi utelukker selskaper som driver virksomhet i strid med bærekraftig utvikling, og søker en diversifisert portefølje.
+                Vi søker en godt diversifisert portefølje med eksponering mot ulike sektorer og selskaper på Oslo Børs.
               </p>
             </CardContent>
           </Card>
@@ -66,10 +66,10 @@ const AboutSection = () => {
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-serif font-semibold text-foreground mb-2">
-                Læring i praksis
+                Transparent portefølje
               </h3>
               <p className="text-sm text-muted-foreground">
-                Inntil 5% av porteføljen er satt av til spekulasjonsaksjer for å gi medlemmene erfaring med risikostyring.
+                Alle studenter ved energi og miljø på NTNU kan til enhver tid følge med på hvordan det går med porteføljen – full åpenhet, ingen hemmeligheter.
               </p>
             </CardContent>
           </Card>
