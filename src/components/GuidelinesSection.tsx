@@ -1,5 +1,4 @@
 import {
-  Leaf,
   PieChart,
   Clock,
   Target,
@@ -10,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 
 const guidelines = [
   {
-    icon: Leaf,
-    title: "Bærekraftige investeringer",
+    icon: Target,
+    title: "Kvalitetsinvesteringer",
     description:
-      "Vi fokuserer på selskaper med sterke ESG-profiler som bidrar til bærekraftig utvikling og positiv miljøpåvirkning.",
+      "Vi fokuserer på selskaper med sterke fundamentale verdier, solid ledelse og bærekraftig konkurransefortrinn.",
     color: "text-primary",
     bgColor: "bg-primary/10",
   },
@@ -56,7 +55,7 @@ const GuidelinesSection = () => {
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Disse prinsippene styrer alle våre investeringsbeslutninger og
-            sikrer at vi investerer ansvarlig og bærekraftig.
+            sikrer at vi investerer ansvarlig og langsiktig.
           </p>
         </div>
 

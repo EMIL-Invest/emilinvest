@@ -36,7 +36,7 @@ const TeamSection = () => {
             Møt komiteen
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Vi er en gruppe engasjerte studenter som brenner for bærekraftige
+            Vi er en gruppe engasjerte studenter som brenner for
             investeringer og økonomisk forståelse.
           </p>
         </div>
@@ -86,7 +86,7 @@ const TeamSection = () => {
           </h3>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
             Er du student på energi og miljø og interessert i
-            bærekraftige investeringer? Ta kontakt med oss!
+            investeringer? Ta kontakt med oss!
           </p>
           <a
             href="mailto:Henrikb.heierstad@gmail.com"

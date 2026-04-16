@@ -37,7 +37,7 @@ const PortfolioSection = () => {
             Våre investeringer
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Følg utviklingen av våre bærekraftige aksjeinvesteringer med live markedsdata
+            Følg utviklingen av våre aksjeinvesteringer med live markedsdata
           </p>
         </div>
 
