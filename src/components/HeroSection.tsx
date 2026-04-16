@@ -49,7 +49,7 @@ const HeroSection = () => {
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{
           animationDelay: "0.2s"
-        }}>Vi er studenter ved energi og miljø som forvalter våre investeringer med fokus på bærekraft og langsiktig vekst.</p>
+        }}>Vi er studenter ved energi og miljø som forvalter våre investeringer med fokus på langsiktig vekst.</p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{
           animationDelay: "0.3s"
