@@ -31,10 +31,36 @@ interface Holding {
 // Map database tickers to Yahoo Finance format
 function getYahooTicker(ticker: string): string {
   const tickerMappings: Record<string, string> = {
+    // Oslo Børs
     "EQNR": "EQNR.OL",
     "AKERBP": "AKRBP.OL",
+    "AKRBP": "AKRBP.OL",
     "KOG": "KOG.OL",
+    "DNB": "DNB.OL",
+    "TEL": "TEL.OL",
+    "MOWI": "MOWI.OL",
+    "ORK": "ORK.OL",
+    "YAR": "YAR.OL",
+    "SALM": "SALM.OL",
+    "SUBC": "SUBC.OL",
+    "NHY": "NHY.OL",
+    "BAKKA": "BAKKA.OL",
+    "SCATC": "SCATC.OL",
+    "AKER": "AKER.OL",
+    "FRO": "FRO.OL",
+    "PGS": "PGS.OL",
+    "AUSS": "AUSS.OL",
+    "GJF": "GJF.OL",
+    "STB": "STB.OL",
+    "VEI": "VEI.OL",
+    "LOKO": "LOKO.OL",
+    "CADLR": "CADLR.OL",
+    "PROT": "PROT.OL",
+    "SATS": "SATS.OL",
+    "VEND": "VEND.OL",
+    // Copenhagen
     "NOVO-B": "NOVO-B.CO",
+    // US
     "AAPL": "AAPL",
     "AMZN": "AMZN",
     "JPM": "JPM",
@@ -42,6 +68,8 @@ function getYahooTicker(ticker: string): string {
     "CCJ": "CCJ",
     "TTWO": "TTWO",
   };
+  // If ticker already includes an exchange suffix, use as-is
+  if (ticker.includes(".")) return ticker;
   return tickerMappings[ticker] || ticker;
 }
 
