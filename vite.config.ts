@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    mcpPlugin(),react(), mode === "development" && componentTagger()].filter(Boolean),
+    mcpPlugin(), react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
