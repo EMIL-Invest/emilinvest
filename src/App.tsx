@@ -9,6 +9,7 @@ import Admin from "./pages/Admin";
 import Competition from "./pages/Competition";
 import Account from "./pages/Account";
 import ReportViewer from "./pages/ReportViewer";
+import OAuthConsent from "./pages/OAuthConsent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/konkurranse" element={<Competition />} />
           <Route path="/konto" element={<Account />} />
           <Route path="/rapport" element={<ReportViewer />} />
+          <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

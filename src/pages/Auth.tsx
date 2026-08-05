@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,22 +22,28 @@ const Auth = () => {
   const [checkingInvitation, setCheckingInvitation] = useState(false);
   const [isInvited, setIsInvited] = useState<boolean | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  const rawNext = searchParams.get("next");
+  const nextPath = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : null;
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        navigate("/");
+        if (nextPath) window.location.href = nextPath;
+        else navigate("/");
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        if (nextPath) window.location.href = nextPath;
+        else navigate("/");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, nextPath]);
 
   const checkInvitation = async (emailToCheck: string) => {
     if (!emailToCheck || isLogin || signupType === "competition") return;
@@ -111,7 +117,9 @@ const Auth = () => {
           return;
         }
 
-        const redirectUrl = signupType === "competition" 
+        const redirectUrl = nextPath
+          ? `${window.location.origin}${nextPath}`
+          : signupType === "competition" 
           ? `${window.location.origin}/konkurranse`
           : `${window.location.origin}/`;
         
