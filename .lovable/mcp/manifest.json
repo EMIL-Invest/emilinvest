@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://rdiansdvvwkpujidyzoe.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "emil-invest",
+      "version": "0.1.0",
+      "title": "Emil Invest"
+    },
+    "tools": [
+      {
+        "name": "get_club_portfolio",
+        "title": "Get club portfolio",
+        "description": "List EMIL Invest's current holdings with quantity, purchase price and cost basis.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_performance_history",
+        "title": "Get performance history",
+        "description": "Daily portfolio value history for EMIL Invest, including the OSEBX benchmark value and invested capital.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365,
+              "default": 60,
+              "description": "Number of most recent days to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_tradable_stocks",
+        "title": "List tradable stocks",
+        "description": "The stocks available for trading in the EMIL Invest stock competition.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_competition_leaderboard",
+        "title": "Get competition leaderboard",
+        "description": "Ranked results from the latest stock competition leaderboard snapshot.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "period": {
+              "type": "string",
+              "enum": [
+                "monthly",
+                "yearly",
+                "all_time"
+              ],
+              "default": "all_time",
+              "description": "Which competition period to rank by."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_competition_portfolio",
+        "title": "Get my competition portfolio",
+        "description": "The signed-in user's stock competition participation: holdings, cash (ASK) and recent transactions.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
