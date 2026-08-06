@@ -453,7 +453,7 @@ SELECT cron.schedule(
     url := 'https://nehqvobfwooyufxqbzpv.supabase.co/functions/v1/daily-snapshot',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'x-cron-secret', '98071ee040cc8d039124ee1d793f0b3a9d4e3558f112e2cf9e5691d4c4e27846'
+      'x-cron-secret', '{{CRON_SECRET}}'
     ),
     body := '{}'::jsonb
   );
