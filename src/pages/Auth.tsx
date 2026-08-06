@@ -8,12 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Mail, Lock, User, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import emilLogo from "@/assets/emil-invest-logo.png";
+import BrandLogo from "@/components/BrandLogo";
 
 type SignupType = "competition" | "admin";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [forgotMode, setForgotMode] = useState(false);
   const [signupType, setSignupType] = useState<SignupType>("competition");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -71,6 +72,33 @@ const Auth = () => {
   const handleEmailBlur = () => {
     if (!isLogin && signupType === "admin" && email) {
       checkInvitation(email);
+    }
+  };
+
+  // Glemt passord: send tilbakestillingslenke på e-post. Lenken åpner
+  // /nytt-passord der brukeren setter nytt passord.
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/nytt-passord`,
+      });
+      if (error) throw error;
+      toast({
+        title: "Sjekk e-posten din!",
+        description: "Vi har sendt deg en lenke for å sette nytt passord.",
+      });
+      setForgotMode(false);
+    } catch (error) {
+      toast({
+        title: "Kunne ikke sende lenke",
+        description: error instanceof Error ? error.message : "Ukjent feil",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -193,20 +221,52 @@ const Auth = () => {
         <Card className="glass-card">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <img src={emilLogo} alt="EMIL Invest" className="h-16 w-auto" />
+              <BrandLogo variant="wordmark" tone="navy" size="md" />
             </div>
             <CardTitle className="font-serif text-2xl">
-              {isLogin ? "Logg inn" : "Opprett konto"}
+              {forgotMode ? "Glemt passord" : isLogin ? "Logg inn" : "Opprett konto"}
             </CardTitle>
             <CardDescription>
-              {isLogin 
-                ? "Logg inn for å delta i konkurransen eller administrere" 
+              {forgotMode
+                ? "Skriv inn e-posten din, så sender vi deg en lenke for å sette nytt passord"
+                : isLogin
+                ? "Logg inn for å delta i konkurransen eller administrere"
                 : signupType === "competition"
                   ? "Registrer deg for å delta i aksjekonkurransen"
                   : "Registrer deg med en gyldig invitasjon"}
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {forgotMode ? (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email">E-post</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      placeholder="din@epost.no"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Sender..." : "Send tilbakestillingslenke"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setForgotMode(false)}
+                  className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  ← Tilbake til innlogging
+                </button>
+              </form>
+            ) : (
+            <>
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <>
@@ -297,7 +357,18 @@ const Auth = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Passord</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Passord</Label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => setForgotMode(true)}
+                      className="text-xs text-primary hover:underline font-medium"
+                    >
+                      Glemt passord?
+                    </button>
+                  )}
+                </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -344,7 +415,7 @@ const Auth = () => {
             {!isLogin && signupType === "admin" && (
               <p className="mt-4 text-xs text-center text-muted-foreground">
                 For admin-tilgang må du bli invitert av en administrator.
-                Kontakt Kristian Hove eller en annen admin.
+                Kontakt Henrik Heierstad eller en annen admin.
               </p>
             )}
             {!isLogin && signupType === "competition" && (
@@ -352,6 +423,8 @@ const Auth = () => {
                 Du vil motta en e-post med en bekreftelseslenke.
                 Klikk på lenken for å aktivere kontoen din.
               </p>
+            )}
+            </>
             )}
           </CardContent>
         </Card>

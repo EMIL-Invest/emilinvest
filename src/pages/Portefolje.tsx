@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PerformanceSection from "@/components/PerformanceSection";
+import { AllocationSection, ContributionSection } from "@/components/PortfolioVisuals";
 import { usePortfolioData, Holding, StockQuote } from "@/hooks/usePortfolioData";
 
 /**
@@ -122,6 +123,9 @@ const Portefolje = () => {
           )}
         </div>
 
+        {/* Fordeling: smultring, fakta og posisjonsbrikker */}
+        {!loading && <AllocationSection stocks={stocks} other={other} totalValue={totalValue} />}
+
         {/* Aksjer */}
         <div className="section-container pb-16">
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-6">Aksjer</h2>
@@ -203,6 +207,9 @@ const Portefolje = () => {
             </>
           )}
         </div>
+
+        {/* Bidrag per posisjon */}
+        {!loading && <ContributionSection stocks={stocks} />}
 
         {/* Utviklingsgrafen — samme som på forsiden */}
         <PerformanceSection />
