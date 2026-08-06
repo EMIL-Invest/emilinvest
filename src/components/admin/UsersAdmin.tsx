@@ -134,10 +134,10 @@ const UsersAdmin = ({ currentUser }: UsersAdminProps) => {
         setNewRole("member");
         fetchInvitations();
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     } finally {
@@ -146,30 +146,32 @@ const UsersAdmin = ({ currentUser }: UsersAdminProps) => {
   };
 
   const handleDeleteInvitation = async (id: string) => {
+    if (!window.confirm("Er du sikker på at du vil slette denne invitasjonen?")) return;
     try {
       const { error } = await supabase.from("invitations").delete().eq("id", id);
       if (error) throw error;
       toast({ title: "Invitasjon slettet" });
       fetchInvitations();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     }
   };
 
   const handleRemoveRole = async (userId: string) => {
+    if (!window.confirm("Er du sikker på at du vil fjerne rollen til denne brukeren? Admin-brukere mister tilgangen sin.")) return;
     try {
       const { error } = await supabase.from("user_roles").delete().eq("user_id", userId);
       if (error) throw error;
       toast({ title: "Rolle fjernet" });
       fetchUserRoles();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     }

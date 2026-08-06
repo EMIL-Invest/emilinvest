@@ -1,26 +1,54 @@
-# Emil Invest
+# EMIL Invest
 
-create a webpage for my investment committee on NTNU Gløshaugen for energy and environmental engineering students. The web page should have an own section with specific stock that we invest in and shall be linked up to Osebx so we can see the yield of your investments. The page should also contain a section with guidelines such as to only invest in environmental friendly stocks, and have a maximum of 10% in stock, the rest in funds. The last section should contain the members of the committee, plus a homepage
+Nettsiden til EMIL Invest — investeringskomiteen for Energi- og miljøstudenter
+ved NTNU Gløshaugen. Siden viser komiteens portefølje målt mot OSEBX,
+retningslinjer, kvartalsrapporter og teamet, og kjører en aksjekonkurranse
+(digital simulering) som alle innloggede studenter kan delta i.
 
-This project was built with [Lovable](https://lovable.dev).
+## Teknologi
 
-**Live app**: https://emilinvest.lovable.app
+- **Frontend:** Vite + React + TypeScript, Tailwind CSS, shadcn/ui
+- **Backend:** [Supabase](https://supabase.com) (Postgres, Auth, Storage, Edge Functions)
+- **Hosting:** Vercel — hver push til `main` deployes automatisk
+- **Kursdata:** Yahoo Finance via `stock-prices`-edge-funksjonen (alle priser konverteres til NOK)
 
-## Build with Lovable
+## Lokal utvikling
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/3ff7494c-b252-4fda-b060-04c40f323061).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Krever Node.js 18+.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+git clone https://github.com/Henrik-star/emilinvest.git
+cd emilinvest
+npm install
+cp .env.example .env   # fyll inn verdiene fra Supabase-dashbordet
+npm run dev            # kjører på http://localhost:8080
 ```
+
+## Nyttige kommandoer
+
+```sh
+npm run build    # produksjonsbygg
+npm run lint     # ESLint
+npm test         # Vitest
+```
+
+## Supabase
+
+Prosjekt-ref: `nehqvobfwooyufxqbzpv` (region eu-west-3).
+
+- Migrasjonsfiler ligger i `supabase/migrations/` (historikk fra Lovable-tiden —
+  databasen ble migrert med dump/restore, så ikke kjør `supabase db push` uten videre).
+- Engangsoppsett og sikkerhetsfikser gjort etter migreringen ligger i `supabase/manual/`.
+- Edge-funksjoner deployes med:
+  ```sh
+  supabase functions deploy stock-prices daily-snapshot check-invitation delete-account competition-reset mcp
+  ```
+- Secrets: `CRON_SECRET` (brukes av den daglige snapshot-jobben) og eventuelt
+  `ALLOWED_ORIGINS` (kommaseparert liste over domener som får kalle
+  admin-funksjonene fra nettleseren).
+
+## Historikk
+
+Prosjektet ble opprinnelig bygget med [Lovable](https://lovable.dev) og
+migrert til egen Supabase + Vercel i august 2026 — med all brukerdata,
+innlogging og konkurransehistorikk intakt.

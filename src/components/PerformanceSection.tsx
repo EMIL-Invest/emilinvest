@@ -80,43 +80,43 @@ const PerformanceSection = () => {
     }
 
     const filtered = history.filter(h => new Date(h.date) >= startDate);
-    
+
     if (filtered.length === 0) return [];
 
-    // Time-weighted return calculation
-    // Each investment is weighted from its entry point
-    // This ensures new capital doesn't artificially inflate/deflate returns
-    
+    // Ekte tidsvektet avkastning (TWR), kjedet over delperioder:
+    //   r_t = pv_t / (pv_{t-1} + innskudd_t)
+    // der innskudd_t = endring i invested_capital siden forrige punkt.
+    // Slik nøytraliseres innskudd/uttak: ny kapital gir verken falsk
+    // gevinst eller falskt tap. Mangler invested_capital på et punkt
+    // antas ingen kapitalflyt (innskudd_t = 0), som gjør at manuelt
+    // innlagte historikkrader fungerer sømløst.
     const firstPoint = filtered[0];
     const firstOsebx = firstPoint.osebx_value || 100;
 
-    return filtered.map((h, index) => {
-      // Calculate time-weighted portfolio return
-      // Sum of weighted returns for each investment tranche
-      let cumulativeWeightedReturn = 0;
-      let totalWeight = 0;
+    let portfolioIndex = 100;
 
-      // For each data point, calculate the weighted return based on when capital was added
-      const currentInvested = h.invested_capital || h.portfolio_value;
-      const prevInvested = index > 0 ? (filtered[index - 1].invested_capital || filtered[index - 1].portfolio_value) : currentInvested;
-      
-      // Calculate the gain/loss relative to invested capital at each point
-      const portfolioGainRatio = h.portfolio_value / currentInvested;
-      const firstGainRatio = firstPoint.portfolio_value / (firstPoint.invested_capital || firstPoint.portfolio_value);
-      
-      // Normalize: ratio of current gain vs first point gain, then scale to 100
-      const portfolioReturn = (portfolioGainRatio / firstGainRatio) * 100;
-      
+    return filtered.map((h, index) => {
+      if (index > 0) {
+        const prev = filtered[index - 1];
+        const flow =
+          h.invested_capital != null && prev.invested_capital != null
+            ? Number(h.invested_capital) - Number(prev.invested_capital)
+            : 0;
+        const denominator = Number(prev.portfolio_value) + flow;
+        const periodReturn = denominator > 0 ? Number(h.portfolio_value) / denominator : 1;
+        portfolioIndex *= periodReturn;
+      }
+
       // OSEBX: simple normalized return from first point
       const osebxReturn = h.osebx_value ? (h.osebx_value / firstOsebx) * 100 : null;
 
       return {
-        date: new Date(h.date).toLocaleDateString("no-NO", { 
-          day: "2-digit", 
+        date: new Date(h.date).toLocaleDateString("no-NO", {
+          day: "2-digit",
           month: "short",
           year: timeFilter === "ALL" || timeFilter === "1Y" ? "2-digit" : undefined
         }),
-        portfolio: Math.round(portfolioReturn * 100) / 100,
+        portfolio: Math.round(portfolioIndex * 100) / 100,
         osebx: osebxReturn ? Math.round(osebxReturn * 100) / 100 : null,
       };
     });

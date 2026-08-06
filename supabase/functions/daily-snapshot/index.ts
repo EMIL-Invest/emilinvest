@@ -1,10 +1,15 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Allowed origins for CORS - restrict to known domains
-const ALLOWED_ORIGINS = [
+// Allowed origins for CORS - restrict to known domains.
+// Kan overstyres med miljøvariabelen ALLOWED_ORIGINS (kommaseparert liste)
+// — sett den når endelig Vercel-/eget domene er klart:
+//   supabase secrets set ALLOWED_ORIGINS=https://ditt-domene.no,http://localhost:8080
+const DEFAULT_ALLOWED_ORIGINS = [
+  "http://localhost:8080",
+  "https://emilinvest.vercel.app",
   "https://emilinvest.lovable.app",
-  "https://id-preview--3ff7494c-b252-4fda-b060-04c40f323061.lovable.app",
 ];
+const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS")?.split(",").map((s) => s.trim()).filter(Boolean)) ?? DEFAULT_ALLOWED_ORIGINS;
 
 function getCorsHeaders(origin: string | null): Record<string, string> {
   const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
@@ -73,15 +78,30 @@ function getYahooTicker(ticker: string): string {
   return tickerMappings[ticker] || ticker;
 }
 
-// Exchange rates to NOK
+// Exchange rates to NOK.
+// NB: "GBp" (pence) må håndteres separat fra "GBP" — LSE-aksjer noteres i
+// pence hos Yahoo. Hold denne i sync med stock-prices/index.ts (FX_TO_NOK).
 function getExchangeRate(currency: string): number {
   const rates: Record<string, number> = {
     'NOK': 1,
     'USD': 11.0,
     'DKK': 1.55,
     'EUR': 11.6,
+    'SEK': 1.05,
+    'GBP': 13.5,
+    'GBp': 0.135,
+    'GBX': 0.135,
+    'CHF': 12.6,
+    'JPY': 0.073,
+    'TWD': 0.34,
+    'CAD': 7.7,
   };
-  return rates[currency] || 1;
+  const rate = rates[currency];
+  if (rate === undefined) {
+    console.warn(`Ukjent valuta "${currency}" — bruker 1:1 mot NOK. Legg den til i kurstabellen!`);
+    return 1;
+  }
+  return rate;
 }
 
 async function fetchStockPrice(ticker: string): Promise<StockQuote | null> {
@@ -236,7 +256,7 @@ Deno.serve(async (req) => {
       .from('portfolio_history')
       .select('id')
       .eq('date', today)
-      .single();
+      .maybeSingle();
 
     // Fetch all holdings
     const { data: holdings, error: holdingsError } = await supabase

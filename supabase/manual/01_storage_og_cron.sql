@@ -1,0 +1,2 @@
+-- UTDATERT: denne filen ble levert avkuttet og er erstattet av
+-- 02_full_oppsett.sql i samme mappe. Kjør den i stedet. Slett gjerne denne.

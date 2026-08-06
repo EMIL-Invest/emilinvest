@@ -81,21 +81,11 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
               {stocks.map((stock) => {
                 const quote = quotes[stock.ticker];
                 const isPositive = quote ? quote.changePercent >= 0 : true;
-                
-                // Exchange rates to NOK
-                const getExchangeRate = (currency: string): number => {
-                  const rates: Record<string, number> = {
-                    'NOK': 1,
-                    'USD': 11.0,
-                    'DKK': 1.55,
-                    'EUR': 11.6,
-                  };
-                  return rates[currency] || 1;
-                };
-                
-                // Calculate value in NOK
+
+                // Edge-funksjonen returnerer alle kurser ferdig konvertert til NOK —
+                // ingen valutakonvertering skal skje her.
                 const currentValue = quote && quote.price > 0
-                  ? quote.price * stock.quantity * getExchangeRate(quote.currency)
+                  ? quote.price * stock.quantity
                   : stock.cost_basis || (stock.purchase_price * stock.quantity);
                 
                 return (
@@ -107,7 +97,7 @@ const StocksTable = ({ holdings, quotes, loading, lastUpdated, onRefresh }: Stoc
                       <a
                         href={
                           stock.exchange === "OSE"
-                            ? `https://www.oslobors.no/markedsaktivitet/#/details/${stock.ticker}.OSE/overview`
+                            ? `https://finance.yahoo.com/quote/${stock.ticker}${stock.ticker.includes(".") ? "" : ".OL"}`
                             : `https://finance.yahoo.com/quote/${stock.ticker}`
                         }
                         target="_blank"

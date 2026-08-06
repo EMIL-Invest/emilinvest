@@ -149,13 +149,10 @@ serve(async (req) => {
       );
     }
 
-    // Return minimal information - don't expose role to reduce information disclosure
+    // Return minimal information — endepunktet er uautentisert, så verken
+    // rolle eller utløpsdato skal eksponeres (frontend bruker kun `invited`).
     return new Response(
-      JSON.stringify({ 
-        invited: !!data, 
-        role: data?.role || null,
-        expiresAt: data?.expires_at || null
-      }),
+      JSON.stringify({ invited: !!data }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

@@ -19,6 +19,7 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
     date: new Date().toISOString().split("T")[0],
     portfolio_value: "",
     osebx_value: "",
+    invested_capital: "",
   });
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -32,6 +33,7 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
         date: formData.date,
         portfolio_value: parseFloat(formData.portfolio_value) || 0,
         osebx_value: formData.osebx_value ? parseFloat(formData.osebx_value) : null,
+        invested_capital: formData.invested_capital ? parseFloat(formData.invested_capital) : null,
       }]);
 
       if (error) throw error;
@@ -44,13 +46,14 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
         date: new Date().toISOString().split("T")[0],
         portfolio_value: "",
         osebx_value: "",
+        invested_capital: "",
       });
       setShowAddForm(false);
       onRefresh();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     } finally {
@@ -59,6 +62,7 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
   };
 
   const handleDelete = async (date: string) => {
+    if (!window.confirm(`Er du sikker på at du vil slette historikken for ${date}?`)) return;
     try {
       const { error } = await supabase
         .from("portfolio_history")
@@ -72,10 +76,10 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
         description: `Data for ${date} er fjernet.`,
       });
       onRefresh();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     }
@@ -112,7 +116,7 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
         {showAddForm && (
           <form onSubmit={handleAdd} className="p-4 rounded-lg bg-muted/50 border border-border mb-6">
             <h4 className="font-medium mb-4">Legg til historisk verdi</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="date">Dato</Label>
                 <Input
@@ -146,7 +150,23 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
                   placeholder="100000"
                 />
               </div>
+              <div>
+                <Label htmlFor="invested_capital">Investert kapital (valgfritt)</Label>
+                <Input
+                  id="invested_capital"
+                  type="number"
+                  step="0.01"
+                  value={formData.invested_capital}
+                  onChange={(e) => setFormData({ ...formData, invested_capital: e.target.value })}
+                  placeholder="100000"
+                />
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              «Investert kapital» brukes til å skille innskudd fra avkastning i grafen.
+              Oppgi total innskutt kapital per denne datoen — uten den antas ingen
+              kapitalendring siden forrige punkt.
+            </p>
             <div className="flex gap-2 mt-4">
               <Button type="submit" disabled={saving}>
                 {saving ? "Lagrer..." : "Legg til"}

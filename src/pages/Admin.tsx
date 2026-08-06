@@ -11,6 +11,7 @@ import PortfolioAdmin from "@/components/admin/PortfolioAdmin";
 import HistoryAdmin from "@/components/admin/HistoryAdmin";
 import InstagramAdmin from "@/components/admin/InstagramAdmin";
 import UsersAdmin from "@/components/admin/UsersAdmin";
+import TeamAdmin from "@/components/admin/TeamAdmin";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import ExcelExport from "@/components/admin/ExcelExport";
 
@@ -114,7 +115,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Portefølje
@@ -131,8 +132,12 @@ const Admin = () => {
               <Instagram className="w-4 h-4" />
               Instagram
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
+            <TabsTrigger value="team" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
+              Komiteen
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
               Brukere
             </TabsTrigger>
           </TabsList>
@@ -157,6 +162,10 @@ const Admin = () => {
 
           <TabsContent value="instagram">
             <InstagramAdmin userId={user?.id || ""} />
+          </TabsContent>
+
+          <TabsContent value="team">
+            <TeamAdmin />
           </TabsContent>
 
           <TabsContent value="users">

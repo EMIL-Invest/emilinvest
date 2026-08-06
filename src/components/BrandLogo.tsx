@@ -1,24 +1,34 @@
+import wordmarkNavy from "@/assets/logo-wordmark-navy.png";
+import wordmarkWhite from "@/assets/logo-wordmark-white.png";
+import eiNavy from "@/assets/logo-ei-navy.png";
+import eiWhite from "@/assets/logo-ei-white.png";
+
 interface BrandLogoProps {
   size?: "sm" | "md" | "lg" | "xl";
+  /** wordmark = «EMIL INVEST» med pil, icon = EI-monogrammet. Brukes aldri sammen. */
+  variant?: "wordmark" | "icon";
+  /** navy for lys bakgrunn, white for mørk bakgrunn */
+  tone?: "navy" | "white";
   className?: string;
 }
 
-const sizeMap = {
-  sm: { text: "text-sm tracking-[0.15em]", line: "mt-0.5" },
-  md: { text: "text-lg tracking-[0.15em]", line: "mt-1" },
-  lg: { text: "text-3xl md:text-4xl tracking-[0.15em]", line: "mt-1.5" },
-  xl: { text: "text-5xl md:text-7xl tracking-[0.15em]", line: "mt-2" },
-};
+const wordmarkHeights = { sm: "h-6", md: "h-8", lg: "h-12 md:h-14", xl: "h-16 md:h-24" };
+const iconHeights = { sm: "h-8", md: "h-10", lg: "h-16", xl: "h-24" };
 
-const BrandLogo = ({ size = "md", className = "" }: BrandLogoProps) => {
-  const s = sizeMap[size];
+const BrandLogo = ({ size = "md", variant = "wordmark", tone = "navy", className = "" }: BrandLogoProps) => {
+  const src =
+    variant === "icon"
+      ? tone === "white" ? eiWhite : eiNavy
+      : tone === "white" ? wordmarkWhite : wordmarkNavy;
+  const height = variant === "icon" ? iconHeights[size] : wordmarkHeights[size];
+
   return (
-    <div className={`inline-flex flex-col items-center ${className}`}>
-      <span className={`font-serif font-bold text-foreground ${s.text}`}>
-        EMIL INVEST
-      </span>
-      <div className={`w-full h-px bg-foreground/80 ${s.line}`} />
-    </div>
+    <img
+      src={src}
+      alt="EMIL Invest"
+      className={`${height} w-auto select-none ${className}`}
+      draggable={false}
+    />
   );
 };
 

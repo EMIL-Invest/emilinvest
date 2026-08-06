@@ -1,98 +1,183 @@
-import { TrendingUp, Leaf, Users, Trophy } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { TrendingUp, TrendingDown, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import BrandLogo from "@/components/BrandLogo";
+
+/**
+ * Teller mykt opp/ned til ny verdi når den endres — NBIM-følelsen av at
+ * saldoen «lever». Bruker requestAnimationFrame med ease-out.
+ */
+const useCountUp = (target: number, durationMs = 1400): number => {
+  const [value, setValue] = useState(0);
+  const fromRef = useRef(0);
+  const frameRef = useRef<number>();
+
+  useEffect(() => {
+    if (!isFinite(target)) return;
+    const from = fromRef.current;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / durationMs, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const current = from + (target - from) * eased;
+      setValue(current);
+      if (t < 1) {
+        frameRef.current = requestAnimationFrame(tick);
+      } else {
+        fromRef.current = target;
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      fromRef.current = target;
+    };
+  }, [target, durationMs]);
+
+  return value;
+};
+
 const HeroSection = () => {
   const navigate = useNavigate();
-  const {
-    holdings,
-    quotes,
-    loading,
-    calculatePortfolioValue
-  } = usePortfolioData();
+  const { holdings, quotes, loading, lastUpdated, calculatePortfolioValue } = usePortfolioData();
+
   const portfolioValue = calculatePortfolioValue(holdings, quotes);
-  const scrollToPortfolio = () => {
-    const element = document.querySelector("#portfolio");
-    if (element) {
-      element.scrollIntoView({
-        behavior: "smooth"
-      });
-    }
-  };
-  return <section id="home" className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 opacity-5" style={{
-      background: "var(--gradient-hero)"
-    }} />
+  const animatedValue = useCountUp(loading ? 0 : portfolioValue);
 
-      {/* Decorative elements */}
-      <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 left-0 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
+  // Dagens bevegelse: sum av dagsendring (NOK) per aksje vi eier
+  const dayChange = holdings
+    .filter((h) => h.holding_type === "stock")
+    .reduce((sum, h) => {
+      const q = quotes[h.ticker];
+      return q ? sum + q.change * h.quantity : sum;
+    }, 0);
+  const dayChangePercent = portfolioValue > 0 ? (dayChange / (portfolioValue - dayChange)) * 100 : 0;
+  const dayPositive = dayChange >= 0;
 
-      <div className="section-container relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary mb-8 animate-fade-up">
-            <Leaf className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-secondary-foreground">
-              Investeringer for fremtiden
+  const scrollTo = (selector: string) =>
+    document.querySelector(selector)?.scrollIntoView({ behavior: "smooth" });
+
+  return (
+    <section
+      id="home"
+      className="relative min-h-screen flex items-center pt-16 overflow-hidden text-white"
+      style={{ background: "var(--gradient-hero)" }}
+    >
+      {/* Dekorative lysflater i blått */}
+      <div className="absolute top-1/4 -right-24 w-[500px] h-[500px] bg-sky-400/10 rounded-full blur-3xl" />
+      <div className="absolute -bottom-32 -left-24 w-[420px] h-[420px] bg-blue-300/10 rounded-full blur-3xl" />
+
+      <div className="section-container relative z-10 w-full">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 backdrop-blur-sm mb-10 animate-fade-up">
+            <span className="text-sm font-medium text-white/90">
+              Investeringskomiteen i EMIL — Energi- og miljøingeniørenes linjeforening
             </span>
           </div>
 
-          <div className="flex items-center justify-center mb-6 animate-fade-up" style={{
-          animationDelay: "0.1s"
-        }}>
-            <h1>
-              <BrandLogo size="xl" />
-            </h1>
+          {/* Saldoen — det første og viktigste på siden */}
+          <p
+            className="text-sm md:text-base uppercase tracking-[0.25em] text-white/70 mb-4 animate-fade-up"
+            style={{ animationDelay: "0.1s" }}
+          >
+            Porteføljens markedsverdi
+          </p>
+          <div className="animate-fade-up" style={{ animationDelay: "0.15s" }}>
+            <p className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight tabular-nums leading-none">
+              {loading ? (
+                <span className="text-white/40">–</span>
+              ) : (
+                <>
+                  {Math.round(animatedValue).toLocaleString("no-NO")}
+                  <span className="text-2xl md:text-4xl font-medium text-white/70 ml-3 align-baseline">kr</span>
+                </>
+              )}
+            </p>
+            <div className="flex items-center justify-center gap-3 mt-5 text-sm md:text-base">
+              {!loading && (
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-medium ${
+                    dayPositive ? "bg-emerald-400/15 text-emerald-300" : "bg-red-400/15 text-red-300"
+                  }`}
+                >
+                  {dayPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                  {dayPositive ? "+" : ""}
+                  {dayChange.toLocaleString("no-NO", { maximumFractionDigits: 0 })} kr i dag
+                  {isFinite(dayChangePercent) && ` (${dayPositive ? "+" : ""}${dayChangePercent.toFixed(2)} %)`}
+                </span>
+              )}
+              {lastUpdated && (
+                <span className="text-white/50">
+                  Oppdatert {lastUpdated.toLocaleTimeString("no-NO", { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              )}
+            </div>
           </div>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{
-          animationDelay: "0.2s"
-        }}>Vi er studenter ved energi og miljø som forvalter våre investeringer med fokus på langsiktig vekst.</p>
+          <p
+            className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mt-10 mb-10 animate-fade-up"
+            style={{ animationDelay: "0.25s" }}
+          >
+            Vi er rundt 15 studenter som forvalter linjeforeningens midler — helt åpent.
+            Følg hver investering vi gjør, lær med oss, og bli med i aksjekonkurransen vår.
+          </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{
-          animationDelay: "0.3s"
-        }}>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8" onClick={scrollToPortfolio}>
+          <div
+            className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up"
+            style={{ animationDelay: "0.35s" }}
+          >
+            <Button
+              size="lg"
+              className="bg-white text-primary hover:bg-white/90 px-8 font-semibold"
+              onClick={() => scrollTo("#portfolio")}
+            >
               <TrendingUp className="w-5 h-5 mr-2" />
-              Se vår portefølje
+              Se porteføljen
             </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/5" onClick={() => document.querySelector("#team")?.scrollIntoView({
-            behavior: "smooth"
-          })}>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              onClick={() => scrollTo("#team")}
+            >
               <Users className="w-5 h-5 mr-2" />
-              Møt teamet
+              Møt komiteen
             </Button>
-            <Button size="lg" className="bg-competition hover:bg-competition/90 text-competition-foreground" onClick={() => navigate("/konkurranse")}>
+            <Button
+              size="lg"
+              className="bg-competition hover:bg-competition/90 text-competition-foreground font-semibold"
+              onClick={() => navigate("/konkurranse")}
+            >
               <Trophy className="w-5 h-5 mr-2" />
-              Konkurranse
+              Bli med i konkurransen
             </Button>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-border/50 animate-fade-up" style={{
-          animationDelay: "0.4s"
-        }}>
+          {/* Nøkkeltall */}
+          <div
+            className="grid grid-cols-3 gap-8 mt-20 pt-10 border-t border-white/15 animate-fade-up"
+            style={{ animationDelay: "0.45s" }}
+          >
             <div>
-<p className="text-3xl md:text-4xl font-serif font-bold text-primary">16</p>
-              <p className="text-sm text-muted-foreground mt-1">Aktive medlemmer</p>
+              <p className="text-3xl md:text-4xl font-serif font-bold">15+</p>
+              <p className="text-sm text-white/60 mt-1">Aktive medlemmer</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">
-                {loading ? "..." : `${portfolioValue.toLocaleString("no-NO", {
-                maximumFractionDigits: 0
-              })} kr`}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">Porteføljeverdi</p>
+              <p className="text-3xl md:text-4xl font-serif font-bold">100 %</p>
+              <p className="text-sm text-white/60 mt-1">Åpen forvaltning</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-serif font-bold text-primary">2024</p>
-              <p className="text-sm text-muted-foreground mt-1">Etablert</p>
+              <p className="text-3xl md:text-4xl font-serif font-bold">2024</p>
+              <p className="text-sm text-white/60 mt-1">Etablert</p>
             </div>
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default HeroSection;

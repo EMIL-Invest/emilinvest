@@ -100,7 +100,7 @@ const StockTrader = ({
 
     const allowFractional = isExpensiveStock(selectedStock.ticker);
     const quantity = parseFloat(buyQuantity);
-    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
+    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity)) || (allowFractional && quantity < 0.01)) {
       toast({
         title: "Ugyldig antall",
         description: "Angi et gyldig antall aksjer å kjøpe",
@@ -177,7 +177,10 @@ const StockTrader = ({
   const handleSell = async () => {
     if (!selectedHolding) return;
 
-    const allowFractional = isExpensiveStock(selectedHolding.ticker);
+    // Tillat desimalsalg både for dyre aksjer OG når beholdningen selv er
+    // en desimal (kjøpt som brøkdel da kursen var >30 000, men kursen har
+    // falt under grensen siden) — ellers blir slike poster usalgbare.
+    const allowFractional = isExpensiveStock(selectedHolding.ticker) || !Number.isInteger(Number(selectedHolding.quantity));
     const quantity = parseFloat(sellQuantity);
     if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
       toast({
@@ -480,9 +483,9 @@ const StockTrader = ({
             <Button variant="outline" onClick={() => setBuyDialogOpen(false)}>
               Avbryt
             </Button>
-            <Button 
-              onClick={handleBuy} 
-              disabled={isBuying || (tradingCheck && !tradingCheck.allowed)}
+            <Button
+              onClick={handleBuy}
+              disabled={isBuying || checkingTrading || !!(tradingCheck && !tradingCheck.allowed)}
             >
               {isBuying ? "Kjøper..." : "Bekreft kjøp"}
             </Button>
@@ -559,9 +562,9 @@ const StockTrader = ({
             <Button variant="outline" onClick={() => setSellDialogOpen(false)}>
               Avbryt
             </Button>
-            <Button 
-              onClick={handleSell} 
-              disabled={isSelling || (tradingCheck && !tradingCheck.allowed)}
+            <Button
+              onClick={handleSell}
+              disabled={isSelling || checkingTrading || !!(tradingCheck && !tradingCheck.allowed)}
             >
               {isSelling ? "Selger..." : "Bekreft salg"}
             </Button>

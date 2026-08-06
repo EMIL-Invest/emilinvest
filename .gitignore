@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Miljøvariabler
+.env
+.env.local
+
+# Databasedumper og sensitive filer
+*.backup
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

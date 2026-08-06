@@ -99,24 +99,14 @@ export const usePortfolioData = () => {
     return {};
   }, [holdings]);
 
-  // Exchange rates to NOK (approximate)
-  const getExchangeRate = (currency: string): number => {
-    const rates: Record<string, number> = {
-      'NOK': 1,
-      'USD': 11.0,  // 1 USD ≈ 11 NOK
-      'DKK': 1.55,  // 1 DKK ≈ 1.55 NOK
-      'EUR': 11.6,  // 1 EUR ≈ 11.6 NOK
-    };
-    return rates[currency] || 1;
-  };
-
   const calculateHoldingValue = useCallback((
     holding: Holding,
     quote: StockQuote | undefined
   ): number => {
+    // Edge-funksjonen stock-prices returnerer alltid priser i NOK,
+    // så ingen valutakonvertering skal skje på klienten.
     if (quote && quote.price > 0) {
-      const exchangeRate = getExchangeRate(quote.currency);
-      return quote.price * holding.quantity * exchangeRate;
+      return quote.price * holding.quantity;
     }
     // Use cost_basis as fallback (already in NOK)
     return holding.cost_basis || (holding.purchase_price * holding.quantity);
@@ -131,6 +121,10 @@ export const usePortfolioData = () => {
     for (const holding of holdingsList) {
       if (holding.holding_type === "stock") {
         totalValue += calculateHoldingValue(holding, quotesMap[holding.ticker]);
+      } else {
+        // Fond og andre beholdninger har ingen live-kurs — bruk kostbasis
+        // slik at totalverdien ikke underrapporterer klubbens verdi.
+        totalValue += holding.cost_basis || (holding.purchase_price * holding.quantity);
       }
     }
 
@@ -145,12 +139,18 @@ export const usePortfolioData = () => {
     setLoading(false);
   }, [fetchHoldings, fetchHistory, fetchQuotes]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     refresh();
-    // Refresh quotes every 5 minutes
+  }, []);
+
+  // Automatisk kursoppdatering hvert 5. minutt.
+  // NB: fetchQuotes må stå i deps — den gjenskapes når holdings endres,
+  // ellers fryser intervallet på en tom holdings-liste (stale closure).
+  useEffect(() => {
     const interval = setInterval(() => fetchQuotes(), 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchQuotes]);
 
   return {
     holdings,
@@ -163,6 +163,5 @@ export const usePortfolioData = () => {
     refresh,
     calculatePortfolioValue,
     calculateHoldingValue,
-    getExchangeRate,
   };
 };

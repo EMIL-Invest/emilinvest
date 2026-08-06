@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -83,20 +84,31 @@ function cleanupRateLimitMap() {
   }
 }
 
-// Convert NOK price based on currency
+// Convert NOK price based on currency.
+// NB: "GBp" (med liten p) er pence — LSE-aksjer noteres i pence hos Yahoo,
+// så 1 GBp = GBP/100. Uten den nøkkelen verdsettes britiske aksjer ~7x feil.
+const FX_TO_NOK: Record<string, number> = {
+  "NOK": 1,
+  "USD": 11.0,
+  "DKK": 1.55,
+  "EUR": 11.6,
+  "SEK": 1.05,
+  "GBP": 13.5,
+  "GBp": 0.135,
+  "GBX": 0.135,
+  "CHF": 12.6,
+  "JPY": 0.073,
+  "TWD": 0.34,
+  "CAD": 7.7,
+};
+
 function convertToNOK(price: number, currency: string): number {
-  const rates: Record<string, number> = {
-    "NOK": 1,
-    "USD": 11.0,
-    "DKK": 1.55,
-    "EUR": 11.6,
-    "SEK": 1.05,
-    "GBP": 13.5,
-    "JPY": 0.073,
-    "TWD": 0.34,
-    "CAD": 7.7,
-  };
-  return price * (rates[currency] || 1);
+  const rate = FX_TO_NOK[currency];
+  if (rate === undefined) {
+    console.warn(`Ukjent valuta "${currency}" — bruker kurs 1:1 mot NOK. Legg den til i FX_TO_NOK!`);
+    return price;
+  }
+  return price * rate;
 }
 
 // Map ticker to Yahoo Finance format
@@ -347,6 +359,28 @@ serve(async (req) => {
     const validQuotes = quotes.filter((q): q is StockQuote => q !== null && q.price > 0);
 
     console.log("Fetched quotes:", validQuotes.length, "of", validTickers.length);
+
+    // Oppdater serverens priscache — konkurransens kjøp/salg-funksjoner
+    // validerer klientens oppgitte pris mot denne (anti-juks).
+    try {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const rows = validQuotes.map((q) => ({
+        ticker: q.ticker,
+        price: q.price,
+        updated_at: new Date().toISOString(),
+      }));
+      if (rows.length > 0) {
+        const { error: cacheError } = await supabaseAdmin
+          .from("stock_price_cache")
+          .upsert(rows, { onConflict: "ticker" });
+        if (cacheError) console.error("Klarte ikke å oppdatere priscachen:", cacheError.message);
+      }
+    } catch (cacheErr) {
+      console.error("Priscache-feil:", cacheErr);
+    }
 
     return new Response(
       JSON.stringify({ quotes: validQuotes, timestamp: new Date().toISOString() }),

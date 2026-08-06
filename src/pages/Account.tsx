@@ -82,7 +82,7 @@ const Account = () => {
       });
       
       navigate("/");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error deleting account:", error);
       toast({
         title: "Kunne ikke slette konto",

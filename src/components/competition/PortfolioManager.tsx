@@ -34,8 +34,11 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
   const handleSell = async () => {
     if (!selectedHolding) return;
 
-    const quantity = parseInt(sellQuantity);
-    if (isNaN(quantity) || quantity <= 0) {
+    // Samme desimallogikk som i StockTrader: heltall for vanlige aksjer,
+    // desimaler tillatt når beholdningen selv er en brøkdel (dyre aksjer).
+    const allowFractional = !Number.isInteger(Number(selectedHolding.quantity));
+    const quantity = parseFloat(sellQuantity);
+    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
       toast({
         title: "Ugyldig antall",
         description: "Angi et gyldig antall aksjer å selge",
@@ -250,7 +253,7 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
               <div className="p-4 bg-secondary/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">Estimert salgsverdi:</p>
                 <p className="text-2xl font-bold">
-                  {(parseInt(sellQuantity) * quotes[selectedHolding.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                  {(parseFloat(sellQuantity) * quotes[selectedHolding.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                 </p>
               </div>
             )}

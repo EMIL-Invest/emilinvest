@@ -46,13 +46,17 @@ const PortfolioAdmin = ({ holdings, onRefresh }: PortfolioAdminProps) => {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!(parseFloat(formData.quantity) > 0)) {
+      toast({ title: "Ugyldig antall", description: "Antall må være større enn 0.", variant: "destructive" });
+      return;
+    }
     setSaving(true);
 
     try {
       const { error } = await supabase.from("portfolio_holdings").insert([{
         ticker: formData.ticker.toUpperCase(),
         name: formData.name,
-        quantity: parseFloat(formData.quantity) || 1,
+        quantity: parseFloat(formData.quantity),
         purchase_price: parseFloat(formData.purchase_price) || 0,
         holding_type: formData.holding_type,
         sector: formData.sector || null,
@@ -67,10 +71,10 @@ const PortfolioAdmin = ({ holdings, onRefresh }: PortfolioAdminProps) => {
       });
       resetForm();
       onRefresh();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     } finally {
@@ -93,6 +97,10 @@ const PortfolioAdmin = ({ holdings, onRefresh }: PortfolioAdminProps) => {
 
   const handleUpdate = async () => {
     if (!editingId) return;
+    if (!(parseFloat(formData.quantity) > 0)) {
+      toast({ title: "Ugyldig antall", description: "Antall må være større enn 0.", variant: "destructive" });
+      return;
+    }
     setSaving(true);
 
     try {
@@ -101,7 +109,7 @@ const PortfolioAdmin = ({ holdings, onRefresh }: PortfolioAdminProps) => {
         .update({
           ticker: formData.ticker.toUpperCase(),
           name: formData.name,
-          quantity: parseFloat(formData.quantity) || 1,
+          quantity: parseFloat(formData.quantity),
           purchase_price: parseFloat(formData.purchase_price) || 0,
           holding_type: formData.holding_type,
           sector: formData.sector || null,
@@ -117,10 +125,10 @@ const PortfolioAdmin = ({ holdings, onRefresh }: PortfolioAdminProps) => {
       });
       resetForm();
       onRefresh();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     } finally {
@@ -129,6 +137,7 @@ const PortfolioAdmin = ({ holdings, onRefresh }: PortfolioAdminProps) => {
   };
 
   const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Er du sikker på at du vil slette ${name} fra porteføljen?`)) return;
     try {
       const { error } = await supabase
         .from("portfolio_holdings")
@@ -142,10 +151,10 @@ const PortfolioAdmin = ({ holdings, onRefresh }: PortfolioAdminProps) => {
         description: `${name} er fjernet fra porteføljen.`,
       });
       onRefresh();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     }

@@ -76,10 +76,10 @@ const InstagramAdmin = ({ userId }: InstagramAdminProps) => {
       setImageUrl("");
       setCaption("");
       fetchPosts();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     } finally {
@@ -88,6 +88,7 @@ const InstagramAdmin = ({ userId }: InstagramAdminProps) => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Er du sikker på at du vil slette dette innlegget?")) return;
     try {
       const { error } = await supabase.from("instagram_posts").delete().eq("id", id);
       if (error) throw error;
@@ -96,10 +97,10 @@ const InstagramAdmin = ({ userId }: InstagramAdminProps) => {
         title: "Innlegg slettet",
       });
       fetchPosts();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     }

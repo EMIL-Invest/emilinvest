@@ -98,11 +98,11 @@ const ExcelExport = () => {
         title: "Excel lastet ned!",
         description: `Filen inneholder data for ${tickers.length} aksjer over ${dates.length} datoer.`,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Export error:", error);
       toast({
         title: "Feil ved eksport",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     } finally {

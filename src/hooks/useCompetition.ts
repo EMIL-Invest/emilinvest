@@ -224,7 +224,7 @@ export const useCompetition = () => {
     const tickers = [...new Set(allHoldings?.filter(h => h.ticker !== "ASK").map(h => h.ticker) || [])];
     
     // Fetch quotes directly and use them immediately (avoid stale closure)
-    let freshQuotes: Record<string, StockQuote> = {};
+    const freshQuotes: Record<string, StockQuote> = {};
     if (tickers.length > 0) {
       try {
         const { data, error: quotesError } = await supabase.functions.invoke("stock-prices", {
@@ -295,50 +295,38 @@ export const useCompetition = () => {
     });
   }, [calculatePortfolioValue]);
 
-  // Join competition
+  // Join competition (atomic via database function: deltaker + startkapital i én transaksjon)
   const joinCompetition = async (displayName: string): Promise<{ error: Error | null }> => {
     if (!user) {
       return { error: new Error("Du må være innlogget for å delta") };
     }
 
-    const { error } = await supabase
-      .from("competition_participants")
-      .insert({
-        user_id: user.id,
-        display_name: displayName,
-      });
+    const { data, error } = await supabase.rpc("competition_join", {
+      _display_name: displayName,
+    });
 
     if (error) {
       console.error("Error joining competition:", error);
       return { error: new Error("Kunne ikke melde deg på konkurransen") };
     }
 
-    // Create initial ASK holding with full starting capital
-    const { data: newParticipant } = await supabase
-      .from("competition_participants")
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
-
-    if (newParticipant) {
-      await supabase.from("competition_portfolios").insert({
-        participant_id: newParticipant.id,
-        ticker: "ASK",
-        quantity: STARTING_CAPITAL,
-        average_purchase_price: 1,
-      });
+    const result = data as { success: boolean; error?: string };
+    if (!result.success) {
+      return { error: new Error(result.error || "Påmelding feilet") };
     }
 
     await fetchParticipant();
     return { error: null };
   };
 
-  // Check daily transaction count for a specific stock
+  // Check daily transaction count for a specific stock.
+  // NB: bruker UTC-midnatt slik at grensen samsvarer eksakt med serverens
+  // date_trunc('day', now()) — ellers spriker UI og server med 1-2 timer i Norge.
   const getDailyTransactionCount = async (participantId: string, ticker: string): Promise<number> => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 
     const { count, error } = await supabase
       .from("competition_transactions")
@@ -483,14 +471,14 @@ export const useCompetition = () => {
       const interval = setInterval(() => fetchQuotes(), 30 * 1000); // Every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [availableStocks.length]); // Only depend on length, not the function
+  }, [availableStocks.length, fetchQuotes]);
 
   // Fetch leaderboard periodically (less often since it uses cached quotes)
   useEffect(() => {
     fetchLeaderboard();
     const interval = setInterval(fetchLeaderboard, 60 * 1000); // Every 60 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchLeaderboard]);
 
   return {
     user,

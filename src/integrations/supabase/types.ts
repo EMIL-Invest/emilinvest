@@ -488,6 +488,36 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          id: string
+          name: string
+          role: string
+          photo_url: string | null
+          sort_order: number
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          role: string
+          photo_url?: string | null
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          role?: string
+          photo_url?: string | null
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -499,6 +529,12 @@ export type Database = {
           _price: number
           _quantity: number
           _ticker: string
+        }
+        Returns: Json
+      }
+      competition_join: {
+        Args: {
+          _display_name: string
         }
         Returns: Json
       }

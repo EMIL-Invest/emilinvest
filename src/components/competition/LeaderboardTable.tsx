@@ -16,6 +16,11 @@ interface LeaderboardTableProps {
 const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }: LeaderboardTableProps) => {
   const [selectedParticipant, setSelectedParticipant] = useState<{ id: string; name: string } | null>(null);
 
+  // Din egen rad hvis du er utenfor topp 10 — vises som egen rad nederst
+  const ownEntryOutsideTop10 = currentParticipantId
+    ? entries.find(e => e.participant_id === currentParticipantId && e.rank > 10)
+    : undefined;
+
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -104,6 +109,51 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
                   </TableCell>
                 </TableRow>
               ))}
+              {ownEntryOutsideTop10 && (
+                <>
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-1">
+                      ⋯
+                    </TableCell>
+                  </TableRow>
+                  <TableRow
+                    key={ownEntryOutsideTop10.participant_id}
+                    className="cursor-pointer bg-primary/5 hover:bg-muted/50 transition-colors"
+                    onClick={() => setSelectedParticipant({
+                      id: ownEntryOutsideTop10.participant_id,
+                      name: ownEntryOutsideTop10.display_name
+                    })}
+                  >
+                    <TableCell>
+                      <div className="flex items-center justify-center w-8 h-8">
+                        <span className="text-muted-foreground font-medium">{ownEntryOutsideTop10.rank}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium hover:underline">{ownEntryOutsideTop10.display_name}</span>
+                        <Badge variant="secondary" className="text-xs">Deg</Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {ownEntryOutsideTop10.portfolio_value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className={`flex items-center justify-end gap-1 font-medium ${
+                        ownEntryOutsideTop10.return_percentage >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {ownEntryOutsideTop10.return_percentage >= 0 ? (
+                          <TrendingUp className="w-4 h-4" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4" />
+                        )}
+                        {ownEntryOutsideTop10.return_percentage >= 0 ? '+' : ''}
+                        {ownEntryOutsideTop10.return_percentage.toFixed(2)}%
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </>
+              )}
             </TableBody>
           </Table>
         </CardContent>

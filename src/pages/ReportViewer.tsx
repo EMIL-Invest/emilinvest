@@ -3,9 +3,23 @@ import { ArrowLeft, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 
+// Kun rapporter fra vår egen Supabase-storage kan vises. Uten denne sjekken
+// kunne hvem som helst lenke til /rapport?url=<ondsinnet side> og vise
+// vilkårlig innhold under vårt domene (phishing).
+const isAllowedReportUrl = (url: string): boolean => {
+  try {
+    const parsed = new URL(url);
+    const supabaseHost = new URL(import.meta.env.VITE_SUPABASE_URL).host;
+    return parsed.protocol === "https:" && parsed.host === supabaseHost;
+  } catch {
+    return false;
+  }
+};
+
 const ReportViewer = () => {
   const [searchParams] = useSearchParams();
-  const fileUrl = searchParams.get("url");
+  const rawUrl = searchParams.get("url");
+  const fileUrl = rawUrl && isAllowedReportUrl(rawUrl) ? rawUrl : null;
   const title = searchParams.get("title") || "Kvartalsrapport";
 
   if (!fileUrl) {

@@ -100,25 +100,58 @@ const exchangeHours: Record<string, ExchangeHours> = {
   },
 };
 
+// Helligdager der børsen er helt stengt, per børs (ISO-datoer i børsens lokale tid).
+// Oslo Børs (Euronext Oslo): nyttårsdag, skjærtorsdag, langfredag, 2. påskedag,
+// 1. mai, 17. mai, Kristi himmelfartsdag, 2. pinsedag, julaften, 1. og 2. juledag,
+// nyttårsaften. Kilde: Euronext trading calendar. Oppdater listen årlig!
+const exchangeHolidays: Record<string, string[]> = {
+  OSL: [
+    // 2026 (17. mai faller på en søndag og trengs ikke i listen)
+    "2026-01-01", "2026-04-02", "2026-04-03", "2026-04-06", "2026-05-01",
+    "2026-05-14", "2026-05-25", "2026-12-24", "2026-12-25", "2026-12-31",
+    // 2027 (2. pinsedag og 17. mai er samme dag; 1. mai er lørdag)
+    "2027-01-01", "2027-03-25", "2027-03-26", "2027-03-29", "2027-05-06",
+    "2027-05-17", "2027-12-24", "2027-12-31",
+    // 2028
+    "2028-01-01", "2028-04-13", "2028-04-14", "2028-04-17", "2028-05-01",
+    "2028-05-17", "2028-05-25", "2028-06-05", "2028-12-25", "2028-12-26",
+  ],
+};
+
+// Halve handelsdager: børsen stenger tidligere enn normalt.
+// Oslo Børs stenger 13:00 onsdag før skjærtorsdag.
+const exchangeHalfDays: Record<string, Record<string, { hour: number; minute: number }>> = {
+  OSL: {
+    "2026-04-01": { hour: 13, minute: 0 },
+    "2027-03-24": { hour: 13, minute: 0 },
+    "2028-04-12": { hour: 13, minute: 0 },
+  },
+};
+
 /**
  * Get the current time in a specific timezone
  */
-function getTimeInTimezone(timezone: string): { hour: number; minute: number; dayOfWeek: number } {
+function getTimeInTimezone(timezone: string): { hour: number; minute: number; dayOfWeek: number; isoDate: string } {
   const now = new Date();
   const options: Intl.DateTimeFormatOptions = {
     timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
     hour: "numeric",
     minute: "numeric",
     hour12: false,
     weekday: "short",
   };
-  
+
   const formatter = new Intl.DateTimeFormat("en-US", options);
   const parts = formatter.formatToParts(now);
-  
-  const hour = parseInt(parts.find(p => p.type === "hour")?.value || "0", 10);
-  const minute = parseInt(parts.find(p => p.type === "minute")?.value || "0", 10);
-  
+
+  const get = (type: string) => parts.find(p => p.type === type)?.value || "0";
+  const hour = parseInt(get("hour"), 10) % 24;
+  const minute = parseInt(get("minute"), 10);
+  const isoDate = `${get("year")}-${get("month")}-${get("day")}`;
+
   // Get day of week (0-6, Sunday = 0)
   const dayStr = parts.find(p => p.type === "weekday")?.value || "";
   const dayMap: Record<string, number> = {
@@ -126,7 +159,7 @@ function getTimeInTimezone(timezone: string): { hour: number; minute: number; da
   };
   const dayOfWeek = dayMap[dayStr] ?? 0;
 
-  return { hour, minute, dayOfWeek };
+  return { hour, minute, dayOfWeek, isoDate };
 }
 
 /**
@@ -145,51 +178,62 @@ export function isExchangeOpen(exchange: string): boolean {
     return true;
   }
 
-  const { hour, minute, dayOfWeek } = getTimeInTimezone(hours.timezone);
+  const { hour, minute, dayOfWeek, isoDate } = getTimeInTimezone(hours.timezone);
 
   // Check if it's a trading day
   if (!hours.weekdays.includes(dayOfWeek)) {
     return false;
   }
 
-  // Check if within trading hours
+  // Check holiday calendar (exchange fully closed)
+  if (exchangeHolidays[exchange]?.includes(isoDate)) {
+    return false;
+  }
+
+  // Check if within trading hours (half days close earlier)
+  const halfDayClose = exchangeHalfDays[exchange]?.[isoDate];
+  const close = halfDayClose || hours.close;
+
   const currentMinutes = hour * 60 + minute;
   const openMinutes = hours.open.hour * 60 + hours.open.minute;
-  const closeMinutes = hours.close.hour * 60 + hours.close.minute;
+  const closeMinutes = close.hour * 60 + close.minute;
 
   return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
 }
 
 /**
- * Convert a time from one timezone to Oslo time
+ * Get a timezone's UTC offset (in minutes) at a given instant, via Intl.
+ */
+function tzOffsetMinutes(timezone: string, at: Date): number {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const parts = formatter.formatToParts(at);
+  const get = (type: string) => parseInt(parts.find(p => p.type === type)?.value || "0", 10);
+  const asUTC = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour") % 24, get("minute"), get("second"));
+  return (asUTC - at.getTime()) / 60000;
+}
+
+/**
+ * Convert a time from one timezone to Oslo time (for display purposes).
+ * Uses the offset difference at the current instant, computed with Intl —
+ * robust across DST, unlike Date-parsing of locale strings.
  */
 function convertToOsloTime(hour: number, minute: number, fromTimezone: string): { hour: number; minute: number } {
-  // Create a reference date (use a known weekday to avoid DST edge cases)
-  const refDate = new Date();
-  const year = refDate.getFullYear();
-  const month = refDate.getMonth();
-  const day = refDate.getDate();
+  const now = new Date();
+  const diffMinutes = tzOffsetMinutes("Europe/Oslo", now) - tzOffsetMinutes(fromTimezone, now);
 
-  // Create a date in the source timezone at the given time
-  // We use a trick: set UTC time, then calculate offset differences
-  const sourceDate = new Date(Date.UTC(year, month, day, hour, minute, 0));
-  
-  // Get the offset for source timezone
-  const sourceStr = sourceDate.toLocaleString("en-US", { timeZone: fromTimezone });
-  const sourceLocal = new Date(sourceStr);
-  
-  // Get the offset for Oslo
-  const osloStr = sourceDate.toLocaleString("en-US", { timeZone: "Europe/Oslo" });
-  const osloLocal = new Date(osloStr);
-  
-  // The difference in minutes between the two interpretations
-  const diffMs = osloLocal.getTime() - sourceLocal.getTime();
-  const diffMinutes = diffMs / (1000 * 60);
-  
   let totalMinutes = hour * 60 + minute + diffMinutes;
   // Normalize to 0-1440
   totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
-  
+
   return {
     hour: Math.floor(totalMinutes / 60),
     minute: Math.round(totalMinutes % 60),
@@ -217,7 +261,18 @@ export function getExchangeInfo(exchange: string): {
     };
   }
 
-  const formatTime = (h: number, m: number) => 
+  // 24/7-markeder har ingen meningsfulle åpne-/stengetider å konvertere
+  if (exchange === "CRYPTO") {
+    return {
+      isOpen: true,
+      openTime: "00:00",
+      closeTime: "24:00",
+      timezone: "norsk tid",
+      tradingDays: "Døgnåpent, alle dager",
+    };
+  }
+
+  const formatTime = (h: number, m: number) =>
     `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 
   // Convert open/close times to Oslo time

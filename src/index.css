@@ -1,54 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
-
 @layer base {
   :root {
-    /* Deep Forest Green palette — matching EI logo */
-    --background: 150 15% 97%;
-    --foreground: 155 40% 10%;
+    /* Marineblå palett — hentet fra EMIL Invest-logoen (#003D76) */
+    --background: 210 30% 98%;
+    --foreground: 212 55% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 155 40% 10%;
+    --card-foreground: 212 55% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 155 40% 10%;
+    --popover-foreground: 212 55% 12%;
 
-    /* Deep forest green from logo */
-    --primary: 155 42% 18%;
-    --primary-foreground: 150 15% 97%;
+    /* Logoens marineblå */
+    --primary: 209 100% 23%;
+    --primary-foreground: 210 30% 98%;
 
-    /* Soft sage */
-    --secondary: 150 20% 93%;
-    --secondary-foreground: 155 42% 15%;
+    /* Kjølig lyseblå flate */
+    --secondary: 210 40% 94%;
+    --secondary-foreground: 209 80% 20%;
 
-    --muted: 150 12% 91%;
-    --muted-foreground: 155 12% 42%;
+    --muted: 211 30% 92%;
+    --muted-foreground: 211 22% 40%;
 
-    /* Warm gold accent */
-    --accent: 38 85% 52%;
+    /* Komplementær himmelblå aksent */
+    --accent: 203 78% 42%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 150 15% 87%;
-    --input: 150 15% 87%;
-    --ring: 155 42% 18%;
+    --border: 211 28% 87%;
+    --input: 211 28% 87%;
+    --ring: 209 100% 23%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --gradient-hero: linear-gradient(135deg, hsl(155 42% 18%) 0%, hsl(155 35% 24%) 50%, hsl(150 30% 28%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(150 20% 97%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(155 42% 18%) 100%);
+    --gradient-hero: linear-gradient(160deg, hsl(213 100% 12%) 0%, hsl(209 100% 23%) 55%, hsl(205 80% 30%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 97%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(155 42% 25%) 100%);
     --gradient-warning: linear-gradient(135deg, hsl(38 85% 52%) 0%, hsl(32 90% 44%) 100%);
-    
-    --shadow-soft: 0 4px 20px -4px hsl(155 40% 10% / 0.08);
-    --shadow-card: 0 8px 30px -8px hsl(155 40% 10% / 0.12);
-    --shadow-elevated: 0 20px 50px -15px hsl(155 40% 10% / 0.15);
+
+    --shadow-soft: 0 4px 20px -4px hsl(212 60% 12% / 0.08);
+    --shadow-card: 0 8px 30px -8px hsl(212 60% 12% / 0.12);
+    --shadow-elevated: 0 20px 50px -15px hsl(212 60% 12% / 0.18);
 
     /* Stock colors */
     --stock-positive: 142 76% 36%;
@@ -70,33 +70,33 @@
   }
 
   .dark {
-    --background: 160 30% 6%;
-    --foreground: 150 20% 95%;
+    --background: 213 60% 7%;
+    --foreground: 210 30% 95%;
 
-    --card: 160 25% 10%;
-    --card-foreground: 150 20% 95%;
+    --card: 212 50% 11%;
+    --card-foreground: 210 30% 95%;
 
-    --popover: 160 25% 10%;
-    --popover-foreground: 150 20% 95%;
+    --popover: 212 50% 11%;
+    --popover-foreground: 210 30% 95%;
 
-    --primary: 155 40% 35%;
-    --primary-foreground: 155 15% 97%;
+    --primary: 207 70% 48%;
+    --primary-foreground: 210 30% 98%;
 
-    --secondary: 160 20% 15%;
-    --secondary-foreground: 150 20% 90%;
+    --secondary: 212 40% 16%;
+    --secondary-foreground: 210 30% 90%;
 
-    --muted: 160 20% 18%;
-    --muted-foreground: 150 15% 60%;
+    --muted: 212 35% 18%;
+    --muted-foreground: 210 20% 62%;
 
-    --accent: 200 60% 50%;
+    --accent: 203 70% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 160 20% 18%;
-    --input: 160 20% 18%;
-    --ring: 155 40% 35%;
+    --border: 212 35% 18%;
+    --input: 212 35% 18%;
+    --ring: 207 70% 48%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;

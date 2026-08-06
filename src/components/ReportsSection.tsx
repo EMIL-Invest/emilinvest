@@ -63,11 +63,13 @@ const ReportsSection = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Kun admin-brukere skal kunne laste opp og slette rapporter
   const checkUserRole = async (userId: string) => {
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .eq("role", "admin");
 
     if (!error && data && data.length > 0) {
       setHasRole(true);
@@ -100,8 +102,13 @@ const ReportsSection = () => {
     setUploading(true);
 
     try {
-      const fileName = `${Date.now()}-${file.name}`;
-      
+      // Supabase Storage avviser nøkler med æ/ø/å, mellomrom og spesialtegn —
+      // saniter filnavnet før opplasting.
+      const safeName = file.name
+        .replace(/[æÆ]/g, "ae").replace(/[øØ]/g, "o").replace(/[åÅ]/g, "a")
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
+      const fileName = `${Date.now()}-${safeName}`;
+
       const { error: uploadError } = await supabase.storage
         .from("reports")
         .upload(fileName, file);
@@ -138,10 +145,10 @@ const ReportsSection = () => {
       setFile(null);
       setShowUploadForm(false);
       fetchReports();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil ved opplasting",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     } finally {
@@ -150,12 +157,19 @@ const ReportsSection = () => {
   };
 
   const handleDelete = async (report: Report) => {
-    if (!user || user.id !== report.uploaded_by) return;
+    if (!user || !hasRole) return;
+    if (!window.confirm(`Er du sikker på at du vil slette «${report.title}»?`)) return;
 
     try {
-      const fileName = report.file_url.split("/").pop();
+      // Utled storage-nøkkelen fra URL-en. decodeURIComponent trengs for
+      // eldre filer med prosent-enkodede tegn (f.eks. mellomrom som %20).
+      const rawName = report.file_url.split("/").pop()?.split("?")[0];
+      const fileName = rawName ? decodeURIComponent(rawName) : null;
       if (fileName) {
-        await supabase.storage.from("reports").remove([fileName]);
+        const { error: removeError } = await supabase.storage.from("reports").remove([fileName]);
+        if (removeError) {
+          console.error("Kunne ikke slette filen fra storage:", removeError);
+        }
       }
 
       const { error } = await supabase
@@ -171,10 +185,10 @@ const ReportsSection = () => {
       });
 
       fetchReports();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Feil ved sletting",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Ukjent feil",
         variant: "destructive",
       });
     }
@@ -333,7 +347,7 @@ const ReportsSection = () => {
                         Åpne
                       </Button>
                     </Link>
-                    {user && user.id === report.uploaded_by && (
+                    {user && hasRole && (
                       <Button
                         variant="outline"
                         size="sm"
