@@ -312,8 +312,12 @@ const ReportsSection = () => {
         ) : reports.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
-              Ingen kvartalsrapporter er lastet opp ennå.
+            <p className="text-lg font-serif font-semibold text-foreground mb-2">
+              Vi starter med kvartalsrapporter høsten 2026
+            </p>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Den første rapporten publiseres her etter tredje kvartal — som
+              alt annet vi gjør, helt åpent for alle.
             </p>
           </div>
         ) : (
