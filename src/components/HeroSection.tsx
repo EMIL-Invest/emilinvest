@@ -112,7 +112,7 @@ const HeroSection = () => {
               )}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 mb-9">
+            <div className="flex flex-wrap items-center gap-4">
               <Button size="lg" className="px-7" onClick={() => scrollTo("#portfolio")}>
                 Se porteføljen
               </Button>
@@ -124,16 +124,15 @@ const HeroSection = () => {
               >
                 Møt komiteen
               </Button>
+              <Button
+                size="lg"
+                className="group px-7 bg-competition text-competition-foreground hover:bg-competition/90 font-semibold"
+                onClick={() => navigate("/konkurranse")}
+              >
+                Bli med i konkurransen
+                <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+              </Button>
             </div>
-
-            <button
-              onClick={() => navigate("/konkurranse")}
-              className="group inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-4 transition-colors"
-              style={{ color: "hsl(32 85% 38%)", textDecorationColor: "hsl(var(--competition) / 0.5)" }}
-            >
-              Bli med i konkurransen
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </button>
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: "0.15s" }}>

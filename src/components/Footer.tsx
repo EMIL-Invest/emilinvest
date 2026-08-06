@@ -35,7 +35,7 @@ const Footer = () => {
               EMIL
             </a>
             <a
-              href="https://www.instagram.com/emilinvest/"
+              href="https://www.instagram.com/emil_invest_/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
