@@ -333,6 +333,24 @@ Deno.serve(async (req) => {
       totalInvestedCapital += holding.cost_basis || 0;
     }
 
+    // Ekte innskutt kapital fra capital_flows-tabellen (innskudd/uttak av
+    // penger). Denne overstyrer kostpris-summen over: aksjebytter endrer
+    // kostprisen, men IKKE hvor mye penger som faktisk er skutt inn — og
+    // avkastningen skal måles per investert krone (TWR). Kostpris-summen
+    // beholdes kun som fallback hvis capital_flows er tom.
+    const { data: capitalFlows, error: flowsError } = await supabase
+      .from('capital_flows')
+      .select('amount')
+      .lte('flow_date', today);
+
+    if (!flowsError && capitalFlows && capitalFlows.length > 0) {
+      totalInvestedCapital = capitalFlows.reduce(
+        (sum: number, f: { amount: number }) => sum + Number(f.amount),
+        0
+      );
+      console.log(`Invested capital from capital_flows: ${totalInvestedCapital}`);
+    }
+
     // Also add OSEBX as a snapshot row
     const osebxValue = await fetchOSEBX();
     console.log(`OSEBX value: ${osebxValue}`);

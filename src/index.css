@@ -56,9 +56,10 @@
     --stock-negative: 0 72% 51%;
     --stock-neutral: 200 65% 45%;
 
-    /* Konkurransefarge — grønnfargen fra EI-logoen (#3B563F) */
-    --competition: 128 19% 28%;
-    --competition-foreground: 0 0% 100%;
+    /* Konkurransefarge — varm gull/rav som skiller seg fra resten av paletten
+       og gir premie-/konkurransefølelse. Mørk tekst for god kontrast. */
+    --competition: 38 92% 48%;
+    --competition-foreground: 156 18% 13%;
 
     /* Logo-grønn som egne tokens + dyp grønn gradient til CTA-flater */
     --brand-green: 128 19% 28%;

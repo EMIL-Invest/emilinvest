@@ -8,9 +8,7 @@ import BrandLogo from "@/components/BrandLogo";
 
 const navLinks = [
   { href: "#home", label: "Hjem" },
-  { href: "#portfolio", label: "Portefølje" },
   { href: "#reports", label: "Rapporter" },
-  { href: "#guidelines", label: "Retningslinjer" },
   { href: "#team", label: "Medlemmer" },
   { href: "#om-oss", label: "Om oss" },
 ];
@@ -98,6 +96,12 @@ const Navbar = () => {
               </Link>
             )}
             <Link
+              to="/portefolje"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              Portefølje
+            </Link>
+            <Link
               to="/konkurranse"
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
@@ -167,6 +171,13 @@ const Navbar = () => {
                 Hjem
               </Link>
             )}
+            <Link
+              to="/portefolje"
+              onClick={() => setIsOpen(false)}
+              className="block py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              Portefølje
+            </Link>
             <Link
               to="/konkurranse"
               onClick={() => setIsOpen(false)}

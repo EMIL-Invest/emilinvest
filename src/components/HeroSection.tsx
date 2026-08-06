@@ -128,7 +128,8 @@ const HeroSection = () => {
 
             <button
               onClick={() => navigate("/konkurranse")}
-              className="group inline-flex items-center gap-2 text-sm font-medium text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground transition-colors"
+              className="group inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-4 transition-colors"
+              style={{ color: "hsl(32 85% 38%)", textDecorationColor: "hsl(var(--competition) / 0.5)" }}
             >
               Bli med i konkurransen
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
