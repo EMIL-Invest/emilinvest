@@ -29,3 +29,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Midlertidige overføringsmapper fra Claude
+_to_delete_pakke/

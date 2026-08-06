@@ -47,9 +47,7 @@ const GuidelinesSection = () => {
     <section id="guidelines" className="py-24">
       <div className="section-container">
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
-            Retningslinjer
-          </Badge>
+          <p className="eyebrow mb-5">Retningslinjer</p>
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4">
             Våre investeringsprinsipper
           </h2>
@@ -63,13 +61,11 @@ const GuidelinesSection = () => {
           {guidelines.map((guideline, index) => (
             <Card
               key={index}
-              className="glass-card group hover:shadow-elevated transition-all duration-300"
+              className="glass-card group transition-shadow duration-300 hover:shadow-[var(--shadow-card)]"
             >
               <CardContent className="pt-6">
-                <div
-                  className={`w-12 h-12 rounded-lg ${guideline.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
-                >
-                  <guideline.icon className={`w-6 h-6 ${guideline.color}`} />
+                <div className="w-12 h-12 rounded-full border border-foreground/20 flex items-center justify-center mb-4">
+                  <guideline.icon className="w-5 h-5 text-foreground/70" />
                 </div>
                 <h3 className="text-lg font-serif font-semibold text-foreground mb-2">
                   {guideline.title}
@@ -83,7 +79,7 @@ const GuidelinesSection = () => {
         </div>
 
         {/* Important Notice */}
-        <div className="mt-12 p-6 rounded-2xl bg-primary/5 border border-primary/20">
+        <div className="mt-12 p-6 rounded-md bg-card border border-border">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               <AlertCircle className="w-5 h-5 text-primary" />

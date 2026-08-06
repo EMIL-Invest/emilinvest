@@ -1,6 +1,9 @@
-import wordmarkNavy from "@/assets/logo-wordmark-navy.png";
+// «navy»-tonen peker nå på de grønne variantene — profilfargen er
+// logo-grønn (#3B563F) etter redesignet. Prop-navnet beholdes for
+// bakoverkompatibilitet: navy = mørk (lys bakgrunn), white = lys (mørk bakgrunn).
+import wordmarkNavy from "@/assets/logo-wordmark-green.png";
 import wordmarkWhite from "@/assets/logo-wordmark-white.png";
-import eiNavy from "@/assets/logo-ei-navy.png";
+import eiNavy from "@/assets/logo-ei-green.png";
 import eiWhite from "@/assets/logo-ei-white.png";
 
 interface BrandLogoProps {

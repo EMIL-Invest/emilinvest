@@ -198,9 +198,7 @@ const ReportsSection = () => {
     <section id="reports" className="py-24">
       <div className="section-container">
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
-            Rapporter
-          </Badge>
+          <p className="eyebrow mb-5">Rapporter</p>
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4">
             Kvartalsrapporter
           </h2>
@@ -323,7 +321,7 @@ const ReportsSection = () => {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {reports.map((report) => (
-              <Card key={report.id} className="glass-card hover:shadow-elevated transition-all duration-300">
+              <Card key={report.id} className="glass-card transition-shadow duration-300 hover:shadow-[var(--shadow-card)]">
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">

@@ -14,10 +14,11 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <HeroSection />
+      {/* Konkurransen rett etter toppen — saldo → bilde → konkurranse */}
+      <CompetitionBanner />
       <AboutSection />
       <PortfolioSection />
       <PerformanceSection />
-      <CompetitionBanner />
       <ReportsSection />
       <GuidelinesSection />
       <TeamSection />

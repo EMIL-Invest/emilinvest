@@ -12,6 +12,7 @@ const navLinks = [
   { href: "#reports", label: "Rapporter" },
   { href: "#guidelines", label: "Retningslinjer" },
   { href: "#team", label: "Medlemmer" },
+  { href: "#om-oss", label: "Om oss" },
 ];
 
 const Navbar = () => {
@@ -98,12 +99,11 @@ const Navbar = () => {
             )}
             <Link
               to="/konkurranse"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
-              <Trophy className="w-4 h-4" />
               Konkurranse
             </Link>
-            
+
             {/* Auth buttons */}
             {user ? (
               <div className="flex items-center gap-2">
@@ -128,8 +128,7 @@ const Navbar = () => {
               </div>
             ) : (
               <Link to="/auth">
-                <Button variant="ghost" size="sm">
-                  <LogIn className="w-4 h-4 mr-1" />
+                <Button size="sm" className="px-5">
                   Logg inn
                 </Button>
               </Link>

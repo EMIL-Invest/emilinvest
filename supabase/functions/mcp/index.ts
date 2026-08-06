@@ -192,7 +192,7 @@ var list_tradable_stocks_default = defineTool5({
 });
 
 // src/lib/mcp/index.ts
-var projectRef = "rdiansdvvwkpujidyzoe";
+var projectRef = "nehqvobfwooyufxqbzpv";
 var mcp_default = defineMcp({
   name: "emil-invest",
   title: "Emil Invest",

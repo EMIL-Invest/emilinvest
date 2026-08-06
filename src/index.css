@@ -6,58 +6,64 @@
 
 @layer base {
   :root {
-    /* Marineblå palett — hentet fra EMIL Invest-logoen (#003D76) */
-    --background: 210 30% 98%;
-    --foreground: 212 55% 12%;
+    /* Krem + dyp grønn — hentet fra EI-logoen. Rolig, redaksjonelt uttrykk. */
+    --background: 40 21% 95%;
+    --foreground: 156 18% 13%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 212 55% 12%;
+    --card: 40 30% 97%;
+    --card-foreground: 156 18% 13%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 212 55% 12%;
+    --popover: 40 30% 97%;
+    --popover-foreground: 156 18% 13%;
 
-    /* Logoens marineblå */
-    --primary: 209 100% 23%;
-    --primary-foreground: 210 30% 98%;
+    /* Dyp skogsgrønn — primærfargen */
+    --primary: 155 15% 19%;
+    --primary-foreground: 40 25% 96%;
 
-    /* Kjølig lyseblå flate */
-    --secondary: 210 40% 94%;
-    --secondary-foreground: 209 80% 20%;
+    /* Varm, dus flate */
+    --secondary: 42 16% 90%;
+    --secondary-foreground: 155 15% 19%;
 
-    --muted: 211 30% 92%;
-    --muted-foreground: 211 22% 40%;
+    --muted: 42 13% 89%;
+    --muted-foreground: 152 8% 38%;
 
-    /* Komplementær himmelblå aksent */
-    --accent: 203 78% 42%;
+    /* Logo-grønn som aksent */
+    --accent: 128 19% 28%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 211 28% 87%;
-    --input: 211 28% 87%;
-    --ring: 209 100% 23%;
+    --border: 44 12% 83%;
+    --input: 44 12% 83%;
+    --ring: 155 15% 19%;
 
-    --radius: 0.75rem;
+    --radius: 0.375rem;
 
     /* Custom tokens */
-    --gradient-hero: linear-gradient(160deg, hsl(213 100% 12%) 0%, hsl(209 100% 23%) 55%, hsl(205 80% 30%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 97%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(155 42% 25%) 100%);
+    --band: 153 18% 17%; /* det mørkegrønne nøkkeltall-båndet */
+    --gradient-hero: linear-gradient(160deg, hsl(153 18% 13%) 0%, hsl(153 16% 20%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(40 30% 97%) 0%, hsl(42 20% 94%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 60% 32%) 0%, hsl(155 42% 25%) 100%);
     --gradient-warning: linear-gradient(135deg, hsl(38 85% 52%) 0%, hsl(32 90% 44%) 100%);
 
-    --shadow-soft: 0 4px 20px -4px hsl(212 60% 12% / 0.08);
-    --shadow-card: 0 8px 30px -8px hsl(212 60% 12% / 0.12);
-    --shadow-elevated: 0 20px 50px -15px hsl(212 60% 12% / 0.18);
+    --shadow-soft: 0 2px 12px -2px hsl(150 20% 10% / 0.06);
+    --shadow-card: 0 8px 30px -10px hsl(150 20% 10% / 0.10);
+    --shadow-elevated: 0 20px 50px -18px hsl(150 20% 10% / 0.14);
 
     /* Stock colors */
     --stock-positive: 142 76% 36%;
     --stock-negative: 0 72% 51%;
     --stock-neutral: 200 65% 45%;
 
-    /* Competition gold */
-    --competition: 38 92% 50%;
+    /* Konkurransefarge — grønnfargen fra EI-logoen (#3B563F) */
+    --competition: 128 19% 28%;
     --competition-foreground: 0 0% 100%;
+
+    /* Logo-grønn som egne tokens + dyp grønn gradient til CTA-flater */
+    --brand-green: 128 19% 28%;
+    --brand-green-light: 128 16% 38%;
+    --gradient-brand: linear-gradient(135deg, hsl(153 18% 14%) 0%, hsl(140 17% 20%) 55%, hsl(128 19% 26%) 100%);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -122,6 +128,11 @@
   h1, h2, h3 {
     font-family: 'Playfair Display', serif;
   }
+
+  /* Tynnere ikonstrek overalt — hever kvalitetsinntrykket */
+  .lucide {
+    stroke-width: 1.5px;
+  }
 }
 
 @layer components {
@@ -136,9 +147,15 @@
     background-clip: text;
   }
 
+  /* Flat, rolig kortstil — tynn strek og myk skygge i stedet for glass-effekt */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-md border border-border/50;
-    box-shadow: var(--shadow-card);
+    @apply bg-card border border-border;
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* Liten overlinje i versaler — brukes over alle seksjonstitler */
+  .eyebrow {
+    @apply text-xs md:text-sm uppercase tracking-[0.22em] text-muted-foreground font-medium;
   }
 
   .stock-positive {

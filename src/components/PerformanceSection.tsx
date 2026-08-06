@@ -148,9 +148,7 @@ const PerformanceSection = () => {
     <section id="performance" className="py-24">
       <div className="section-container">
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
-            Utvikling
-          </Badge>
+          <p className="eyebrow mb-5">Utvikling</p>
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4">
             Portefølje vs OSEBX
           </h2>
