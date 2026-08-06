@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { TrendingUp, Landmark } from "lucide-react";
 import {
-  LineChart,
+  ComposedChart,
+  Area,
   Line,
   XAxis,
   YAxis,
@@ -157,105 +156,140 @@ const PerformanceSection = () => {
           </p>
         </div>
 
-        <Card className="glass-card">
-          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CardTitle className="font-serif">Avkastning</CardTitle>
+        <div
+          className="rounded-md border border-border bg-card p-6 md:p-9"
+          style={{ boxShadow: "var(--shadow-soft)" }}
+        >
+          {/* Topp: tittel + periodevalg */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h3 className="font-serif text-2xl md:text-3xl text-foreground">Avkastning</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Utvikling i portefølje sammenlignet med OSEBX
+              </p>
+            </div>
             <div className="flex flex-wrap gap-2">
               {filters.map((filter) => (
-                <Button
+                <button
                   key={filter.key}
-                  variant={timeFilter === filter.key ? "default" : "outline"}
-                  size="sm"
                   onClick={() => setTimeFilter(filter.key)}
-                  className={timeFilter === filter.key ? "bg-primary text-primary-foreground" : ""}
+                  className={`px-4 py-2 rounded-[4px] text-sm font-medium border transition-colors ${
+                    timeFilter === filter.key
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border bg-background text-foreground hover:bg-secondary/60"
+                  }`}
                 >
                   {filter.label}
-                </Button>
+                </button>
               ))}
             </div>
-          </CardHeader>
-          <CardContent>
-            {filteredData.length === 0 ? (
-              <div className="h-80 flex items-center justify-center">
-                <p className="text-muted-foreground">
-                  Ingen historiske data tilgjengelig for denne perioden.
-                </p>
+          </div>
+
+          {filteredData.length === 0 ? (
+            <div className="h-80 flex items-center justify-center">
+              <p className="text-muted-foreground">
+                Ingen historiske data tilgjengelig for denne perioden.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Nøkkeltall-kort */}
+              <div className="grid sm:grid-cols-2 gap-4 mb-8">
+                <div className="flex items-center gap-4 p-5 rounded-md border border-border bg-background">
+                  <div className="w-12 h-12 rounded-[4px] bg-primary flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">EMIL Invest</p>
+                    <p className={`text-2xl font-serif font-bold tabular-nums ${returns.portfolio >= 0 ? "stock-positive" : "stock-negative"}`}>
+                      {returns.portfolio >= 0 ? "+" : ""}{returns.portfolio.toFixed(2)} %
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Avkastning ({filters.find((f) => f.key === timeFilter)?.label})
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-5 rounded-md border border-border bg-background">
+                  <div className="w-12 h-12 rounded-[4px] border border-foreground/25 bg-secondary/50 flex items-center justify-center flex-shrink-0">
+                    <Landmark className="w-5 h-5 text-foreground/70" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">OSEBX</p>
+                    <p className={`text-2xl font-serif font-bold tabular-nums ${returns.osebx >= 0 ? "stock-positive" : "stock-negative"}`}>
+                      {returns.osebx >= 0 ? "+" : ""}{returns.osebx.toFixed(2)} %
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Avkastning ({filters.find((f) => f.key === timeFilter)?.label})
+                    </p>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <>
-                {/* Return Summary */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                    <p className="text-sm text-muted-foreground mb-1">EMIL Invest</p>
-                    <p className={`text-2xl font-serif font-bold ${returns.portfolio >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                      {returns.portfolio >= 0 ? "+" : ""}{returns.portfolio.toFixed(2)}%
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-lg bg-muted/50 border border-border">
-                    <p className="text-sm text-muted-foreground mb-1">OSEBX</p>
-                    <p className={`text-2xl font-serif font-bold ${returns.osebx >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                      {returns.osebx >= 0 ? "+" : ""}{returns.osebx.toFixed(2)}%
-                    </p>
-                  </div>
-                </div>
 
-                {/* Chart */}
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={filteredData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="hsl(var(--muted-foreground))"
-                        fontSize={12}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        stroke="hsl(var(--muted-foreground))"
-                        fontSize={12}
-                        tickLine={false}
-                        domain={['auto', 'auto']}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                        }}
-                        labelStyle={{ color: "hsl(var(--foreground))" }}
-                      />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="portfolio"
-                        name="EMIL Invest"
-                        stroke="hsl(158 64% 35%)"
-                        strokeWidth={3}
-                        dot={false}
-                        activeDot={{ r: 5, fill: "hsl(158 64% 35%)" }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="osebx"
-                        name="OSEBX"
-                        stroke="hsl(200 65% 50%)"
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                        dot={false}
-                        activeDot={{ r: 4, fill: "hsl(200 65% 50%)" }}
-                        connectNulls
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+              {/* Graf: EMIL som fylt areal, OSEBX som stiplet linje */}
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={filteredData}>
+                    <defs>
+                      <linearGradient id="emilFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="hsl(153 20% 30%)" stopOpacity={0.14} />
+                        <stop offset="100%" stopColor="hsl(153 20% 30%)" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="4 5" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      domain={['auto', 'auto']}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                      labelStyle={{ color: "hsl(var(--foreground))" }}
+                    />
+                    <Legend iconType="plainline" />
+                    <Area
+                      type="monotone"
+                      dataKey="portfolio"
+                      name="EMIL Invest"
+                      stroke="hsl(153 22% 22%)"
+                      strokeWidth={2.5}
+                      fill="url(#emilFill)"
+                      dot={false}
+                      activeDot={{ r: 5, fill: "hsl(153 22% 22%)" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="osebx"
+                      name="OSEBX"
+                      stroke="hsl(150 6% 62%)"
+                      strokeWidth={1.8}
+                      strokeDasharray="6 5"
+                      dot={false}
+                      activeDot={{ r: 4, fill: "hsl(150 6% 62%)" }}
+                      connectNulls
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
 
-                <p className="text-xs text-muted-foreground text-center mt-4">
-                  * Verdier er normalisert til 100 ved periodens start for enkel sammenligning
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
+              <p className="text-xs text-muted-foreground text-center mt-4">
+                * Verdier er normalisert til 100 ved periodens start for enkel sammenligning
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </section>
   );

@@ -59,6 +59,9 @@ export const AllocationSection = ({
   other: OtherRow[];
   totalValue: number;
 }) => {
+  // Hvilket kakestykke pekes det på? De andre fader ut så det aktive står frem.
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
   if (totalValue <= 0 || stocks.length + other.length === 0) return null;
 
   const stockValue = stocks.reduce((s, r) => s + r.value, 0);
@@ -125,9 +128,16 @@ export const AllocationSection = ({
                     outerRadius="95%"
                     paddingAngle={1.5}
                     strokeWidth={0}
+                    onMouseEnter={(_: unknown, index: number) => setActiveIndex(index)}
+                    onMouseLeave={() => setActiveIndex(null)}
                   >
-                    {slices.map((slice) => (
-                      <Cell key={slice.name} fill={slice.color} />
+                    {slices.map((slice, i) => (
+                      <Cell
+                        key={slice.name}
+                        fill={slice.color}
+                        fillOpacity={activeIndex === null || activeIndex === i ? 1 : 0.22}
+                        style={{ transition: "fill-opacity 0.25s ease" }}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
@@ -158,10 +168,18 @@ export const AllocationSection = ({
 
             {/* Posisjonsbrikker */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 mt-8">
-              {slices.map((slice) => (
+              {slices.map((slice, i) => (
                 <div
                   key={slice.name}
-                  className="flex items-center justify-between gap-2 rounded-[4px] border border-border bg-background px-3 py-2"
+                  onMouseEnter={() => setActiveIndex(i)}
+                  onMouseLeave={() => setActiveIndex(null)}
+                  className={`flex items-center justify-between gap-2 rounded-[4px] border bg-background px-3 py-2 transition-all duration-200 cursor-default ${
+                    activeIndex === i
+                      ? "border-foreground/40 shadow-sm"
+                      : activeIndex !== null
+                      ? "border-border opacity-45"
+                      : "border-border"
+                  }`}
                 >
                   <span className="flex items-center gap-2 min-w-0">
                     <span
