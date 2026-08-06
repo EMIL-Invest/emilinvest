@@ -86,15 +86,11 @@ const HeroSection = () => {
             Porteføljens markedsverdi
           </p>
           <div className="animate-fade-up" style={{ animationDelay: "0.15s" }}>
+            {/* Vis alltid tallet — «0 kr» fra første render er penere enn en
+                tom plassholder mens dataene lastes. Telleren tar over derfra. */}
             <p className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight tabular-nums leading-none">
-              {loading ? (
-                <span className="text-white/40">–</span>
-              ) : (
-                <>
-                  {Math.round(animatedValue).toLocaleString("no-NO")}
-                  <span className="text-2xl md:text-4xl font-medium text-white/70 ml-3 align-baseline">kr</span>
-                </>
-              )}
+              {Math.round(animatedValue).toLocaleString("no-NO")}
+              <span className="text-2xl md:text-4xl font-medium text-white/70 ml-3 align-baseline">kr</span>
             </p>
             <div className="flex items-center justify-center gap-3 mt-5 text-sm md:text-base">
               {!loading && (
