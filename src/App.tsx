@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Portefolje from "./pages/Portefolje";
 import Auth from "./pages/Auth";
@@ -18,12 +20,30 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+/**
+ * Sikkerhetsnett for «glemt passord»: uansett hvilken side
+ * gjenopprettingslenken lander på, sendes brukeren til /nytt-passord.
+ */
+const RecoveryRedirect = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        navigate("/nytt-passord");
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <RecoveryRedirect />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/portefolje" element={<Portefolje />} />
