@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import Portefolje from "./pages/Portefolje";
 import Auth from "./pages/Auth";
 import NyttPassord from "./pages/NyttPassord";
+import Personvern from "./pages/Personvern";
+import Vilkar from "./pages/Vilkar";
 import Admin from "./pages/Admin";
 import Competition from "./pages/Competition";
 import Account from "./pages/Account";
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/portefolje" element={<Portefolje />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/nytt-passord" element={<NyttPassord />} />
+          <Route path="/personvern" element={<Personvern />} />
+          <Route path="/vilkar" element={<Vilkar />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/konkurranse" element={<Competition />} />
           <Route path="/konto" element={<Account />} />

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import BrandLogo from "@/components/BrandLogo";
 
 const Footer = () => {
@@ -13,9 +14,25 @@ const Footer = () => {
             </p>
           </div>
 
-          <p className="text-sm text-primary-foreground/60 text-center">
-            © {new Date().getFullYear()} EMIL Invest. Alle rettigheter reservert.
-          </p>
+          <div className="text-center">
+            <p className="text-sm text-primary-foreground/60 mb-2">
+              © {new Date().getFullYear()} EMIL Invest. Alle rettigheter reservert.
+            </p>
+            <div className="flex justify-center gap-4 text-sm">
+              <Link
+                to="/personvern"
+                className="text-primary-foreground/70 hover:text-primary-foreground underline underline-offset-2 transition-colors"
+              >
+                Personvern
+              </Link>
+              <Link
+                to="/vilkar"
+                className="text-primary-foreground/70 hover:text-primary-foreground underline underline-offset-2 transition-colors"
+              >
+                Vilkår
+              </Link>
+            </div>
+          </div>
 
           <div className="flex gap-6">
             <a
