@@ -1,18 +1,34 @@
-import { Badge } from "@/components/ui/badge";
-import { usePortfolioData } from "@/hooks/usePortfolioData";
-import PortfolioOverview from "@/components/portfolio/PortfolioOverview";
-import StocksTable from "@/components/portfolio/StocksTable";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { usePortfolioData, StockQuote } from "@/hooks/usePortfolioData";
+import { AllocationSection } from "@/components/PortfolioVisuals";
 
+/**
+ * Forsidens porteføljeseksjon: viser fordelingsdiagrammet (smultringen)
+ * fra porteføljesiden — den fulle aksjetabellen bor på /portefolje.
+ */
 const PortfolioSection = () => {
-  const {
-    holdings,
-    quotes,
-    loading,
-    quotesLoading,
-    lastUpdated,
-    fetchQuotes,
-    calculatePortfolioValue,
-  } = usePortfolioData();
+  const { holdings, quotes, loading, calculateHoldingValue, calculatePortfolioValue } =
+    usePortfolioData();
+
+  const totalValue = calculatePortfolioValue(holdings, quotes);
+
+  const stocks = holdings
+    .filter((h) => h.holding_type === "stock")
+    .map((h) => ({
+      holding: h,
+      quote: quotes[h.ticker] as StockQuote | undefined,
+      value: calculateHoldingValue(h, quotes[h.ticker]),
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  const other = holdings
+    .filter((h) => h.holding_type !== "stock")
+    .map((h) => ({
+      holding: h,
+      value: h.cost_basis || h.purchase_price * h.quantity,
+    }))
+    .sort((a, b) => b.value - a.value);
 
   if (loading) {
     return (
@@ -35,23 +51,21 @@ const PortfolioSection = () => {
             Våre investeringer
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Følg utviklingen av våre aksjeinvesteringer med live markedsdata
+            Slik er porteføljen fordelt — live. Pek på et felt for detaljer.
           </p>
         </div>
+      </div>
 
-        <PortfolioOverview 
-          holdings={holdings}
-          quotes={quotes}
-          calculatePortfolioValue={calculatePortfolioValue}
-        />
+      <AllocationSection stocks={stocks} other={other} totalValue={totalValue} />
 
-        <StocksTable
-          holdings={holdings}
-          quotes={quotes}
-          loading={quotesLoading}
-          lastUpdated={lastUpdated}
-          onRefresh={() => fetchQuotes()}
-        />
+      <div className="section-container text-center">
+        <Link
+          to="/portefolje"
+          className="group inline-flex items-center gap-2 text-sm font-medium text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground transition-colors"
+        >
+          Se hele porteføljen — alle aksjene, verdier og utvikling
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </Link>
       </div>
     </section>
   );
