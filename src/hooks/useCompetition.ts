@@ -138,20 +138,33 @@ export const useCompetition = () => {
 
     setQuotesLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("stock-prices", {
-        body: { tickers: tickersToFetch },
-      });
-
-      if (error) {
-        console.error("Error fetching quotes:", error?.message || "Unknown error");
-        return;
+      // Edge-funksjonen godtar maks 250 tickere per kall — del opp i bolker
+      // så kurslisten skalerer når aksjeuniverset vokser.
+      const CHUNK = 150;
+      const chunks: string[][] = [];
+      for (let i = 0; i < tickersToFetch.length; i += CHUNK) {
+        chunks.push(tickersToFetch.slice(i, i + CHUNK));
       }
 
-      if (data?.quotes) {
-        const quotesMap: Record<string, StockQuote> = {};
-        data.quotes.forEach((q: StockQuote) => {
-          quotesMap[q.ticker] = q;
-        });
+      const results = await Promise.all(
+        chunks.map((chunk) =>
+          supabase.functions.invoke("stock-prices", { body: { tickers: chunk } })
+        )
+      );
+
+      const quotesMap: Record<string, StockQuote> = {};
+      for (const { data, error } of results) {
+        if (error) {
+          console.error("Error fetching quotes:", error?.message || "Unknown error");
+          continue;
+        }
+        if (data?.quotes) {
+          data.quotes.forEach((q: StockQuote) => {
+            quotesMap[q.ticker] = q;
+          });
+        }
+      }
+      if (Object.keys(quotesMap).length > 0) {
         setQuotes(prev => ({ ...prev, ...quotesMap }));
       }
     } catch (err) {

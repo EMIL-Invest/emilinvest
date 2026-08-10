@@ -15,9 +15,9 @@ const Index = () => {
       <HeroSection />
       {/* Konkurransen rett etter toppen — saldo → bilde → konkurranse */}
       <CompetitionBanner />
-      <AboutSection />
       <PortfolioSection />
       <PerformanceSection />
+      <AboutSection />
       <ReportsSection />
       <TeamSection />
       <Footer />

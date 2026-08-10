@@ -276,7 +276,7 @@ const StockTrader = ({
             Kjøp aksjer
           </CardTitle>
           <CardDescription>
-            Velg aksjer fra Oslo Børs å legge til i porteføljen din
+            Velg aksjer fra Oslo Børs og de store internasjonale børsene
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
