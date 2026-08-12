@@ -92,19 +92,20 @@ const HeroSection = () => {
         <svg width="0" height="0" aria-hidden="true" className="absolute">
           <defs>
             <clipPath id="hero-kurve" clipPathUnits="objectBoundingBox">
-              <path d="M0.17,0 C0.075,0.2 0.05,0.58 0.10,1 L1,1 L1,0 Z" />
+              <path d="M0.16,0 C0.10,0.22 0.085,0.58 0.115,1 L1,1 L1,0 Z" />
             </clipPath>
           </defs>
         </svg>
 
         <div
-          className="hidden xl:block absolute inset-y-0 right-0 w-[52%] animate-fade-up"
+          className="hidden xl:block absolute inset-y-0 right-0 w-[56%] max-w-[860px] animate-fade-up"
           style={{ clipPath: "url(#hero-kurve)", animationDelay: "0.15s" }}
         >
           <img
             src={heroPhoto}
             alt="EMIL Invest-komiteen foran Hovedbygningen på NTNU"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: "center 32%" }}
           />
         </div>
 
