@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PerformanceSection from "@/components/PerformanceSection";
@@ -44,6 +45,7 @@ const useYtdReturn = (
   }, [history]);
 
 const Portefolje = () => {
+  const navigate = useNavigate();
   const { holdings, quotes, history, loading, lastUpdated, calculatePortfolioValue, calculateHoldingValue } =
     usePortfolioData();
 
@@ -148,9 +150,22 @@ const Portefolje = () => {
                 </thead>
                 <tbody>
                   {stocks.map(({ holding, quote, value }) => (
-                    <tr key={holding.id} className="border-b border-border/60 last:border-0 hover:bg-secondary/40 transition-colors">
+                    <tr
+                      key={holding.id}
+                      onClick={() => navigate(`/aksje/${holding.ticker}`)}
+                      className="border-b border-border/60 last:border-0 hover:bg-secondary/40 transition-colors cursor-pointer"
+                    >
                       <td className="py-4 px-6">
-                        <p className="font-medium text-foreground">{holding.name}</p>
+                        {/* Lenken gjør raden tilgjengelig med tastatur og
+                            skjermleser; onClick på raden gjør hele flaten
+                            klikkbar for mus. */}
+                        <Link
+                          to={`/aksje/${holding.ticker}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-medium text-foreground hover:underline underline-offset-2"
+                        >
+                          {holding.name}
+                        </Link>
                         <p className="text-xs text-muted-foreground">{holding.ticker}</p>
                       </td>
                       <td className="py-4 px-4 text-sm text-muted-foreground">{holding.sector || "–"}</td>

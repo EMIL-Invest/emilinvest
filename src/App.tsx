@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Portefolje from "./pages/Portefolje";
+import Aksje from "./pages/Aksje";
 import Auth from "./pages/Auth";
 import NyttPassord from "./pages/NyttPassord";
 import Personvern from "./pages/Personvern";
@@ -47,6 +48,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/portefolje" element={<Portefolje />} />
+          <Route path="/aksje/:ticker" element={<Aksje />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/nytt-passord" element={<NyttPassord />} />
           <Route path="/personvern" element={<Personvern />} />

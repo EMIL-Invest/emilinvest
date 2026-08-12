@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, Shield, Briefcase, LineChart, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, Users, Shield, Briefcase, LineChart, FileSpreadsheet, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import PortfolioAdmin from "@/components/admin/PortfolioAdmin";
 import HistoryAdmin from "@/components/admin/HistoryAdmin";
 import UsersAdmin from "@/components/admin/UsersAdmin";
 import TeamAdmin from "@/components/admin/TeamAdmin";
+import StockProfilesAdmin from "@/components/admin/StockProfilesAdmin";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import ExcelExport from "@/components/admin/ExcelExport";
 
@@ -114,7 +115,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Portefølje
@@ -126,6 +127,10 @@ const Admin = () => {
             <TabsTrigger value="excel" className="flex items-center gap-2">
               <FileSpreadsheet className="w-4 h-4" />
               Excel
+            </TabsTrigger>
+            <TabsTrigger value="aksjesider" className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Aksjesider
             </TabsTrigger>
             <TabsTrigger value="team" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -153,6 +158,10 @@ const Admin = () => {
 
           <TabsContent value="excel">
             <ExcelExport />
+          </TabsContent>
+
+          <TabsContent value="aksjesider">
+            <StockProfilesAdmin />
           </TabsContent>
 
           <TabsContent value="team">
