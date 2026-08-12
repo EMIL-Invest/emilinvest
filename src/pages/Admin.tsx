@@ -4,12 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, Shield, Briefcase, LineChart, Instagram, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, Users, Shield, Briefcase, LineChart, FileSpreadsheet } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import PortfolioAdmin from "@/components/admin/PortfolioAdmin";
 import HistoryAdmin from "@/components/admin/HistoryAdmin";
-import InstagramAdmin from "@/components/admin/InstagramAdmin";
 import UsersAdmin from "@/components/admin/UsersAdmin";
 import TeamAdmin from "@/components/admin/TeamAdmin";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
@@ -115,7 +114,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Portefølje
@@ -127,10 +126,6 @@ const Admin = () => {
             <TabsTrigger value="excel" className="flex items-center gap-2">
               <FileSpreadsheet className="w-4 h-4" />
               Excel
-            </TabsTrigger>
-            <TabsTrigger value="instagram" className="flex items-center gap-2">
-              <Instagram className="w-4 h-4" />
-              Instagram
             </TabsTrigger>
             <TabsTrigger value="team" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -158,10 +153,6 @@ const Admin = () => {
 
           <TabsContent value="excel">
             <ExcelExport />
-          </TabsContent>
-
-          <TabsContent value="instagram">
-            <InstagramAdmin userId={user?.id || ""} />
           </TabsContent>
 
           <TabsContent value="team">

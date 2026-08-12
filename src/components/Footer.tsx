@@ -12,6 +12,13 @@ const Footer = () => {
               Investeringskomiteen i EMIL — Energi- og miljøingeniørenes
               linjeforening, NTNU.
             </p>
+            {/* Kontaktpunkt. Samme adresse som i personvernerklæringen. */}
+            <a
+              href="mailto:kontakt@emilinvest.no"
+              className="text-sm text-primary-foreground/70 hover:text-primary-foreground underline underline-offset-2 transition-colors"
+            >
+              kontakt@emilinvest.no
+            </a>
           </div>
 
           <div className="text-center">

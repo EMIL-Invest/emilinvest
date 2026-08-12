@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { TrendingUp, Landmark } from "lucide-react";
 import {
   ComposedChart,
@@ -285,6 +286,20 @@ const PerformanceSection = () => {
 
               <p className="text-xs text-muted-foreground text-center mt-4">
                 * Verdier er normalisert til 100 ved periodens start for enkel sammenligning
+              </p>
+
+              {/* Risikoopplysning. Hører hjemme der avkastningstallene faktisk
+                  vises, ikke bare i vilkårene. */}
+              <p className="text-xs text-muted-foreground/80 text-center mt-3 max-w-2xl mx-auto leading-relaxed">
+                Historisk avkastning er ingen garanti for framtidig avkastning. Tallene
+                vises for åpenhet og læring, og er ikke investeringsrådgivning. Se{" "}
+                <Link
+                  to="/vilkar"
+                  className="underline underline-offset-2 hover:text-foreground transition-colors"
+                >
+                  vilkårene
+                </Link>{" "}
+                for mer.
               </p>
             </>
           )}
