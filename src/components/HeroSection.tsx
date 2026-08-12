@@ -104,8 +104,10 @@ const HeroSection = () => {
           <img
             src={heroPhoto}
             alt="EMIL Invest-komiteen foran Hovedbygningen på NTNU"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: "center 32%" }}
+            /* Beskjæringen ligger i selve bildefilen: gjengen har senter på
+               55 % av bredden, slik at den leses som sentrert etter at kurven
+               har dekket til venstre ~10 %. Derfor holder ren object-center. */
+            className="w-full h-full object-cover object-center"
           />
         </div>
 
