@@ -4,11 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EMIL Invest</title>
-    <!-- ?v=2 tvinger nettlesere (særlig Safari) til å hente det grønne ikonet
-         i stedet for det gamle blå fra mellomlageret -->
-    <link rel="icon" href="/favicon.ico?v=2" sizes="32x32" />
-    <link rel="icon" type="image/png" href="/favicon.png?v=2" sizes="256x256" />
-    <link rel="apple-touch-icon" href="/favicon.png?v=2" />
+    <!-- Nye FILNAVN (ikke ?v=), fordi Safari lagrer ikoner til startside,
+         søkeforslag og bokmerker i et eget arkiv som er nøklet på domenet
+         alene og ignorerer query-strengen. Ny sti = friskt ikon.
+         apple-touch-icon er helt ugjennomsiktig — iOS gjør transparente
+         hjørner svarte og legger på sin egen maske. -->
+    <link rel="icon" href="/favicon-gronn.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" href="/favicon-gronn.png" sizes="256x256" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-gronn.png" />
     <meta name="description" content="Investeringskomiteen for Energi- og miljøstudenter. Investeringer for fremtiden." />
     <meta name="author" content="EMIL Invest" />
 
