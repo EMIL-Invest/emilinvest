@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
-import { isExchangeOpen, getExchangeInfo, getExchangeName, getExchangeFromTicker } from "@/lib/exchangeHours";
 
 interface StockTraderProps {
   availableStocks: OsloStock[];
@@ -233,14 +232,6 @@ const StockTrader = ({
     if (price <= 0) return 0;
     if (price > 30000) return Math.floor((cashBalance / price) * 100) / 100; // 2 decimals for expensive
     return Math.floor(cashBalance / price);
-  };
-
-  // Get exchange status for a stock
-  const getExchangeStatus = (ticker: string) => {
-    const exchange = availableStocks.find(s => s.ticker === ticker)?.exchange || getExchangeFromTicker(ticker);
-    const info = getExchangeInfo(exchange);
-    const name = getExchangeName(exchange);
-    return { ...info, name, exchange };
   };
 
   return (

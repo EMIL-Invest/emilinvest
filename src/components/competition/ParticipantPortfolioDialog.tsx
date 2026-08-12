@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Wallet, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PortfolioHolding, StockQuote } from "@/hooks/useCompetition";

@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PerformanceSection from "@/components/PerformanceSection";
 import { AllocationSection, ContributionSection } from "@/components/PortfolioVisuals";
-import { usePortfolioData, Holding, StockQuote } from "@/hooks/usePortfolioData";
+import { usePortfolioData, StockQuote } from "@/hooks/usePortfolioData";
 
 /**
  * Dedikert porteføljeside — viser alle plasseringene med vekting,

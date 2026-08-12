@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCompetition } from "@/hooks/useCompetition";
-import { Trophy, TrendingUp, Wallet, ArrowUpRight, ArrowDownRight, RefreshCw, LogIn } from "lucide-react";
+import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, RefreshCw, LogIn } from "lucide-react";
 import LeaderboardTable from "@/components/competition/LeaderboardTable";
 import PortfolioManager from "@/components/competition/PortfolioManager";
 import StockTrader from "@/components/competition/StockTrader";

@@ -83,12 +83,36 @@ const HeroSection = () => {
 
   return (
     <section id="home" className="pt-16">
-      {/* Øvre del: tekst til venstre, gruppebildet til høyre */}
-      <div className="section-container">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-14 md:py-20">
-          <div className="animate-fade-up">
+      {/* Øvre del: tekst til venstre, gruppebildet fullt ut mot høyre kant */}
+      <div className="relative overflow-hidden">
+        {/* Organisk kurve som skiller tekstflaten fra bildet.
+            clipPathUnits="objectBoundingBox" gjør kurven responsiv —
+            koordinatene er andeler av elementets egen størrelse, så den
+            holder formen uansett skjermbredde. */}
+        <svg width="0" height="0" aria-hidden="true" className="absolute">
+          <defs>
+            <clipPath id="hero-kurve" clipPathUnits="objectBoundingBox">
+              <path d="M0.17,0 C0.075,0.2 0.05,0.58 0.10,1 L1,1 L1,0 Z" />
+            </clipPath>
+          </defs>
+        </svg>
+
+        <div
+          className="hidden xl:block absolute inset-y-0 right-0 w-[52%] animate-fade-up"
+          style={{ clipPath: "url(#hero-kurve)", animationDelay: "0.15s" }}
+        >
+          <img
+            src={heroPhoto}
+            alt="EMIL Invest-komiteen foran Hovedbygningen på NTNU"
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+
+        <div className="section-container relative">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-14 md:py-20">
+            <div className="animate-fade-up">
             <p className="eyebrow mb-6">Investeringskomiteen i EMIL</p>
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] text-foreground mb-7">
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] text-foreground mb-7 xl:max-w-md">
               Energi- og miljø&shy;ingeniørenes linjeforening
             </h1>
             <div className="w-10 h-px bg-foreground/30 mb-7" />
@@ -135,13 +159,16 @@ const HeroSection = () => {
             </div>
           </div>
 
-          <div className="animate-fade-up" style={{ animationDelay: "0.15s" }}>
-            <img
-              src={heroPhoto}
-              alt="EMIL Invest-komiteen foran Hovedbygningen på NTNU"
-              className="w-full h-auto rounded-md"
-              style={{ boxShadow: "var(--shadow-card)" }}
-            />
+            {/* Under xl ligger bildet i vanlig ramme ved siden av / under teksten.
+                Full-bleed-varianten krever bredde for at kurven skal se riktig ut. */}
+            <div className="xl:hidden animate-fade-up" style={{ animationDelay: "0.15s" }}>
+              <img
+                src={heroPhoto}
+                alt="EMIL Invest-komiteen foran Hovedbygningen på NTNU"
+                className="w-full h-auto rounded-md"
+                style={{ boxShadow: "var(--shadow-card)" }}
+              />
+            </div>
           </div>
         </div>
       </div>

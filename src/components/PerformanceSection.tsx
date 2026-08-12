@@ -123,7 +123,6 @@ const PerformanceSection = () => {
 
   const returns = useMemo(() => {
     if (filteredData.length < 2) return { portfolio: 0, osebx: 0 };
-    const first = filteredData[0];
     const last = filteredData[filteredData.length - 1];
     return {
       portfolio: last.portfolio - 100,
