@@ -105,7 +105,11 @@ export const hentRegnskap = async (ticker: string): Promise<Regnskapsperiode[]> 
     if (manglerTabell(error)) return [];
     throw error;
   }
-  return (data as Regnskapsperiode[]) ?? [];
+  // Sorter også her. Grafen og tabellen leser rekkefølgen direkte, og skal
+  // ikke stå og falle på at serveren sorterte som forventet.
+  return ((data as Regnskapsperiode[]) ?? [])
+    .slice()
+    .sort((a, b) => a.periode_slutt.localeCompare(b.periode_slutt));
 };
 
 export const lagreProfil = async (profil: Partial<Aksjeprofil>) => {
