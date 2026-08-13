@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { REGLER, HVORFOR_REGLER } from "@/lib/konkurranseregler";
 
 /**
  * Vilkår for bruk — inkluderer ansvarsfraskrivelsen (ikke investeringsråd)
@@ -27,8 +28,49 @@ const Vilkar = () => {
           <div className="w-10 h-px bg-foreground/30 mb-8" />
           <p className="text-lg text-muted-foreground leading-relaxed mb-12">
             Ved å bruke emilinvest.no og delta i aksjekonkurransen godtar du
-            disse vilkårene. De er korte og skrevet for å leses.
+            disse vilkårene. De er korte og skrevet for å leses. Reglene i
+            konkurransen står først — resten er det formelle.
           </p>
+
+          {/* Reglene øverst, punktvis. Folk som trykker «Les reglene» skal
+              ikke måtte lete gjennom vilkårene for å finne dem. */}
+          <section
+            id="regler"
+            className="rounded-md border border-border bg-card p-6 md:p-8 mb-14"
+            style={{ boxShadow: "var(--shadow-soft)" }}
+          >
+            <p className="eyebrow mb-3">Kortversjonen</p>
+            <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-6">
+              Reglene i aksjekonkurransen
+            </h2>
+
+            <ul className="space-y-4">
+              {REGLER.map((regel) => (
+                <li key={regel.tittel} className="flex gap-3.5">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2.5"
+                    style={{ background: "hsl(var(--competition))" }}
+                  />
+                  <span className="leading-relaxed">
+                    <span className="text-foreground font-medium">{regel.tittel}.</span>{" "}
+                    <span className="text-muted-foreground">{regel.tekst}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-muted-foreground leading-relaxed mt-7 pt-6 border-t border-border">
+              {HVORFOR_REGLER}
+            </p>
+
+            <p className="text-sm text-muted-foreground mt-5">
+              Reglene håndheves automatisk når du handler — et kjøp som bryter
+              en av dem blir avvist med en forklaring.{" "}
+              <Link to="/konkurranse" className="text-primary underline underline-offset-2">
+                Til konkurransen
+              </Link>
+            </p>
+          </section>
 
           <Section title="Om tjenesten">
             <p>
@@ -66,43 +108,6 @@ const Vilkar = () => {
               premier etter eget skjønn. Forsøk på å utnytte tekniske feil,
               opprette flere kontoer eller manipulere kurser fører til
               utestengelse.
-            </p>
-          </Section>
-
-          <Section title="Reglene for handel">
-            <p>
-              Alle deltakere starter med 100 000 virtuelle kroner. Følgende
-              regler gjelder:
-            </p>
-            <p>
-              <span className="text-foreground">Én aksje kan maks utgjøre 30 %</span>{" "}
-              av porteføljen din på kjøpstidspunktet. Vokser en posisjon forbi
-              30 % fordi kursen stiger, er det helt greit — du får bare ikke
-              kjøpe mer av den.
-            </p>
-            <p>
-              <span className="text-foreground">Førstegangskjøp i en aksje må være minst 4 000 kr.</span>{" "}
-              Det hindrer at man kjøper småposter i mange selskaper bare for å
-              oppfylle kravene.
-            </p>
-            <p>
-              <span className="text-foreground">For å bli rangert på ledertavlen må du eie minst 5 ulike aksjer.</span>{" "}
-              Er du under fem, står du i en egen liste under rangeringen med
-              hvor mange du mangler.
-            </p>
-            <p>
-              <span className="text-foreground">Maks 10 ulike aksjer</span> i
-              porteføljen, og{" "}
-              <span className="text-foreground">maks 3 handler per aksje per dag</span>.
-              Handel er bare mulig når børsen aksjen er notert på er åpen.
-            </p>
-            <p>
-              Grunnen til reglene er at konkurransen skal gi erfaring med å
-              bygge en portefølje. Uten en øvre grense per aksje ville den beste
-              vinnersjansen vært å legge alt i det mest volatile selskapet man
-              fant og håpe på flaks — som er både dårlig læring og dårlig
-              investering. Diversifisering er ikke en begrensning vi har funnet
-              på; det er selve poenget.
             </p>
           </Section>
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { isExchangeOpen, getExchangeFromTicker, getExchangeInfo, getExchangeName } from "@/lib/exchangeHours";
+import { KRAV_ANTALL_AKSJER } from "@/lib/konkurranseregler";
 
 export interface OsloStock {
   id: string;
@@ -44,12 +45,11 @@ export interface LeaderboardEntry {
 
 /**
  * Hvor mange ulike aksjer som kreves for å bli rangert på ledertavlen.
- * Poenget med konkurransen er å lære porteføljebygging, så en enkelt
- * posisjon skal ikke kunne vinne. Reglene for kjøp (maksvekt 30 % og
- * minstebeløp 4 000 kr) håndheves i databasen — se
- * supabase/manual/13_konkurranseregler.sql.
+ * Selve tallet bor nå i src/lib/konkurranseregler.ts sammen med de andre
+ * konkurransereglene; det re-eksporteres her fordi flere komponenter
+ * allerede importerer det herfra.
  */
-export const KRAV_ANTALL_AKSJER = 5;
+export { KRAV_ANTALL_AKSJER };
 
 export interface StockQuote {
   ticker: string;

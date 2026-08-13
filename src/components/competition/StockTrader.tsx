@@ -10,6 +10,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
+import { Link } from "react-router-dom";
+import {
+  KRAV_ANTALL_AKSJER,
+  MAKSVEKT_PROSENT,
+  MINSTE_FORSTEKJOP,
+} from "@/lib/konkurranseregler";
 
 interface StockTraderProps {
   availableStocks: OsloStock[];
@@ -247,14 +253,20 @@ const StockTrader = ({
             og du har maks {maxDailyTransactions} transaksjoner per aksje per dag.
           </p>
           <p>
-            <strong>Diversifisering:</strong> Én aksje kan maks utgjøre 30 % av
-            porteføljen, og et førstegangskjøp må være på minst 4 000 kr. For å
-            bli rangert på ledertavlen må du eie minst 5 ulike aksjer.
+            <strong>Diversifisering:</strong> Én aksje kan maks utgjøre{" "}
+            {MAKSVEKT_PROSENT} % av porteføljen, og et førstegangskjøp må være
+            på minst {MINSTE_FORSTEKJOP.toLocaleString("no-NO")} kr. For å bli
+            rangert på ledertavlen må du eie minst {KRAV_ANTALL_AKSJER} ulike
+            aksjer.
           </p>
           <p className="text-muted-foreground">
             Reglene finnes fordi konkurransen skal gi erfaring med å bygge en
             portefølje. Uten dem ville den beste vinnersjansen vært å satse alt
-            på ett selskap og håpe på flaks — og da lærer man ingenting.
+            på ett selskap og håpe på flaks — og da lærer man ingenting.{" "}
+            <Link to="/vilkar" className="underline underline-offset-2">
+              Alle reglene
+            </Link>
+            .
           </p>
         </AlertDescription>
       </Alert>
