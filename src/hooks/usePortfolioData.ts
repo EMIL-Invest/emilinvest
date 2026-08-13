@@ -11,6 +11,8 @@ export interface Holding {
   holding_type: string;
   sector: string | null;
   exchange: string | null;
+  /** Datoen posisjonen ble kjøpt — utgangspunktet avkastningen måles fra. */
+  purchase_date: string | null;
 }
 
 export interface StockQuote {

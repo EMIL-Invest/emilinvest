@@ -143,9 +143,10 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="portfolio">
-            <PortfolioAdmin 
-              holdings={portfolioData.holdings} 
-              onRefresh={portfolioData.refresh} 
+            <PortfolioAdmin
+              holdings={portfolioData.holdings}
+              quotes={portfolioData.quotes}
+              onRefresh={portfolioData.refresh}
             />
           </TabsContent>
 

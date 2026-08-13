@@ -2,6 +2,16 @@
 -- 14_nullstill_kostpris.sql — nullstill «Avkastning per aksje»
 -- Kjøres i Supabase SQL Editor (prosjekt nehqvobfwooyufxqbzpv).
 --
+-- MERK: dette gjøres nå enklere i admin-panelet → Portefølje →
+-- «Kostpriser» → «Sett til dagens kurs». Den knappen bruker live-kursene
+-- og skriver både purchase_price, cost_basis og purchase_date. Skriptet
+-- her er beholdt som dokumentasjon og for tilfellet der du vil sette
+-- mange kostpriser til bestemte historiske kurser.
+--
+-- OBS: UPDATE-blokkene under er bevisst kommentert ut med /* ... */.
+-- Kjører du fila som den er, skjer det INGEN endring — bare SELECT-ene
+-- kjører. Du må fjerne kommentartegnene rundt den blokken du vil bruke.
+--
 -- HVORFOR TRENGS DENNE?
 -- Grafen «Avkastning per aksje» (Bidrag per posisjon) leser ikke fra
 -- portfolio_history i det hele tatt. Den regner ut
