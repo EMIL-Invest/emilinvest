@@ -19,6 +19,9 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  // Samtykke til vilkår og personvern. Kreves for å opprette konto, ikke
+  // for å logge inn — og lagres implisitt ved at kontoen opprettes.
+  const [godtarVilkar, setGodtarVilkar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingInvitation, setCheckingInvitation] = useState(false);
   const [isInvited, setIsInvited] = useState<boolean | null>(null);
@@ -139,6 +142,17 @@ const Auth = () => {
           toast({
             title: "Ikke invitert",
             description: "Du må ha en invitasjon fra en administrator for å opprette admin-konto.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (!godtarVilkar) {
+          toast({
+            title: "Du må godta vilkårene",
+            description:
+              "Kryss av for at du har lest vilkårene og personvernerklæringen for å opprette konto.",
             variant: "destructive",
           });
           setLoading(false);
@@ -384,10 +398,39 @@ const Auth = () => {
                 </div>
               </div>
 
+              {!isLogin && (
+                <div className="flex items-start gap-3 rounded-md border border-border bg-secondary/30 p-4">
+                  <input
+                    id="godtar"
+                    type="checkbox"
+                    checked={godtarVilkar}
+                    onChange={(e) => setGodtarVilkar(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 accent-primary cursor-pointer"
+                  />
+                  <Label htmlFor="godtar" className="text-sm font-normal leading-relaxed cursor-pointer">
+                    Jeg har lest og godtar{" "}
+                    <Link to="/vilkar" target="_blank" className="text-primary underline underline-offset-2">
+                      vilkårene
+                    </Link>{" "}
+                    og{" "}
+                    <Link to="/personvern" target="_blank" className="text-primary underline underline-offset-2">
+                      personvernerklæringen
+                    </Link>
+                    .{signupType === "competition" && (
+                      <span className="block text-muted-foreground mt-1.5">
+                        Deltar du i konkurransen, blir visningsnavnet ditt,
+                        avkastningen og porteføljen din synlig for andre
+                        innloggede deltakere på ledertavlen.
+                      </span>
+                    )}
+                  </Label>
+                </div>
+              )}
+
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isSignupDisabled()}
+                disabled={isSignupDisabled() || (!isLogin && !godtarVilkar)}
               >
                 {loading 
                   ? "Vennligst vent..." 

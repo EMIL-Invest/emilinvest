@@ -36,8 +36,20 @@ export interface LeaderboardEntry {
   display_name: string;
   portfolio_value: number;
   return_percentage: number;
+  /** 0 for de som ennå ikke er kvalifisert — de rangeres ikke. */
   rank: number;
+  antall_aksjer: number;
+  kvalifisert: boolean;
 }
+
+/**
+ * Hvor mange ulike aksjer som kreves for å bli rangert på ledertavlen.
+ * Poenget med konkurransen er å lære porteføljebygging, så en enkelt
+ * posisjon skal ikke kunne vinne. Reglene for kjøp (maksvekt 30 % og
+ * minstebeløp 4 000 kr) håndheves i databasen — se
+ * supabase/manual/13_konkurranseregler.sql.
+ */
+export const KRAV_ANTALL_AKSJER = 5;
 
 export interface StockQuote {
   ticker: string;
@@ -281,21 +293,27 @@ export const useCompetition = () => {
           ? ((portfolioValue - startValue) / startValue) * 100 
           : 0;
 
+        const antallAksjer = participantHoldings.filter((h) => h.ticker !== "ASK").length;
+
         entries.push({
           participant_id: p.id,
           display_name: p.display_name,
           portfolio_value: portfolioValue,
           return_percentage: returnPercentage,
           rank: 0,
+          antall_aksjer: antallAksjer,
+          kvalifisert: antallAksjer >= KRAV_ANTALL_AKSJER,
         });
       }
 
-      // Sort by return percentage
+      // Sorter på avkastning, men ranger bare dem som oppfyller
+      // diversifiseringskravet. De øvrige får rank 0 og vises i en egen
+      // gruppe under tabellen, slik at det er tydelig hva som mangler.
       entries.sort((a, b) => b.return_percentage - a.return_percentage);
-      
-      // Assign ranks
-      entries.forEach((entry, index) => {
-        entry.rank = index + 1;
+
+      let plassering = 0;
+      entries.forEach((entry) => {
+        entry.rank = entry.kvalifisert ? ++plassering : 0;
       });
 
       return entries;

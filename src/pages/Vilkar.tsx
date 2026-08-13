@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -68,6 +69,60 @@ const Vilkar = () => {
             </p>
           </Section>
 
+          <Section title="Reglene for handel">
+            <p>
+              Alle deltakere starter med 100 000 virtuelle kroner. Følgende
+              regler gjelder:
+            </p>
+            <p>
+              <span className="text-foreground">Én aksje kan maks utgjøre 30 %</span>{" "}
+              av porteføljen din på kjøpstidspunktet. Vokser en posisjon forbi
+              30 % fordi kursen stiger, er det helt greit — du får bare ikke
+              kjøpe mer av den.
+            </p>
+            <p>
+              <span className="text-foreground">Førstegangskjøp i en aksje må være minst 4 000 kr.</span>{" "}
+              Det hindrer at man kjøper småposter i mange selskaper bare for å
+              oppfylle kravene.
+            </p>
+            <p>
+              <span className="text-foreground">For å bli rangert på ledertavlen må du eie minst 5 ulike aksjer.</span>{" "}
+              Er du under fem, står du i en egen liste under rangeringen med
+              hvor mange du mangler.
+            </p>
+            <p>
+              <span className="text-foreground">Maks 10 ulike aksjer</span> i
+              porteføljen, og{" "}
+              <span className="text-foreground">maks 3 handler per aksje per dag</span>.
+              Handel er bare mulig når børsen aksjen er notert på er åpen.
+            </p>
+            <p>
+              Grunnen til reglene er at konkurransen skal gi erfaring med å
+              bygge en portefølje. Uten en øvre grense per aksje ville den beste
+              vinnersjansen vært å legge alt i det mest volatile selskapet man
+              fant og håpe på flaks — som er både dårlig læring og dårlig
+              investering. Diversifisering er ikke en begrensning vi har funnet
+              på; det er selve poenget.
+            </p>
+          </Section>
+
+          <Section title="Hva andre deltakere ser">
+            <p>
+              Ledertavlen er åpen for alle innloggede deltakere. De ser
+              visningsnavnet du velger, porteføljeverdien, avkastningen din og
+              hvilke aksjer du eier. De ser ikke e-postadressen din eller det
+              fulle navnet ditt.
+            </p>
+            <p>
+              Velg visningsnavn med det i tanke — du kan godt bruke et
+              kallenavn. Se{" "}
+              <Link to="/personvern" className="underline underline-offset-2 hover:text-foreground">
+                personvernerklæringen
+              </Link>{" "}
+              for hva vi lagrer og hvorfor.
+            </p>
+          </Section>
+
           <Section title="Din konto">
             <p>
               Du er selv ansvarlig for å holde passordet ditt hemmelig. Velg
@@ -103,7 +158,7 @@ const Vilkar = () => {
                 kontakt@emilinvest.no
               </a>.
             </p>
-            <p className="text-sm">Sist oppdatert: 6. august 2026</p>
+            <p className="text-sm">Sist oppdatert: 13. august 2026</p>
           </Section>
         </div>
       </main>

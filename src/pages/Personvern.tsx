@@ -52,10 +52,10 @@ const Personvern = () => {
             </p>
             <p>
               <span className="text-foreground font-medium">Aksjekonkurransen:</span>{" "}
-              Deltar du i konkurransen lagrer vi visningsnavnet ditt og de
-              virtuelle handlene du gjør. Visningsnavnet og plasseringen din
-              vises på resultatlisten, som er synlig for andre innloggede
-              deltakere.
+              Deltar du i konkurransen lagrer vi visningsnavnet du velger, den
+              virtuelle porteføljen din og hver enkelt handel du gjør, med
+              tidspunkt, aksje, antall og kurs. Handelshistorikken trengs for å
+              regne ut avkastningen din og for å kunne rette opp feil.
             </p>
             <p>
               <span className="text-foreground font-medium">Komitémedlemmer:</span>{" "}
@@ -71,13 +71,41 @@ const Personvern = () => {
             </p>
           </Section>
 
+          <Section title="Hva andre deltakere kan se om deg">
+            <p>
+              Konkurransen har en åpen ledertavle. Er du påmeldt, kan andre
+              innloggede deltakere se{" "}
+              <span className="text-foreground">visningsnavnet ditt</span>,{" "}
+              <span className="text-foreground">porteføljeverdien</span>,{" "}
+              <span className="text-foreground">avkastningen din</span> og{" "}
+              <span className="text-foreground">hvilke aksjer du eier</span> med
+              antall og verdi. De kan ikke se e-postadressen din, det fulle
+              navnet ditt eller noe annet fra kontoen.
+            </p>
+            <p>
+              Dette er kjernen i konkurransen — poenget er å kunne sammenligne
+              og lære av hverandres valg. Men det betyr at du bør velge
+              visningsnavn med det i tanke. Du står fritt til å bruke et
+              kallenavn i stedet for ditt eget navn, og du kan endre
+              visningsnavnet under Konto.
+            </p>
+            <p>
+              Melder du deg av konkurransen, eller sletter kontoen, forsvinner
+              du fra ledertavlen.
+            </p>
+          </Section>
+
           <Section title="Hvorfor behandler vi opplysningene?">
             <p>
-              Vi behandler kontoopplysninger for å levere tjenestene du ber om
-              (avtale, GDPR art. 6 nr. 1 b), bilder av komiteen basert på
-              samtykke (art. 6 nr. 1 a), og tekniske driftsdata ut fra vår
-              berettigede interesse i å holde nettsiden sikker og stabil
-              (art. 6 nr. 1 f). Opplysningene brukes aldri til markedsføring.
+              Vi behandler kontoopplysninger og konkurransedata for å levere
+              tjenesten du melder deg på (avtale, GDPR art. 6 nr. 1 b) — det
+              omfatter at visningsnavn, avkastning og portefølje vises på
+              ledertavlen, siden en konkurranse uten resultatliste ikke er en
+              konkurranse. Bilder av komiteen behandles på grunnlag av samtykke
+              (art. 6 nr. 1 a), og tekniske driftsdata ut fra vår berettigede
+              interesse i å holde nettsiden sikker og stabil (art. 6 nr. 1 f).
+              Opplysningene brukes aldri til markedsføring, og vi tar ingen
+              automatiserte avgjørelser om deg.
             </p>
           </Section>
 
@@ -92,8 +120,9 @@ const Personvern = () => {
 
           <Section title="Hvor lenge lagrer vi dem?">
             <p>
-              Kontoen din og konkurransedataene lagres så lenge du har en
-              aktiv konto. Sletter du kontoen, slettes opplysningene dine.
+              Kontoen din, porteføljen og handelshistorikken lagres så lenge du
+              har en aktiv konto. Sletter du kontoen under Konto, slettes
+              opplysningene dine — også handlene og plasseringen på ledertavlen.
               Bilder og navn på komitémedlemmer fjernes når medlemmet trer ut
               av komiteen eller trekker samtykket.
             </p>
@@ -130,7 +159,7 @@ const Personvern = () => {
               nettsiden får ny funksjonalitet. Vesentlige endringer varsles på
               nettsiden.
             </p>
-            <p className="text-sm">Sist oppdatert: 6. august 2026</p>
+            <p className="text-sm">Sist oppdatert: 13. august 2026</p>
           </Section>
         </div>
       </main>

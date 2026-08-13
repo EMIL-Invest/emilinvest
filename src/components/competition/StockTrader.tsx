@@ -236,11 +236,26 @@ const StockTrader = ({
 
   return (
     <div className="space-y-6">
-      {/* Trading rules info */}
+      {/* Handelsregler. Diversifiseringskravene håndheves i databasen
+          (13_konkurranseregler.sql), men de må stå her også — ellers
+          oppdager man dem først når et kjøp blir avslått. */}
       <Alert>
         <Clock className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Handelsregler:</strong> Du kan kun handle når børsen er åpen, og du har maks {maxDailyTransactions} transaksjoner per aksje per dag.
+        <AlertDescription className="space-y-1.5">
+          <p>
+            <strong>Handelsregler:</strong> Du kan kun handle når børsen er åpen,
+            og du har maks {maxDailyTransactions} transaksjoner per aksje per dag.
+          </p>
+          <p>
+            <strong>Diversifisering:</strong> Én aksje kan maks utgjøre 30 % av
+            porteføljen, og et førstegangskjøp må være på minst 4 000 kr. For å
+            bli rangert på ledertavlen må du eie minst 5 ulike aksjer.
+          </p>
+          <p className="text-muted-foreground">
+            Reglene finnes fordi konkurransen skal gi erfaring med å bygge en
+            portefølje. Uten dem ville den beste vinnersjansen vært å satse alt
+            på ett selskap og håpe på flaks — og da lærer man ingenting.
+          </p>
         </AlertDescription>
       </Alert>
 
