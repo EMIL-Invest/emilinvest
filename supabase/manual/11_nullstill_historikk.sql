@@ -2,10 +2,11 @@
 -- 11_nullstill_historikk.sql — nullstiller avkastningshistorikken
 -- Kjøres i Supabase SQL Editor (prosjekt nehqvobfwooyufxqbzpv).
 --
--- Bakgrunn: porteføljen har ligget registrert en stund, men midlene har
--- ikke vært investert. Historikken beskriver derfor en periode som ikke
--- er reell, og gir en avkastningskurve som ikke betyr noe. Vi starter på
--- nytt fra i dag, med porteføljen og OSEBX på samme utgangspunkt.
+-- Bakgrunn: midlene har fram til nå vært plassert i ulike fond, med noen
+-- mindre aksjeposisjoner ved siden av. Komiteen forvalter en egen
+-- portefølje først fra dette semesteret, så den registrerte historikken
+-- beskriver ikke den porteføljen grafen skal vise. Vi starter på nytt fra
+-- i dag, med porteføljen og OSEBX på samme utgangspunkt.
 --
 -- Grafen normaliserer begge seriene til 100 ved første datapunkt i
 -- perioden. Når historikken er tom og første rad er fra i dag, starter
