@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Info } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ExternalLink, Info } from "lucide-react";
 import {
   ComposedChart,
   Bar,
@@ -291,6 +291,20 @@ const Aksje = () => {
                     hjelp="Hvor mange år med dagens driftsresultat gjelden utgjør"
                   />
                 </div>
+
+                {/* KI-forbehold. Står her, rett under tallene, fordi det er
+                    her leseren faktisk trenger det — ikke nederst på siden. */}
+                <div className="flex items-start gap-3 mt-4 px-1">
+                  <AlertTriangle className="w-4 h-4 text-foreground/50 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-3xl">
+                    Tallene på denne siden er hentet inn ved hjelp av kunstig
+                    intelligens og er <span className="text-foreground">ikke kvalitetssikret</span>{" "}
+                    mot selskapets offisielle rapporter. De kan inneholde feil.
+                    Bruk dem som et utgangspunkt for egen research, ikke som fasit —
+                    gå til selskapets kvartals- og årsrapport for tall du skal
+                    stole på.
+                  </p>
+                </div>
               </section>
 
               {/* Regnskap */}
@@ -464,10 +478,10 @@ const Aksje = () => {
 
               {/* Ansvarsfraskrivelse */}
               <p className="text-xs text-muted-foreground/80 leading-relaxed max-w-3xl">
-                Tallene er lagt inn manuelt av komiteen og oppdateres ikke automatisk — se
-                datoen over nøkkeltallene for hvor ferske de er. Historisk avkastning er
-                ingen garanti for framtidig avkastning, og ingenting på denne siden er
-                investeringsrådgivning. Se{" "}
+                Tallene er samlet inn med KI-hjelp, lagt inn manuelt og oppdateres ikke
+                automatisk — se datoen over nøkkeltallene for hvor ferske de er. Historisk
+                avkastning er ingen garanti for framtidig avkastning, og ingenting på denne
+                siden er investeringsrådgivning. Se{" "}
                 <Link to="/vilkar" className="underline underline-offset-2 hover:text-foreground">
                   vilkårene
                 </Link>

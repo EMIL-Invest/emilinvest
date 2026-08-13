@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   PieChart,
   Pie,
@@ -61,6 +62,7 @@ export const AllocationSection = ({
 }) => {
   // Hvilket kakestykke pekes det på? De andre fader ut så det aktive står frem.
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   if (totalValue <= 0 || stocks.length + other.length === 0) return null;
 
@@ -74,6 +76,8 @@ export const AllocationSection = ({
       value: r.value,
       share: (r.value / totalValue) * 100,
       color: STOCK_COLORS[i % STOCK_COLORS.length],
+      // Bare aksjer har egen side med nøkkeltall og regnskap
+      lenke: `/aksje/${r.holding.ticker}`,
     })),
     ...other.map((r) => ({
       name: r.holding.name,
@@ -81,6 +85,7 @@ export const AllocationSection = ({
       value: r.value,
       share: (r.value / totalValue) * 100,
       color: OTHER_COLOR,
+      lenke: null as string | null,
     })),
   ];
 
@@ -130,13 +135,20 @@ export const AllocationSection = ({
                     strokeWidth={0}
                     onMouseEnter={(_: unknown, index: number) => setActiveIndex(index)}
                     onMouseLeave={() => setActiveIndex(null)}
+                    onClick={(_: unknown, index: number) => {
+                      const lenke = slices[index]?.lenke;
+                      if (lenke) navigate(lenke);
+                    }}
                   >
                     {slices.map((slice, i) => (
                       <Cell
                         key={slice.name}
                         fill={slice.color}
                         fillOpacity={activeIndex === null || activeIndex === i ? 1 : 0.22}
-                        style={{ transition: "fill-opacity 0.25s ease" }}
+                        style={{
+                          transition: "fill-opacity 0.25s ease",
+                          cursor: slice.lenke ? "pointer" : "default",
+                        }}
                       />
                     ))}
                   </Pie>
@@ -168,19 +180,22 @@ export const AllocationSection = ({
 
             {/* Posisjonsbrikker */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 mt-8">
-              {slices.map((slice, i) => (
-                <div
-                  key={slice.name}
-                  onMouseEnter={() => setActiveIndex(i)}
-                  onMouseLeave={() => setActiveIndex(null)}
-                  className={`flex items-center justify-between gap-2 rounded-[4px] border bg-background px-3 py-2 transition-all duration-200 cursor-default ${
-                    activeIndex === i
-                      ? "border-foreground/40 shadow-sm"
-                      : activeIndex !== null
-                      ? "border-border opacity-45"
-                      : "border-border"
-                  }`}
-                >
+              {slices.map((slice, i) => {
+                const klasser = `flex items-center justify-between gap-2 rounded-[4px] border bg-background px-3 py-2 transition-all duration-200 ${
+                  slice.lenke ? "cursor-pointer hover:border-foreground/40" : "cursor-default"
+                } ${
+                  activeIndex === i
+                    ? "border-foreground/40 shadow-sm"
+                    : activeIndex !== null
+                    ? "border-border opacity-45"
+                    : "border-border"
+                }`;
+                const pek = {
+                  onMouseEnter: () => setActiveIndex(i),
+                  onMouseLeave: () => setActiveIndex(null),
+                };
+                const innhold = (
+                  <>
                   <span className="flex items-center gap-2 min-w-0">
                     <span
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
@@ -191,8 +206,19 @@ export const AllocationSection = ({
                   <span className="text-xs text-muted-foreground tabular-nums">
                     {slice.share.toFixed(1).replace(".", ",")} %
                   </span>
-                </div>
-              ))}
+                  </>
+                );
+                // Aksjer lenker til sin egen side; fond og bank har ingen.
+                return slice.lenke ? (
+                  <Link key={slice.name} to={slice.lenke} className={klasser} {...pek}>
+                    {innhold}
+                  </Link>
+                ) : (
+                  <div key={slice.name} className={klasser} {...pek}>
+                    {innhold}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

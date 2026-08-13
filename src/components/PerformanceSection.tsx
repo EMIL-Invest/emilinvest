@@ -154,6 +154,16 @@ const PerformanceSection = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Sammenlign utviklingen av vår portefølje mot Oslo Børs hovedindeks
           </p>
+          {/* Historikken er nullstilt: midlene ble investert først nå, så
+              kurven er kort med vilje. Denne teksten kan fjernes når det
+              har gått noen måneder. */}
+          <p className="text-sm text-muted-foreground/90 max-w-2xl mx-auto mt-4 leading-relaxed">
+            Merk at porteføljen først nå er satt i markedet. Midlene har stått
+            uinvestert fram til dette tidspunktet, og vi har derfor nullstilt
+            historikken framfor å vise en kurve som ikke beskriver reelle
+            investeringer. Både porteføljen og OSEBX starter på samme nivå fra
+            dag én, så grafen dekker bare de siste dagene inntil videre.
+          </p>
         </div>
 
         <div
@@ -187,8 +197,9 @@ const PerformanceSection = () => {
 
           {filteredData.length === 0 ? (
             <div className="h-80 flex items-center justify-center">
-              <p className="text-muted-foreground">
-                Ingen historiske data tilgjengelig for denne perioden.
+              <p className="text-muted-foreground text-center max-w-md leading-relaxed">
+                Historikken er nullstilt, og det første datapunktet kommer med
+                neste kursoppdatering. Da begynner kurven å bygge seg opp.
               </p>
             </div>
           ) : (
