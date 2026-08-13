@@ -247,6 +247,10 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
   const worst = rows[rows.length - 1];
   const positive = "hsl(153 20% 32%)";
   const negative = "hsl(14 55% 45%)";
+  // Rett etter en nullstilling er kostprisen lik dagens kurs, og alle
+  // stolpene blir null. Da er grafen bare fem tomme linjer, så vi sier
+  // det med ord i stedet.
+  const alleNull = rows.every((r) => Math.abs(r.gain) < 0.5);
 
   return (
     <div className="section-container pb-16">
@@ -259,9 +263,10 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
           </h2>
           <div className="w-10 h-px bg-foreground/30 mb-6" />
           <p className="text-muted-foreground leading-relaxed">
-            Stolpene viser urealisert gevinst og tap per posisjon siden kjøp —
-            hvem som drar lasset, og hvem som skuffer. Bytt mellom kroner og
-            prosentvis avkastning.
+            Stolpene viser urealisert gevinst og tap per posisjon — hvem som
+            drar lasset, og hvem som skuffer. Målt fra kursen da komiteen tok
+            over porteføljen dette semesteret, samme utgangspunkt som grafen
+            lenger ned. Bytt mellom kroner og prosentvis avkastning.
           </p>
         </div>
 
@@ -270,6 +275,15 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
           className="rounded-md border border-border bg-card p-6 md:p-8"
           style={{ boxShadow: "var(--shadow-soft)" }}
         >
+          {alleNull ? (
+            <p className="text-muted-foreground leading-relaxed py-6">
+              Kostprisene er nettopp nullstilt, så alle posisjonene står på
+              null. Stolpene begynner å bevege seg fra neste kursoppdatering,
+              og etter noen dager ser du hvilke selskaper som trekker
+              porteføljen opp og ned.
+            </p>
+          ) : (
+          <>
           <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
             <div className="flex gap-8">
               <div>
@@ -368,8 +382,11 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
               </BarChart>
             </ResponsiveContainer>
           </div>
+          </>
+          )}
           <p className="text-xs text-muted-foreground mt-4">
-            Urealisert gevinst/tap målt mot kostpris. Live-kurser fra Oslo Børs.
+            Urealisert gevinst/tap målt mot kostpris, altså kursen porteføljen
+            ble nullstilt til. Live-kurser fra Oslo Børs.
           </p>
         </div>
       </div>

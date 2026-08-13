@@ -145,7 +145,7 @@ const Portefolje = () => {
                     <th className="text-right py-4 px-4 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Antall</th>
                     <th className="text-right py-4 px-4 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">I dag</th>
                     <th className="text-right py-4 px-4 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Verdi</th>
-                    <th className="text-left py-4 px-6 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium w-40">Andel</th>
+                    <th className="text-right py-4 px-6 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium w-24">Andel</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -176,18 +176,10 @@ const Portefolje = () => {
                         {quote ? `${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(2)} %` : "–"}
                       </td>
                       <td className="py-4 px-4 text-sm text-right font-medium tabular-nums">{formatKr(value)}</td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
-                            <div
-                              className="h-full rounded-full"
-                              style={{ width: `${Math.min(weight(value), 100)}%`, background: "hsl(var(--accent))" }}
-                            />
-                          </div>
-                          <span className="text-xs text-muted-foreground tabular-nums w-10 text-right">
-                            {weight(value).toFixed(1)} %
-                          </span>
-                        </div>
+                      {/* Bare tallet — stolpen ga samme informasjon to ganger,
+                          og smultringen over tabellen viser fordelingen bedre. */}
+                      <td className="py-4 px-6 text-sm text-right text-muted-foreground tabular-nums">
+                        {weight(value).toFixed(1).replace(".", ",")} %
                       </td>
                     </tr>
                   ))}
@@ -213,7 +205,7 @@ const Portefolje = () => {
                     <div className="flex items-center gap-6">
                       <p className="text-sm font-medium tabular-nums">{formatKr(value)}</p>
                       <span className="text-xs text-muted-foreground tabular-nums w-12 text-right">
-                        {weight(value).toFixed(1)} %
+                        {weight(value).toFixed(1).replace(".", ",")} %
                       </span>
                     </div>
                   </div>
