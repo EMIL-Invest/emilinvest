@@ -250,7 +250,11 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
   // Rett etter en nullstilling er kostprisen lik dagens kurs, og alle
   // stolpene blir null. Da er grafen bare fem tomme linjer, så vi sier
   // det med ord i stedet.
-  const alleNull = rows.every((r) => Math.abs(r.gain) < 0.5);
+  // Terskelen er relativ, ikke i kroner: kostprisen settes fra
+  // markedsverdien avrundet til hele kroner, så en fersk nullstilling gir
+  // noen få øre i utslag per posisjon. 0,05 % er godt under det som er
+  // synlig i en graf, og passeres med god margin så snart kursen rører seg.
+  const alleNull = rows.every((r) => Math.abs(r.pct) < 0.05);
 
   return (
     <div className="section-container pb-16">
