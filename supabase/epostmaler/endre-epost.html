@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Bekreft den nye e-postadressen</title>
+  </head>
+  <!-- Alt er venstrestilt: kortet ligger til venstre i vinduet, og
+       ordmerket, knappen og bunnteksten står langs venstre kant. -->
+  <body style="margin:0; padding:0; background:#F5F3F0;">
+    <!-- Forhåndsvisningstekst — vises i innboksen, ikke i e-posten -->
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0;">Bekreft endringen av e-postadressen din.</div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F5F3F0;">
+      <tr>
+        <td align="left" style="padding:32px 20px;">
+
+          <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:560px; max-width:100%; background:#FAF8F5; border:1px solid #D9D6CE; border-radius:6px; overflow:hidden;">
+
+            <!-- Topp: ordmerket i profilfargen -->
+            <tr>
+              <td align="left" bgcolor="#24332C" style="padding:26px 32px;">
+                <span style="font-family:Georgia, 'Times New Roman', serif; font-size:22px; letter-spacing:0.14em; color:#F7F6F2;">EMIL&nbsp;INVEST</span>
+              </td>
+            </tr>
+
+            <!-- Innhold -->
+            <tr>
+              <td align="left" style="padding:34px 32px 8px 32px;">
+                <h1 style="margin:0 0 18px 0; font-family:Georgia, 'Times New Roman', serif; font-size:24px; font-weight:normal; line-height:1.3; color:#1B2722;">Bekreft den nye e-postadressen</h1>
+              <p style="margin:0 0 18px 0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; line-height:1.65; color:#1B2722;">Hei!</p>
+              <p style="margin:0 0 18px 0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; line-height:1.65; color:#1B2722;">Vi har fått beskjed om at du vil endre e-postadressen på kontoen din fra {{ .Email }} til {{ .NewEmail }}.</p>
+              <p style="margin:0 0 18px 0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; line-height:1.65; color:#1B2722;">Trykk på knappen under for å bekrefte endringen.</p>
+
+              <!-- Knapp. Bygget med tabell, ikke <a style="display:block">,
+                   fordi Outlook ignorerer padding på lenker. -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px 0;">
+                <tr>
+                  <td align="center" bgcolor="#293832" style="border-radius:4px;">
+                    <a href="{{ .ConfirmationURL }}"
+                       style="display:inline-block; padding:14px 30px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; font-weight:600; color:#F7F6F2; text-decoration:none; border-radius:4px;">
+                      Bekreft ny e-postadresse
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 28px 0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:13px; line-height:1.6; color:#596961;">
+                Virker ikke knappen? Kopier denne lenken inn i nettleseren:<br />
+                <a href="{{ .ConfirmationURL }}" style="color:#293832; word-break:break-all;">{{ .ConfirmationURL }}</a>
+              </p>
+
+                <p style="margin:0 0 4px 0; padding-top:22px; border-top:1px solid #D9D6CE; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:13px; line-height:1.65; color:#596961;">Var det ikke du som ba om endringen? Ta kontakt med oss på kontakt@emilinvest.no — da beholder vi den gamle adressen.</p>
+              </td>
+            </tr>
+
+            <!-- Bunn -->
+            <tr>
+              <td align="left" style="padding:22px 32px 26px 32px;">
+                <p style="margin:0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:12px; line-height:1.6; color:#596961;">
+                  EMIL Invest — investeringskomiteen i EMIL, NTNU Gløshaugen<br />
+                  <a href="https://emilinvest.no" style="color:#596961;">emilinvest.no</a>
+                  &nbsp;·&nbsp;
+                  <a href="mailto:kontakt@emilinvest.no" style="color:#596961;">kontakt@emilinvest.no</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
