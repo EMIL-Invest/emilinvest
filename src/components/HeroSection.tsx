@@ -140,16 +140,20 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
-              <Button size="lg" className="px-7" onClick={() => scrollTo("#portfolio")}>
-                Se porteføljen
+              {/* Opptaket er åpent — søknadsknappen står først. Den går rett
+                  til e-post, med emnefeltet forhåndsfylt. */}
+              <Button size="lg" className="px-7" asChild>
+                <a href="mailto:kontakt@emilinvest.no?subject=Søknad%20til%20EMIL%20Invest">
+                  Søk her
+                </a>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="px-7 border-foreground/25 bg-transparent text-foreground hover:bg-foreground/5"
-                onClick={() => scrollTo("#team")}
+                onClick={() => scrollTo("#portfolio")}
               >
-                Møt komiteen
+                Se porteføljen
               </Button>
               <Button
                 size="lg"
