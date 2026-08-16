@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Trash2, Calendar, Banknote } from "lucide-react";
+import { Plus, Trash2, Calendar, Banknote, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -219,7 +219,38 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
     invested_capital: "",
   });
   const [saving, setSaving] = useState(false);
+  const [tarSnapshot, setTarSnapshot] = useState(false);
   const { toast } = useToast();
+
+  /**
+   * Kjør daily-snapshot manuelt — samme funksjon som cron-jobben kaller
+   * hverdager kl. 10. Funksjonen godtar innloggede administratorer, så
+   * dette virker uten cron-hemmeligheten. Brukes når en kjøring har
+   * feilet, eller etter en nullstilling for å få første datapunkt inn
+   * med én gang.
+   */
+  const taSnapshotNaa = async () => {
+    setTarSnapshot(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("daily-snapshot", { body: {} });
+      if (error) throw error;
+      toast({
+        title: "Snapshot lagret",
+        description: data?.portfolioValue
+          ? `Porteføljeverdi ${Number(data.portfolioValue).toLocaleString("no-NO")} kr er lagt inn for i dag.`
+          : "Dagens datapunkt er lagt inn.",
+      });
+      onRefresh();
+    } catch (error) {
+      toast({
+        title: "Snapshot feilet",
+        description: error instanceof Error ? error.message : "Ukjent feil",
+        variant: "destructive",
+      });
+    } finally {
+      setTarSnapshot(false);
+    }
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -302,12 +333,22 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
             </CardDescription>
           </div>
           {!showAddForm && (
-            <Button onClick={() => setShowAddForm(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Legg til
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={taSnapshotNaa} disabled={tarSnapshot}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${tarSnapshot ? "animate-spin" : ""}`} />
+                {tarSnapshot ? "Henter kurser…" : "Ta snapshot nå"}
+              </Button>
+              <Button onClick={() => setShowAddForm(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Legg til
+              </Button>
+            </div>
           )}
         </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          «Ta snapshot nå» henter dagens kurser og lagrer dagens datapunkt —
+          det samme som den automatiske jobben gjør hverdager kl. 10.
+        </p>
       </CardHeader>
       <CardContent>
         {/* Add Form */}

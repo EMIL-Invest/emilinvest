@@ -8,6 +8,10 @@ const DEFAULT_ALLOWED_ORIGINS = [
   "http://localhost:8080",
   "https://emilinvest.vercel.app",
   "https://emilinvest.lovable.app",
+  // Produksjonsdomenet — uten disse blokkerer CORS admin-knappen
+  // «Ta snapshot nå», som kaller funksjonen fra nettsiden.
+  "https://emilinvest.no",
+  "https://www.emilinvest.no",
 ];
 const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS")?.split(",").map((s) => s.trim()).filter(Boolean)) ?? DEFAULT_ALLOWED_ORIGINS;
 
