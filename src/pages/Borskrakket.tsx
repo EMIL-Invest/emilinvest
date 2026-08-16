@@ -24,7 +24,7 @@ import {
 import { lagreResultat } from "@/lib/invest-game/ledertavle";
 
 /**
- * Børskrakket — femminutterskonkurransen.
+ * Børskrakket — treminutterskonkurransen.
  *
  * Én sentral spillklokke styrer alt: tSek regnes fra Date.now() minus
  * starttidspunktet, aldri fra antall renders eller intervall-ticks.

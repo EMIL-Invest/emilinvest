@@ -33,8 +33,15 @@ const DebugPanel = ({
 }: DebugPanelProps) => {
   const [visTidslinjer, setVisTidslinjer] = useState(false);
   const [visNyheter, setVisNyheter] = useState(false);
-  const stopp = [60, 120, 180, 240];
+  // Hoppunkter hvert 30. sekund, avledet av varigheten — ikke hardkodet,
+  // så panelet følger med hvis spillet endrer lengde igjen.
+  const stopp: number[] = [];
+  for (let s = 30; s < VARIGHET_SEK; s += 30) stopp.push(s);
   const sektorer = Object.keys(SEKTOR_TIDSLINJER) as SektorId[];
+  const mmss = (s: number) =>
+    `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+  // Kolonnene i tidslinjetabellen — seks jevne nedslag gjennom løpet.
+  const tabelltider = Array.from({ length: 6 }, (_, i) => Math.round((VARIGHET_SEK * i) / 5));
 
   return (
     <div
@@ -48,7 +55,7 @@ const DebugPanel = ({
       <div className="flex flex-wrap gap-1.5 mb-2">
         {stopp.map((s) => (
           <Button key={s} size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => onHoppTil(s)}>
-            {`0${Math.floor(s / 60)}:00`}
+            {mmss(s)}
           </Button>
         ))}
         <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => onHoppTil(VARIGHET_SEK - 10)}>
@@ -100,7 +107,7 @@ const DebugPanel = ({
           <thead>
             <tr className="text-muted-foreground">
               <th className="text-left font-normal">Sektor</th>
-              {[0, 60, 120, 180, 240, 300].map((t) => (
+              {tabelltider.map((t) => (
                 <th key={t} className="text-right font-normal">
                   {t}
                 </th>
@@ -111,7 +118,7 @@ const DebugPanel = ({
             {sektorer.map((sektor) => (
               <tr key={sektor}>
                 <td className="text-muted-foreground">{sektor}</td>
-                {[0, 60, 120, 180, 240, 300].map((t) => (
+                {tabelltider.map((t) => (
                   <td key={t} className="text-right">
                     {multiplikator(SEKTOR_TIDSLINJER[sektor], t).toFixed(2)}
                   </td>

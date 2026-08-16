@@ -29,7 +29,7 @@ const IntroSkjerm = ({ forrigeNavn, onStart }: IntroSkjermProps) => {
       <div className="text-lg text-muted-foreground leading-relaxed space-y-4 mb-10">
         <p>
           Dere har <span className="text-foreground">100 millioner kroner</span> og{" "}
-          <span className="text-foreground">fem minutter</span>. Kjøp og selg investeringer
+          <span className="text-foreground">tre minutter</span>. Kjøp og selg investeringer
           mens markedet beveger seg.
         </p>
         <p>

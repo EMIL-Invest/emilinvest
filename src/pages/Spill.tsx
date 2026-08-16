@@ -235,7 +235,7 @@ const Spill = () => {
                   Børskrakket
                 </p>
                 <p className="text-sm" style={{ color: "hsl(var(--primary-foreground) / 0.65)" }}>
-                  100 millioner, fem minutter, nyheter som flytter markedet. Samle
+                  100 millioner, tre minutter, nyheter som flytter markedet. Samle
                   gjengen og se hvem som treffer best.
                 </p>
               </div>

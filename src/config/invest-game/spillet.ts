@@ -1,8 +1,8 @@
 /**
- * Børskrakket — all konfigurasjon for femminutterskonkurransen.
+ * Børskrakket — all konfigurasjon for treminutterskonkurransen.
  *
  * ALT som styrer spilløpet ligger i denne fila: selskapene, hvordan hver
- * sektor beveger seg gjennom de fem minuttene, og nyhetene. Komponentene
+ * sektor beveger seg gjennom de tre minuttene, og nyhetene. Komponentene
  * leser bare herfra — vil du rebalansere spillet før et arrangement,
  * endrer du tall her og lar resten av koden være.
  *
@@ -16,9 +16,15 @@
  * ender rundt +8 %. En gruppe som følger nyhetene og flytter pengene,
  * kan hente langt mer. Nyheten kommer alltid 2–5 sekunder FØR bevegelsen
  * starter, så det går an å reagere.
+ *
+ * MERK om varigheten: spillet ble kortet fra fem til tre minutter.
+ * Tidslinjene og nyhetene er skrevet om for 180 sekunder — ikke bare
+ * skalert — slik at avstanden mellom nyhet og kursbevegelse fortsatt er
+ * 2–5 sekunder. Endrer du VARIGHET_SEK igjen, må tidslinjene og
+ * nyhetstidspunktene skrives om sammen med den.
  */
 
-export const VARIGHET_SEK = 300;
+export const VARIGHET_SEK = 180;
 export const STARTKAPITAL = 100_000_000;
 /** Hvor lenge en nyhet ligger som banner før den bare finnes i feeden. */
 export const BANNER_SEK = 10;
@@ -65,114 +71,114 @@ export interface Nyhet {
 /* ------------------------------------------------------------------ */
 
 export const SEKTOR_TIDSLINJER: Record<SektorId, Punkt[]> = {
-  // Rolig start, kraftig opp etter AI-nyheten (35 s), korreksjon på slutten.
+  // Rolig start, kraftig opp etter AI-nyheten (20 s), korreksjon på slutten.
   teknologi: [
     { t: 0, v: 1.0 },
-    { t: 30, v: 1.01 },
-    { t: 40, v: 1.03 },
-    { t: 70, v: 1.16 },
-    { t: 100, v: 1.32 },
-    { t: 130, v: 1.44 },
-    { t: 190, v: 1.4 },
-    { t: 235, v: 1.43 },
-    { t: 262, v: 1.41 },
-    { t: 278, v: 1.28 },
-    { t: 300, v: 1.22 },
+    { t: 18, v: 1.01 },
+    { t: 24, v: 1.03 },
+    { t: 42, v: 1.16 },
+    { t: 60, v: 1.32 },
+    { t: 78, v: 1.44 },
+    { t: 114, v: 1.4 },
+    { t: 141, v: 1.43 },
+    { t: 157, v: 1.41 },
+    { t: 167, v: 1.28 },
+    { t: 180, v: 1.22 },
   ],
-  // Liten oppgang først, stort fall etter oljefunn-nyheten (70 s).
+  // Liten oppgang først, stort fall etter oljefunn-nyheten (42 s).
   energi: [
     { t: 0, v: 1.0 },
-    { t: 40, v: 1.04 },
-    { t: 72, v: 1.06 },
-    { t: 90, v: 0.95 },
-    { t: 115, v: 0.84 },
-    { t: 145, v: 0.81 },
-    { t: 220, v: 0.83 },
-    { t: 300, v: 0.79 },
+    { t: 24, v: 1.04 },
+    { t: 44, v: 1.06 },
+    { t: 54, v: 0.95 },
+    { t: 69, v: 0.84 },
+    { t: 87, v: 0.81 },
+    { t: 132, v: 0.83 },
+    { t: 180, v: 0.79 },
   ],
-  // Stabilt, så kraftig og vedvarende opp etter budsjettnyheten (105 s).
+  // Stabilt, så kraftig og vedvarende opp etter budsjettnyheten (63 s).
   forsvar: [
     { t: 0, v: 1.0 },
-    { t: 60, v: 1.01 },
-    { t: 100, v: 1.02 },
-    { t: 108, v: 1.03 },
-    { t: 130, v: 1.18 },
-    { t: 170, v: 1.32 },
-    { t: 210, v: 1.38 },
-    { t: 300, v: 1.44 },
+    { t: 36, v: 1.01 },
+    { t: 60, v: 1.02 },
+    { t: 65, v: 1.03 },
+    { t: 78, v: 1.18 },
+    { t: 102, v: 1.32 },
+    { t: 126, v: 1.38 },
+    { t: 180, v: 1.44 },
   ],
-  // Jevnt pent helt til sykdomsnyheten (180 s) — så rett ned.
+  // Jevnt pent helt til sykdomsnyheten (105 s) — så rett ned.
   sjomat: [
     { t: 0, v: 1.0 },
-    { t: 60, v: 1.03 },
-    { t: 120, v: 1.07 },
-    { t: 182, v: 1.1 },
-    { t: 200, v: 0.88 },
-    { t: 225, v: 0.74 },
-    { t: 260, v: 0.71 },
-    { t: 300, v: 0.7 },
+    { t: 36, v: 1.03 },
+    { t: 72, v: 1.07 },
+    { t: 107, v: 1.1 },
+    { t: 120, v: 0.88 },
+    { t: 135, v: 0.74 },
+    { t: 156, v: 0.71 },
+    { t: 180, v: 0.7 },
   ],
-  // Moderat opp, faller etter renteøkningen (140 s).
+  // Moderat opp, faller etter renteøkningen (84 s).
   eiendom: [
     { t: 0, v: 1.0 },
-    { t: 60, v: 1.04 },
-    { t: 120, v: 1.07 },
-    { t: 142, v: 1.08 },
-    { t: 165, v: 0.97 },
-    { t: 195, v: 0.89 },
-    { t: 240, v: 0.87 },
-    { t: 300, v: 0.86 },
+    { t: 36, v: 1.04 },
+    { t: 72, v: 1.07 },
+    { t: 86, v: 1.08 },
+    { t: 99, v: 0.97 },
+    { t: 117, v: 0.89 },
+    { t: 144, v: 0.87 },
+    { t: 180, v: 0.86 },
   ],
   // Ingen nyhet — vandrer rolig. Trygg, men aldri spektakulær.
   fornybar: [
     { t: 0, v: 1.0 },
-    { t: 50, v: 0.96 },
-    { t: 110, v: 1.0 },
-    { t: 170, v: 1.07 },
-    { t: 230, v: 1.05 },
-    { t: 300, v: 1.03 },
+    { t: 30, v: 0.96 },
+    { t: 66, v: 1.0 },
+    { t: 102, v: 1.07 },
+    { t: 138, v: 1.05 },
+    { t: 180, v: 1.03 },
   ],
-  // Flatt lenge, opp etter medisinnyheten (215 s).
+  // Flatt lenge, opp etter medisinnyheten (128 s).
   helse: [
     { t: 0, v: 1.0 },
-    { t: 80, v: 0.99 },
-    { t: 150, v: 1.01 },
-    { t: 217, v: 1.02 },
-    { t: 240, v: 1.12 },
-    { t: 270, v: 1.22 },
-    { t: 300, v: 1.27 },
+    { t: 48, v: 0.99 },
+    { t: 90, v: 1.01 },
+    { t: 130, v: 1.02 },
+    { t: 144, v: 1.12 },
+    { t: 162, v: 1.22 },
+    { t: 180, v: 1.27 },
   ],
-  // Sidelengs, moderat positivt etter renteøkningen (140 s).
+  // Sidelengs, moderat positivt etter renteøkningen (84 s).
   finans: [
     { t: 0, v: 1.0 },
-    { t: 80, v: 1.01 },
-    { t: 140, v: 1.02 },
-    { t: 160, v: 1.06 },
-    { t: 210, v: 1.1 },
-    { t: 300, v: 1.12 },
+    { t: 48, v: 1.01 },
+    { t: 84, v: 1.02 },
+    { t: 96, v: 1.06 },
+    { t: 126, v: 1.1 },
+    { t: 180, v: 1.12 },
   ],
   // Ingen nyhet — opp, ned, opp. Belønner ikke passivitet spesielt.
   romfart: [
     { t: 0, v: 1.0 },
-    { t: 45, v: 1.08 },
-    { t: 90, v: 1.13 },
-    { t: 140, v: 1.02 },
-    { t: 190, v: 0.97 },
-    { t: 250, v: 1.03 },
-    { t: 300, v: 1.06 },
+    { t: 27, v: 1.08 },
+    { t: 54, v: 1.13 },
+    { t: 84, v: 1.02 },
+    { t: 114, v: 0.97 },
+    { t: 150, v: 1.03 },
+    { t: 180, v: 1.06 },
   ],
-  // Faller tidlig, kraftig opp etter reguleringsnyheten (250 s).
+  // Faller tidlig, kraftig opp etter reguleringsnyheten (148 s).
   krypto: [
     { t: 0, v: 1.0 },
-    { t: 35, v: 0.92 },
-    { t: 70, v: 0.87 },
-    { t: 120, v: 0.83 },
-    { t: 170, v: 0.88 },
-    { t: 210, v: 0.91 },
-    { t: 252, v: 0.92 },
-    { t: 268, v: 1.1 },
-    { t: 285, v: 1.26 },
-    { t: 300, v: 1.31 },
+    { t: 21, v: 0.92 },
+    { t: 42, v: 0.87 },
+    { t: 72, v: 0.83 },
+    { t: 102, v: 0.88 },
+    { t: 126, v: 0.91 },
+    { t: 151, v: 0.92 },
+    { t: 161, v: 1.1 },
+    { t: 171, v: 1.26 },
+    { t: 180, v: 1.31 },
   ],
 };
 
@@ -199,56 +205,56 @@ export const SELSKAPER: Selskap[] = [
 
 export const NYHETER: Nyhet[] = [
   {
-    tidSek: 35,
+    tidSek: 20,
     tittel: "AI-gjennombrudd",
     tekst: "Et stort teknologiselskap lanserer en ny AI-modell som overgår alle forventninger.",
     konsekvens: "Teknologisektoren ventes å stige kraftig.",
     retning: "opp",
   },
   {
-    tidSek: 70,
+    tidSek: 42,
     tittel: "Enorme oljefunn",
     tekst: "Store nye oljereserver er oppdaget, og markedet venter et kraftig fall i oljeprisen.",
     konsekvens: "Energisektoren ventes å falle.",
     retning: "ned",
   },
   {
-    tidSek: 105,
+    tidSek: 63,
     tittel: "Forsvarsbudsjettene økes",
     tekst: "Europeiske land varsler en kraftig og varig økning i forsvarsbudsjettene.",
     konsekvens: "Forsvarssektoren ventes å stige.",
     retning: "opp",
   },
   {
-    tidSek: 140,
+    tidSek: 84,
     tittel: "Renten settes opp",
     tekst: "Sentralbanken overrasker markedet med en renteøkning.",
     konsekvens: "Eiendom ventes å falle. Bankene kan få en moderat positiv effekt.",
     retning: "blandet",
   },
   {
-    tidSek: 180,
+    tidSek: 105,
     tittel: "Sykdom i oppdrettsanleggene",
     tekst: "En sykdom sprer seg raskt mellom lakseoppdrettsanlegg langs kysten.",
     konsekvens: "Sjømatsektoren ventes å falle kraftig.",
     retning: "ned",
   },
   {
-    tidSek: 215,
+    tidSek: 128,
     tittel: "Gjennombrudd for ny medisin",
     tekst: "Et legemiddelselskap legger fram svært gode resultater fra en klinisk studie.",
     konsekvens: "Helsesektoren ventes å stige.",
     retning: "opp",
   },
   {
-    tidSek: 250,
+    tidSek: 148,
     tittel: "Krypto får regulatorisk medvind",
     tekst: "Myndighetene åpner for enklere og tryggere bruk av kryptovaluta.",
     konsekvens: "Kryptosektoren ventes å stige kraftig.",
     retning: "opp",
   },
   {
-    tidSek: 258,
+    tidSek: 155,
     tittel: "Gevinstsikring i teknologi",
     tekst: "Etter en eventyrlig opptur begynner store investorer å ta gevinst i teknologiaksjer.",
     konsekvens: "Teknologisektoren ventes å falle noe tilbake.",
