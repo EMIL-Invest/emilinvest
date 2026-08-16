@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import NyttPassord from "./pages/NyttPassord";
 import Personvern from "./pages/Personvern";
 import Vilkar from "./pages/Vilkar";
+import Spill from "./pages/Spill";
 import Admin from "./pages/Admin";
 import Competition from "./pages/Competition";
 import Account from "./pages/Account";
@@ -72,6 +73,7 @@ const App = () => (
           <Route path="/vilkar" element={<Vilkar />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/konkurranse" element={<Competition />} />
+          <Route path="/spill" element={<Spill />} />
           <Route path="/konto" element={<Account />} />
           <Route path="/rapport" element={<ReportViewer />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />

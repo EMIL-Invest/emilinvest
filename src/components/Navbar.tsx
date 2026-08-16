@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Trophy, LogIn, LogOut, Shield, UserCog } from "lucide-react";
+import { Menu, X, Trophy, LogIn, LogOut, Shield, UserCog, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,6 +107,12 @@ const Navbar = () => {
             >
               Konkurranse
             </Link>
+            <Link
+              to="/spill"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              Spill
+            </Link>
 
             {/* Auth buttons */}
             {user ? (
@@ -186,7 +192,15 @@ const Navbar = () => {
               <Trophy className="w-4 h-4" />
               Konkurranse
             </Link>
-            
+            <Link
+              to="/spill"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 py-3 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Layers className="w-4 h-4" />
+              Spill
+            </Link>
+
             {/* Mobile Auth buttons */}
             {user ? (
               <>
