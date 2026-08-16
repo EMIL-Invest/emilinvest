@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RotateCcw, Shuffle, ArrowLeft, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -211,6 +212,39 @@ const Spill = () => {
               Mellomrom snur · piltaster bytter kort
             </p>
           </div>
+
+          {/* Gruppekonkurransen — brukes på arrangementer, men er åpen for alle */}
+          <Link
+            to="/borskrakket"
+            className="block rounded-md overflow-hidden mt-12 group"
+            style={{ background: "hsl(var(--band))" }}
+          >
+            <div className="h-1 w-full" style={{ background: "hsl(var(--competition))" }} />
+            <div className="p-6 md:p-8 flex items-center justify-between gap-6">
+              <div>
+                <p
+                  className="text-[0.65rem] uppercase tracking-[0.2em] mb-2"
+                  style={{ color: "hsl(var(--competition))" }}
+                >
+                  Gruppekonkurranse
+                </p>
+                <p
+                  className="font-serif text-2xl md:text-3xl mb-1"
+                  style={{ color: "hsl(var(--primary-foreground))" }}
+                >
+                  Børskrakket
+                </p>
+                <p className="text-sm" style={{ color: "hsl(var(--primary-foreground) / 0.65)" }}>
+                  100 millioner, fem minutter, nyheter som flytter markedet. Samle
+                  gjengen og se hvem som treffer best.
+                </p>
+              </div>
+              <ArrowRight
+                className="w-6 h-6 flex-shrink-0 transition-transform group-hover:translate-x-1"
+                style={{ color: "hsl(var(--competition))" }}
+              />
+            </div>
+          </Link>
 
           <p className="text-sm text-muted-foreground leading-relaxed mt-10">
             Forklaringene er ment som en pekepinn, ikke som fasit i en eksamen —
