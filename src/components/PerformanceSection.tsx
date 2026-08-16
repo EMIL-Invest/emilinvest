@@ -154,15 +154,16 @@ const PerformanceSection = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Sammenlign utviklingen av vår portefølje mot Oslo Børs hovedindeks
           </p>
-          {/* Historikken er nullstilt fordi komiteen først nå forvalter en
-              egen portefølje. Kurven er kort med vilje. Teksten kan fjernes
-              når det har gått noen måneder. */}
+          {/* Forklarer hvorfor kurven starter i august 2026. Teksten er
+              skrevet for å tåle tid: den oppgir en fast startmåned i stedet
+              for «de siste dagene», så den blir ikke feil når grafen vokser.
+              Skal bare endres hvis historikken nullstilles på nytt. */}
           <p className="text-sm text-muted-foreground/90 max-w-2xl mx-auto mt-4 leading-relaxed">
-            Midlene har fram til nå vært plassert i ulike fond, med noen mindre
-            aksjeposisjoner ved siden av. Egen portefølje, forvaltet av komiteen
-            selv, begynner dette semesteret — derfor er historikken nullstilt
-            her. Porteføljen og OSEBX måles fra samme utgangspunkt, så grafen
-            dekker bare de siste dagene inntil videre.
+            Fram til august 2026 var midlene plassert i ulike fond, med noen
+            mindre aksjeposisjoner ved siden av. Da tok komiteen over
+            forvaltningen selv, og grafen starter derfor der. Porteføljen og
+            OSEBX måles fra samme utgangspunkt, slik at kurvene viser hvordan
+            vi har gjort det mot markedet siden oppstarten.
           </p>
         </div>
 
@@ -197,9 +198,13 @@ const PerformanceSection = () => {
 
           {filteredData.length === 0 ? (
             <div className="h-80 flex items-center justify-center">
+              {/* Vises bare når valgt periode ikke har nok datapunkter —
+                  enten rett etter oppstart, eller hvis noen velger «1 mnd»
+                  på en historikk som ennå er kortere enn det. */}
               <p className="text-muted-foreground text-center max-w-md leading-relaxed">
-                Historikken er nullstilt, og det første datapunktet kommer med
-                neste kursoppdatering. Da begynner kurven å bygge seg opp.
+                Det er ikke nok datapunkter i denne perioden til å tegne en
+                kurve ennå. Velg en lengre periode, eller kom tilbake når
+                kursene har oppdatert seg noen dager til.
               </p>
             </div>
           ) : (
