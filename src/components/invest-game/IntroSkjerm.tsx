@@ -3,8 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { hentLedertavle } from "@/lib/invest-game/ledertavle";
-import { formatPct } from "@/lib/invest-game/motor";
+import Ledertavle from "@/components/invest-game/Ledertavle";
 
 interface IntroSkjermProps {
   forrigeNavn: string;
@@ -13,7 +12,6 @@ interface IntroSkjermProps {
 
 const IntroSkjerm = ({ forrigeNavn, onStart }: IntroSkjermProps) => {
   const [navn, setNavn] = useState(forrigeNavn);
-  const tavle = hentLedertavle();
 
   const start = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,33 +55,17 @@ const IntroSkjerm = ({ forrigeNavn, onStart }: IntroSkjermProps) => {
         </Button>
       </form>
 
-      {tavle.length > 0 && (
-        <div
-          className="rounded-md border border-border bg-card p-6"
-          style={{ boxShadow: "var(--shadow-soft)" }}
-        >
-          <p className="eyebrow mb-4">Ledertavlen så langt</p>
-          <ol className="space-y-2">
-            {tavle.slice(0, 5).map((r, i) => (
-              <li key={`${r.navn}-${r.tidspunkt}`} className="flex items-baseline gap-4">
-                <span className="font-serif text-lg text-muted-foreground w-5 tabular-nums">
-                  {i + 1}
-                </span>
-                <span className="flex-1 text-sm font-medium text-foreground truncate">
-                  {r.navn}
-                </span>
-                <span
-                  className={`font-serif text-lg tabular-nums ${
-                    r.avkastningPct >= 0 ? "stock-positive" : "stock-negative"
-                  }`}
-                >
-                  {formatPct(r.avkastningPct)}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
+      <div
+        className="rounded-md border border-border bg-card p-6"
+        style={{ boxShadow: "var(--shadow-soft)" }}
+      >
+        <p className="eyebrow mb-4">Ledertavlen</p>
+        <Ledertavle antall={5} />
+        <p className="text-xs text-muted-foreground mt-4">
+          Tavlen er felles for alle enheter — resultatene lagres sentralt.
+        </p>
+      </div>
+
     </div>
   );
 };

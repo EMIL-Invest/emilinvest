@@ -8,13 +8,15 @@ import {
   totalverdi,
   type Portefolje,
 } from "@/lib/invest-game/motor";
-import { hentLedertavle } from "@/lib/invest-game/ledertavle";
+import Ledertavle from "@/components/invest-game/Ledertavle";
 
 interface ResultatSkjermProps {
   portefolje: Portefolje;
   gruppenavn: string;
   /** Tidspunktet resultatet ble lagret med — brukes til å utheve raden i tavlen. */
   lagretTidspunkt: string;
+  /** null mens lagringen pågår, false hvis den havnet i offline-køen. */
+  lagringOk: boolean | null;
   onSpillIgjen: () => void;
 }
 
@@ -22,6 +24,7 @@ const ResultatSkjerm = ({
   portefolje,
   gruppenavn,
   lagretTidspunkt,
+  lagringOk,
   onSpillIgjen,
 }: ResultatSkjermProps) => {
   const sluttverdi = totalverdi(portefolje, VARIGHET_SEK);
@@ -29,7 +32,6 @@ const ResultatSkjerm = ({
   const resultater = investeringsresultater(portefolje, VARIGHET_SEK);
   const beste = resultater[0];
   const darligste = resultater.length > 1 ? resultater[resultater.length - 1] : undefined;
-  const tavle = hentLedertavle();
 
   return (
     <div className="section-container py-14 md:py-20 max-w-2xl">
@@ -113,34 +115,16 @@ const ResultatSkjerm = ({
         style={{ boxShadow: "var(--shadow-soft)" }}
       >
         <p className="eyebrow mb-5">Ledertavle</p>
-        <ol className="space-y-2.5">
-          {tavle.slice(0, 10).map((r, i) => {
-            const erDenne = r.tidspunkt === lagretTidspunkt;
-            return (
-              <li
-                key={`${r.navn}-${r.tidspunkt}`}
-                className={`flex items-baseline gap-4 rounded-[4px] px-3 py-1.5 ${
-                  erDenne ? "" : ""
-                }`}
-                style={erDenne ? { background: "hsl(var(--competition) / 0.12)" } : undefined}
-              >
-                <span className="font-serif text-lg text-muted-foreground w-5 tabular-nums">
-                  {i + 1}
-                </span>
-                <span className="flex-1 text-sm font-medium text-foreground truncate">
-                  {r.navn}
-                </span>
-                <span
-                  className={`font-serif text-lg tabular-nums ${
-                    r.avkastningPct >= 0 ? "stock-positive" : "stock-negative"
-                  }`}
-                >
-                  {formatPct(r.avkastningPct)}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
+        {/* nokkel = lagretTidspunkt sikrer at tavlen hentes på nytt når
+            rundens eget resultat er skrevet, så gruppen ser seg selv. */}
+        <Ledertavle antall={10} uthevTidspunkt={lagretTidspunkt} nokkel={lagretTidspunkt} />
+        {lagringOk === false && (
+          <p className="text-sm stock-negative mt-4 leading-relaxed">
+            Resultatet kunne ikke lagres akkurat nå — nettforbindelsen sviktet.
+            Det er lagret lokalt og sendes automatisk neste gang siden åpnes
+            med nett.
+          </p>
+        )}
       </div>
 
       <Button size="lg" onClick={onSpillIgjen} className="px-7">

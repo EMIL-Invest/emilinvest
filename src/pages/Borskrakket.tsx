@@ -51,7 +51,10 @@ const Borskrakket = () => {
   const debugAktiv = new URLSearchParams(useLocation().search).has("debug");
   const [manuellNyhet, setManuellNyhet] = useState<{ nyhet: Nyhet; til: number } | null>(null);
 
+  // Tidspunktet databasen ga raden (uthever gruppen i tavlen), og om
+  // lagringen gikk gjennom. null = venter fortsatt på svar.
   const [lagretTidspunkt, setLagretTidspunkt] = useState("");
+  const [lagringOk, setLagringOk] = useState<boolean | null>(null);
   const lagretRef = useRef(false);
 
   /** Sekunder inn i spillet akkurat nå — den ene kilden til sannhet. */
@@ -75,13 +78,15 @@ const Borskrakket = () => {
     if (fase !== "spill" || tSek < VARIGHET_SEK) return;
     if (!lagretRef.current) {
       lagretRef.current = true;
-      const tidspunkt = new Date().toISOString();
-      setLagretTidspunkt(tidspunkt);
+      // Lagringen er et nettverkskall nå. Tidspunktet kommer fra basen,
+      // slik at raden vår kan utheves i den delte tavlen.
       lagreResultat({
         navn: gruppenavn,
         avkastningPct: avkastningPct(portefolje, VARIGHET_SEK),
         sluttverdi: totalverdi(portefolje, VARIGHET_SEK),
-        tidspunkt,
+      }).then((tidspunkt) => {
+        setLagretTidspunkt(tidspunkt ?? "");
+        setLagringOk(tidspunkt !== null);
       });
     }
     setHandel(null);
@@ -94,6 +99,8 @@ const Borskrakket = () => {
     setPausetVed(null);
     setPausetSum(0);
     setManuellNyhet(null);
+    setLagretTidspunkt("");
+    setLagringOk(null);
     lagretRef.current = false;
     setStartetTid(Date.now());
     setFase("spill");
@@ -204,6 +211,7 @@ const Borskrakket = () => {
             portefolje={portefolje}
             gruppenavn={gruppenavn}
             lagretTidspunkt={lagretTidspunkt}
+            lagringOk={lagringOk}
             onSpillIgjen={tilbakeTilStart}
           />
         )}

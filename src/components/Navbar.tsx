@@ -6,12 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import BrandLogo from "@/components/BrandLogo";
 
-const navLinks = [
-  { href: "#home", label: "Hjem" },
-  { href: "#reports", label: "Rapporter" },
-  { href: "#team", label: "Medlemmer" },
-  { href: "#om-oss", label: "Om oss" },
-];
+/**
+ * Rapporter, Medlemmer og Om oss er fjernet: de var ankerlenker til
+ * seksjoner lenger ned på forsiden, altså navigasjon til siden man
+ * allerede står på. Menyen peker nå bare på egne sider.
+ */
+const navLinks = [{ href: "#home", label: "Hjem" }];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
