@@ -61,9 +61,6 @@ const IntroSkjerm = ({ forrigeNavn, onStart }: IntroSkjermProps) => {
       >
         <p className="eyebrow mb-4">Ledertavlen</p>
         <Ledertavle antall={5} />
-        <p className="text-xs text-muted-foreground mt-4">
-          Tavlen er felles for alle enheter — resultatene lagres sentralt.
-        </p>
       </div>
 
     </div>
