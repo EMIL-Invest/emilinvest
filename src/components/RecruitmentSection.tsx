@@ -1,25 +1,28 @@
-import { CalendarDays, Mail } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, CalendarDays } from "lucide-react";
+import { FRIST } from "@/lib/opptak";
 
 /**
  * Rekruttering — ligger rett under toppen på forsiden mens opptaket er åpent.
+ *
+ * Hele boksen er én lenke til /soknad, der det står hvordan man søker.
+ * Derfor ligger ingen e-postlenke her: en <a> inni en <Link> er ugyldig
+ * markup, og ett trykkmål er tydeligere enn to.
  *
  * Boksen står i profilfargen, så den skiller seg fra de lyse kortene
  * ellers på siden. Derfor er tekstfargene invertert (primary-foreground)
  * i stedet for de vanlige foreground/muted-tokenene.
  *
- * Fristen og e-postadressen står som konstanter under, så det er to
- * linjer å endre neste gang. Er opptaket over, kan hele seksjonen fjernes
- * fra Index.tsx uten at noe annet påvirkes.
+ * Fristen ligger i src/lib/opptak.ts. Er opptaket over, kan hele seksjonen
+ * fjernes fra Index.tsx uten at noe annet påvirkes.
  */
-const FRIST = "6. september";
-const EPOST = "kontakt@emilinvest.no";
-
 const RecruitmentSection = () => {
   return (
     <section id="rekruttering" className="py-14 md:py-16">
       <div className="section-container">
-        <div
-          className="rounded-md bg-primary text-primary-foreground p-7 md:p-10"
+        <Link
+          to="/soknad"
+          className="block rounded-md bg-primary text-primary-foreground p-7 md:p-10 group transition-shadow hover:shadow-lg"
           style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-12">
@@ -38,7 +41,7 @@ const RecruitmentSection = () => {
               </p>
             </div>
 
-            <div className="lg:w-80 lg:flex-shrink-0 lg:border-l lg:border-primary-foreground/20 lg:pl-10 space-y-5">
+            <div className="lg:w-72 lg:flex-shrink-0 lg:border-l lg:border-primary-foreground/20 lg:pl-10 space-y-6">
               <div className="flex items-start gap-3">
                 <CalendarDays className="w-5 h-5 text-primary-foreground/60 flex-shrink-0 mt-0.5" />
                 <div>
@@ -49,28 +52,13 @@ const RecruitmentSection = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-primary-foreground/60 flex-shrink-0 mt-0.5" />
-                <div className="min-w-0">
-                  <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/60 mb-1">
-                    Slik søker du
-                  </p>
-                  <p className="text-sm text-primary-foreground/75 leading-relaxed">
-                    Send en e-post til{" "}
-                    <a
-                      href={`mailto:${EPOST}?subject=Søknad%20til%20EMIL%20Invest`}
-                      className="text-primary-foreground underline underline-offset-2 hover:decoration-2 break-words"
-                    >
-                      {EPOST}
-                    </a>{" "}
-                    med litt om deg selv, hvorfor du vil være med, og eventuelle
-                    forkunnskaper.
-                  </p>
-                </div>
-              </div>
+              <p className="inline-flex items-center gap-2 font-medium">
+                Slik søker du
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </p>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     </section>
   );

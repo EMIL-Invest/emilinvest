@@ -144,7 +144,7 @@ const HeroSection = () => {
                   til e-post, med emnefeltet forhåndsfylt. */}
               <Button size="lg" className="px-7" asChild>
                 <a href="mailto:kontakt@emilinvest.no?subject=Søknad%20til%20EMIL%20Invest">
-                  Søk her
+                  Søk EMIL Invest
                 </a>
               </Button>
               <Button

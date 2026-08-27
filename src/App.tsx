@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import NyttPassord from "./pages/NyttPassord";
 import Personvern from "./pages/Personvern";
 import Vilkar from "./pages/Vilkar";
+import Soknad from "./pages/Soknad";
 import Spill from "./pages/Spill";
 import Begreper from "./pages/Begreper";
 import Borskrakket from "./pages/Borskrakket";
@@ -73,6 +74,7 @@ const App = () => (
           <Route path="/nytt-passord" element={<NyttPassord />} />
           <Route path="/personvern" element={<Personvern />} />
           <Route path="/vilkar" element={<Vilkar />} />
+          <Route path="/soknad" element={<Soknad />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/konkurranse" element={<Competition />} />
           <Route path="/spill" element={<Spill />} />
