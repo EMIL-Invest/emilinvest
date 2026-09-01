@@ -334,13 +334,34 @@ export const useCompetition = () => {
       return { error: new Error("Du må være innlogget for å delta") };
     }
 
+    // Mobilnettlesere legger gjerne fanen i dvale, og da kan innloggingen
+    // ha utløpt selv om siden fortsatt VISER deg som innlogget. getSession
+    // fornyer tokenet ved behov; mangler sesjonen helt, sier vi det rett ut
+    // i stedet for å sende et kall som blir avvist.
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      return {
+        error: new Error(
+          "Innloggingen din har utløpt. Last siden på nytt og logg inn igjen, så er påmeldingen ett trykk unna."
+        ),
+      };
+    }
+
     const { data, error } = await supabase.rpc("competition_join", {
       _display_name: displayName,
     });
 
     if (error) {
       console.error("Error joining competition:", error);
-      return { error: new Error("Kunne ikke melde deg på konkurransen") };
+      // Vis den faktiske årsaken — «Kunne ikke melde deg på» uten forklaring
+      // gjorde mobilfeilsøkingen 1. september unødvendig vanskelig.
+      return {
+        error: new Error(
+          error.message
+            ? `Kunne ikke melde deg på: ${error.message}`
+            : "Kunne ikke melde deg på konkurransen"
+        ),
+      };
     }
 
     const result = data as { success: boolean; error?: string };
