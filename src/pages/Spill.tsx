@@ -33,7 +33,7 @@ const SPILL: Spilloppforing[] = [
     merke: "Gruppekonkurranse",
     navn: "Børskrakket",
     beskrivelse:
-      "Dere får 100 millioner og tre minutter. Nyheter flytter markedet underveis — den som følger best med, vinner.",
+      "Dere får 100 millioner og to minutter. Nyheter flytter markedet underveis — den som følger best med, vinner.",
     fakta: ["100 mill.", `${VARIGHET_SEK / 60} minutter`, "I grupper"],
   },
   {

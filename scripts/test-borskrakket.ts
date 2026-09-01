@@ -45,17 +45,17 @@ sjekk("alle kurser positive og endelige gjennom hele løpet", alleGyldige);
 
 /* Nyheten kommer FØR bevegelsen, og bevegelsen kommer faktisk */
 const sektorForNyhet: Record<number, { sektor: SektorId; retning: 1 | -1 }[]> = {
-  20: [{ sektor: "teknologi", retning: 1 }],
-  42: [{ sektor: "energi", retning: -1 }],
-  63: [{ sektor: "forsvar", retning: 1 }],
-  84: [
+  13: [{ sektor: "teknologi", retning: 1 }],
+  26: [{ sektor: "energi", retning: -1 }],
+  41: [{ sektor: "forsvar", retning: 1 }],
+  54: [
     { sektor: "eiendom", retning: -1 },
     { sektor: "finans", retning: 1 },
   ],
-  105: [{ sektor: "sjomat", retning: -1 }],
-  128: [{ sektor: "helse", retning: 1 }],
-  148: [{ sektor: "krypto", retning: 1 }],
-  155: [{ sektor: "teknologi", retning: -1 }],
+  68: [{ sektor: "sjomat", retning: -1 }],
+  85: [{ sektor: "helse", retning: 1 }],
+  99: [{ sektor: "krypto", retning: 1 }],
+  103: [{ sektor: "teknologi", retning: -1 }],
 };
 for (const nyhet of NYHETER) {
   const effekter = sektorForNyhet[nyhet.tidSek];
@@ -115,10 +115,10 @@ const flytt = (tilId: string, t: number) => {
   for (const s of SELSKAPER) reaktiv = selg(reaktiv, s, 1, t);
   reaktiv = kjop(reaktiv, SELSKAPER.find((s) => s.id === tilId)!, reaktiv.kontanter, t);
 };
-flytt("nova", 23);
-flytt("arctic", 66);
-flytt("medica", 131);
-flytt("cryptofund", 151);
+flytt("nova", 16);
+flytt("arctic", 44);
+flytt("medica", 88);
+flytt("cryptofund", 102);
 const reaktivAvkastning = avkastningPct(reaktiv, VARIGHET_SEK);
 
 console.log(`\npassiv 10 %-i-alt:      ${passivAvkastning.toFixed(1)} %`);
