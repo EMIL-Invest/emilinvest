@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -14,6 +14,12 @@ import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, RefreshCw, LogIn } from "
 import LeaderboardTable from "@/components/competition/LeaderboardTable";
 import PortfolioManager from "@/components/competition/PortfolioManager";
 import StockTrader from "@/components/competition/StockTrader";
+import { ReglerKnapp, PorteforljeStatus } from "@/components/competition/KonkurranseGuide";
+import {
+  KRAV_ANTALL_AKSJER,
+  MAKSVEKT_PROSENT,
+  MINSTE_FORSTEKJOP,
+} from "@/lib/konkurranseregler";
 
 const Competition = () => {
   const { toast } = useToast();
@@ -39,6 +45,14 @@ const Competition = () => {
 
   const [displayName, setDisplayName] = useState("");
   const [isJoining, setIsJoining] = useState(false);
+
+  /**
+   * Fanen styres manuelt: en ny deltaker uten gyldig portefølje skal lande
+   * rett i Kjøp/Selg. Auth og deltakerdata kommer asynkront, så en ren
+   * defaultValue på <Tabs> rekker ikke — den er låst før dataene finnes.
+   */
+  const [aktivFane, setAktivFane] = useState("leaderboard");
+  const [faneAutovalgt, setFaneAutovalgt] = useState(false);
 
   const handleJoin = async () => {
     if (!displayName.trim()) {
@@ -68,12 +82,43 @@ const Competition = () => {
     }
   };
 
-  const portfolioValue = participant 
-    ? calculatePortfolioValue(holdings, quotes) 
+  /**
+   * Kjøpet går via en wrapper slik at siden kan feire øyeblikket
+   * porteføljen blir gyldig — serveren sier fra via nylig_kvalifisert.
+   */
+  const handleBuy = async (ticker: string, quantity: number, price: number) => {
+    const result = await buyStock(ticker, quantity, price);
+    if (!result.error && result.nyligKvalifisert) {
+      toast({
+        title: "Porteføljen din er gyldig! 🎉",
+        description:
+          "Du har nå minst " + KRAV_ANTALL_AKSJER + " aksjer og rangeres på ledertavlen. Avkastningen din måles fra nå av.",
+      });
+    }
+    return result;
+  };
+
+  const antallAksjer = holdings.filter((h) => h.ticker !== "ASK").length;
+
+  useEffect(() => {
+    if (!faneAutovalgt && participant) {
+      if (antallAksjer < KRAV_ANTALL_AKSJER) setAktivFane("trade");
+      setFaneAutovalgt(true);
+    }
+  }, [faneAutovalgt, participant, antallAksjer]);
+
+  const portfolioValue = participant
+    ? calculatePortfolioValue(holdings, quotes)
     : 0;
 
-  const totalReturn = participant 
-    ? ((portfolioValue - STARTING_CAPITAL) / STARTING_CAPITAL) * 100 
+  // Avkastning måles fra porteføljen ble gyldig (startverdiene nullstilles
+  // i det øyeblikket), med startkapitalen som reserve for eldre deltakere.
+  const startValue = participant
+    ? Number(participant.all_time_start_value) || STARTING_CAPITAL
+    : STARTING_CAPITAL;
+
+  const totalReturn = participant
+    ? ((portfolioValue - startValue) / startValue) * 100
     : 0;
 
   if (loading) {
@@ -106,9 +151,13 @@ const Competition = () => {
               Investeringskonkurranse
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Bygg din virtuelle portefølje og konkurrer mot andre. Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr 
+              Bygg din virtuelle portefølje og konkurrer mot andre. Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr
               og se hvem som oppnår høyest avkastning!
             </p>
+            {/* Reglene skal være ett trykk unna fra forsiden av konkurransen */}
+            <div className="mt-5">
+              <ReglerKnapp />
+            </div>
           </div>
 
           {/* Not logged in */}
@@ -141,6 +190,16 @@ const Competition = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Det viktigste fra reglene, synlig FØR man melder seg på */}
+                <div className="rounded-md bg-secondary/50 border border-border p-3 text-sm text-muted-foreground space-y-1">
+                  <p className="font-medium text-foreground">Slik blir porteføljen din gyldig:</p>
+                  <p>
+                    Kjøp minst {KRAV_ANTALL_AKSJER} ulike aksjer (minst{" "}
+                    {MINSTE_FORSTEKJOP.toLocaleString("nb-NO")} kr per førstekjøp,
+                    maks {MAKSVEKT_PROSENT} % i én aksje). Avkastningen din måles
+                    fra porteføljen er gyldig.
+                  </p>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="displayName">Visningsnavn</Label>
                   <Input
@@ -151,15 +210,20 @@ const Competition = () => {
                     maxLength={50}
                   />
                 </div>
-                <Button 
-                  onClick={handleJoin} 
-                  disabled={isJoining} 
+                <Button
+                  onClick={handleJoin}
+                  disabled={isJoining}
                   className="w-full bg-competition hover:bg-competition/90 text-competition-foreground"
                 >
                   {isJoining ? "Melder på..." : "Meld meg på"}
                 </Button>
               </CardContent>
             </Card>
+          )}
+
+          {/* Guiden: fra påmeldt til gyldig portefølje */}
+          {participant && (
+            <PorteforljeStatus participant={participant} holdings={holdings} />
           )}
 
           {/* Participating - Show portfolio overview */}
@@ -208,8 +272,9 @@ const Competition = () => {
             </div>
           )}
 
-          {/* Main content tabs */}
-          <Tabs defaultValue="leaderboard" className="space-y-6">
+          {/* Main content tabs — nye deltakere lander rett i handelen,
+              slik at veien til gyldig portefølje er kortest mulig */}
+          <Tabs value={aktivFane} onValueChange={setAktivFane} className="space-y-6">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
               <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
               {participant && (
@@ -288,7 +353,8 @@ const Competition = () => {
                     quotes={quotes}
                     holdings={holdings}
                     cashBalance={getCashBalance()}
-                    onBuy={buyStock}
+                    erKvalifisert={!!participant?.qualified_at}
+                    onBuy={handleBuy}
                     onSell={sellStock}
                     onRefreshQuotes={fetchQuotes}
                     quotesLoading={quotesLoading}

@@ -22,6 +22,8 @@ export interface Participant {
   all_time_start_value: number;
   monthly_start_value: number;
   yearly_start_value: number;
+  /** Når porteføljen først ble gyldig (minst 5 aksjer). Null = ikke ennå. */
+  qualified_at: string | null;
 }
 
 export interface PortfolioHolding {
@@ -382,7 +384,11 @@ export const useCompetition = () => {
   };
 
   // Buy stock (atomic via database function)
-  const buyStock = async (ticker: string, quantity: number, price: number): Promise<{ error: Error | null }> => {
+  const buyStock = async (
+    ticker: string,
+    quantity: number,
+    price: number
+  ): Promise<{ error: Error | null; nyligKvalifisert?: boolean }> => {
     if (!participant) {
       return { error: new Error("Du må være påmeldt konkurransen") };
     }
@@ -409,13 +415,13 @@ export const useCompetition = () => {
       return { error: new Error("Kunne ikke gjennomføre kjøp") };
     }
 
-    const result = data as { success: boolean; error?: string };
+    const result = data as { success: boolean; error?: string; nylig_kvalifisert?: boolean };
     if (!result.success) {
       return { error: new Error(result.error || "Kjøp feilet") };
     }
 
     await fetchParticipant();
-    return { error: null };
+    return { error: null, nyligKvalifisert: result.nylig_kvalifisert === true };
   };
 
   // Sell stock (atomic via database function)

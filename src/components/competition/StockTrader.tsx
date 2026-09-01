@@ -28,6 +28,8 @@ interface StockTraderProps {
   quotesLoading: boolean;
   checkTradingAllowed?: (ticker: string) => Promise<{ allowed: boolean; reason?: string; dailyCount?: number }>;
   maxDailyTransactions?: number;
+  /** Har porteføljen vært gyldig? Da kan den ikke selges under 5 aksjer. */
+  erKvalifisert?: boolean;
 }
 
 const StockTrader = ({ 
@@ -40,7 +42,8 @@ const StockTrader = ({
   onRefreshQuotes,
   quotesLoading,
   checkTradingAllowed,
-  maxDailyTransactions = 3
+  maxDailyTransactions = 3,
+  erKvalifisert = false,
 }: StockTraderProps) => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -234,6 +237,19 @@ const StockTrader = ({
     }
   };
 
+  /**
+   * Vil dette salget tømme posisjonen og ta en gyldig portefølje under
+   * 5 aksjer? Serveren avviser det uansett — men beskjeden skal komme
+   * FØR man trykker, ikke som en avvist handel.
+   */
+  const sperretSalg = (holding: PortfolioHolding | null, antall: string): boolean => {
+    if (!holding || !erKvalifisert) return false;
+    const q = parseFloat(antall);
+    if (isNaN(q)) return false;
+    const tommerPosisjonen = q >= Number(holding.quantity);
+    return tommerPosisjonen && stockHoldings.length <= KRAV_ANTALL_AKSJER;
+  };
+
   const getMaxBuyable = (price: number): number => {
     if (price <= 0) return 0;
     if (price > 30000) return Math.floor((cashBalance / price) * 100) / 100; // 2 decimals for expensive
@@ -257,7 +273,8 @@ const StockTrader = ({
             {MAKSVEKT_PROSENT} % av porteføljen, og et førstegangskjøp må være
             på minst {MINSTE_FORSTEKJOP.toLocaleString("no-NO")} kr. For å bli
             rangert på ledertavlen må du eie minst {KRAV_ANTALL_AKSJER} ulike
-            aksjer.
+            aksjer — og en gyldig portefølje kan ikke selges under den grensen
+            igjen. Avkastningen din måles fra porteføljen først ble gyldig.
           </p>
           <p className="text-muted-foreground">
             Reglene finnes fordi konkurransen skal gi erfaring med å bygge en
@@ -566,6 +583,18 @@ const StockTrader = ({
               )}
             </div>
 
+            {/* Regelvarsel FØR man prøver: gyldig portefølje kan ikke gå under 5 aksjer */}
+            {sperretSalg(selectedHolding, sellQuantity) && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Dette salget ville tømt posisjonen og tatt porteføljen din under{" "}
+                  {KRAV_ANTALL_AKSJER} aksjer — det tillater ikke reglene. Kjøp en
+                  annen aksje først, eller selg bare deler av posisjonen.
+                </AlertDescription>
+              </Alert>
+            )}
+
             {sellQuantity && selectedHolding && quotes[selectedHolding.ticker] && (
               <div className="p-4 bg-secondary/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">Estimert salgsverdi:</p>
@@ -582,7 +611,12 @@ const StockTrader = ({
             </Button>
             <Button
               onClick={handleSell}
-              disabled={isSelling || checkingTrading || !!(tradingCheck && !tradingCheck.allowed)}
+              disabled={
+                isSelling ||
+                checkingTrading ||
+                !!(tradingCheck && !tradingCheck.allowed) ||
+                sperretSalg(selectedHolding, sellQuantity)
+              }
             >
               {isSelling ? "Selger..." : "Bekreft salg"}
             </Button>
