@@ -36,6 +36,14 @@ const SPILL: Spilloppforing[] = [
       "Dere får 100 millioner og tre minutter. Nyheter flytter markedet underveis — den som følger best med, vinner.",
     fakta: ["100 mill.", `${VARIGHET_SEK / 60} minutter`, "I grupper"],
   },
+  {
+    til: "/spill/hjulet",
+    merke: "Standspill",
+    navn: "Spinn hjulet",
+    beskrivelse:
+      "Trykk på hjulet og se hvor det lander. Én av ti sektorer gir en Red Bull — resten gir ingenting.",
+    fakta: ["1 av 10 vinner", "Red Bull", "Ett trykk"],
+  },
 ];
 
 const SpillKort = ({ spill }: { spill: Spilloppforing }) => (

@@ -15,6 +15,7 @@ import Vilkar from "./pages/Vilkar";
 import Soknad from "./pages/Soknad";
 import Spill from "./pages/Spill";
 import Begreper from "./pages/Begreper";
+import Hjulet from "./pages/Hjulet";
 import Borskrakket from "./pages/Borskrakket";
 import Admin from "./pages/Admin";
 import Competition from "./pages/Competition";
@@ -79,6 +80,7 @@ const App = () => (
           <Route path="/konkurranse" element={<Competition />} />
           <Route path="/spill" element={<Spill />} />
           <Route path="/spill/begreper" element={<Begreper />} />
+          <Route path="/spill/hjulet" element={<Hjulet />} />
           <Route path="/borskrakket" element={<Borskrakket />} />
           <Route path="/konto" element={<Account />} />
           <Route path="/rapport" element={<ReportViewer />} />
