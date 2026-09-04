@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Check, CircleCheck } from "lucide-react";
+import { BookOpen, Check, CircleAlert, CircleCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,17 +20,16 @@ import {
 } from "@/lib/konkurranseregler";
 
 /**
- * Regelknappen og førstegangsguiden på konkurransesiden.
+ * Regelknappen og porteføljestatusen på konkurransesiden.
  *
  * ReglerKnapp: alle reglene i en dialog, tilgjengelig rett fra forsiden
  * av konkurransen — også uten innlogging. Ingen skal måtte finne /vilkar
  * for å vite hva de er med på.
  *
- * PorteforljeStatus: banneret som følger en deltaker fra påmelding til
- * gyldig portefølje. Så lenge porteføljen har færre enn KRAV_ANTALL_AKSJER
- * aksjer, viser det hvor langt man er kommet og hva reglene krever — og at
- * avkastningen først begynner å telle når porteføljen er gyldig. Etterpå
- * krymper det til en bekreftelse.
+ * PorteforljeStatus: én kompakt knapp — grønn når porteføljen er gyldig,
+ * rød når den ikke er det. Detaljene (kravlisten) ligger i en dialog bak
+ * knappen, og er den rød står det i punkter under hva som mangler.
+ * Erstatter de gamle tekstbannerne, som tok mye plass på siden.
  */
 
 export const ReglerKnapp = ({ variant }: { variant?: "outline" | "default" }) => {
@@ -93,87 +92,110 @@ interface StatusProps {
 }
 
 export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
+  const [open, setOpen] = useState(false);
   const antall = holdings.filter((h) => h.ticker !== "ASK").length;
   const gyldig = antall >= KRAV_ANTALL_AKSJER || !!participant.qualified_at;
+  const mangler = Math.max(0, KRAV_ANTALL_AKSJER - antall);
 
-  if (gyldig) {
-    return (
-      <div className="flex items-center gap-3 rounded-md border border-primary/25 bg-primary/5 px-4 py-3 mb-8">
-        <CircleCheck className="w-5 h-5 text-primary flex-shrink-0" />
-        <p className="text-sm text-foreground">
-          <span className="font-medium">Porteføljen din er gyldig</span> — du
-          rangeres på ledertavlen
-          {participant.qualified_at && (
-            <span className="text-muted-foreground">
-              , og avkastningen din måles fra{" "}
-              {new Date(participant.qualified_at).toLocaleDateString("no-NO", {
-                day: "numeric",
-                month: "long",
-              })}
-            </span>
-          )}
-          . Husk at du ikke kan selge deg under {KRAV_ANTALL_AKSJER} aksjer.
-        </p>
-      </div>
-    );
-  }
+  const krav = [
+    {
+      ok: gyldig,
+      tekst: `Minst ${KRAV_ANTALL_AKSJER} ulike aksjer i porteføljen (du har ${antall})`,
+    },
+    {
+      ok: true,
+      tekst: `Førstekjøp på minst ${MINSTE_FORSTEKJOP.toLocaleString("no-NO")} kr per aksje — håndheves automatisk ved kjøp`,
+    },
+    {
+      ok: true,
+      tekst: `Maks ${MAKSVEKT_PROSENT} % av porteføljen i én aksje — håndheves automatisk ved kjøp`,
+    },
+  ];
 
   return (
-    <div
-      className="rounded-md p-5 md:p-6 mb-8 text-primary-foreground"
-      style={{ background: "hsl(var(--band))" }}
-    >
-      <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-        <div className="flex-shrink-0">
-          <p
-            className="text-[0.65rem] uppercase tracking-[0.2em] mb-1"
-            style={{ color: "hsl(var(--competition))" }}
+    <div className="flex flex-col items-center mb-8">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            size="sm"
+            className={
+              gyldig
+                ? "bg-green-600 hover:bg-green-700 text-white"
+                : "bg-red-600 hover:bg-red-700 text-white"
+            }
           >
-            Kom i gang
-          </p>
-          <p className="font-serif text-2xl">
-            {antall} av {KRAV_ANTALL_AKSJER} aksjer
-          </p>
-          <div className="flex gap-1.5 mt-2" aria-hidden="true">
-            {Array.from({ length: KRAV_ANTALL_AKSJER }).map((_, i) => (
-              <span
-                key={i}
-                className="w-6 h-1.5 rounded-full"
-                style={{
-                  background:
-                    i < antall
-                      ? "hsl(var(--competition))"
-                      : "hsl(var(--primary-foreground) / 0.2)",
-                }}
-              />
-            ))}
-          </div>
-        </div>
+            {gyldig ? (
+              <CircleCheck className="w-4 h-4 mr-2" />
+            ) : (
+              <CircleAlert className="w-4 h-4 mr-2" />
+            )}
+            {gyldig ? "Porteføljen er gyldig" : "Porteføljen er ikke gyldig"}
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">
+              {gyldig ? "Porteføljen er gyldig" : "Porteføljen er ikke gyldig ennå"}
+            </DialogTitle>
+            <DialogDescription>Krav til en gyldig portefølje:</DialogDescription>
+          </DialogHeader>
 
-        <div className="flex-1 text-sm leading-relaxed text-primary-foreground/80 space-y-1.5">
-          <p>
-            Kjøp{" "}
-            <span className="font-medium text-primary-foreground">
-              {KRAV_ANTALL_AKSJER - antall} aksje
-              {KRAV_ANTALL_AKSJER - antall === 1 ? "" : "r"} til
-            </span>{" "}
-            i ulike selskaper, så er porteføljen gyldig og du rangeres på
-            ledertavlen. Hvert førstegangskjøp må være på minst{" "}
-            {MINSTE_FORSTEKJOP.toLocaleString("no-NO")} kr, og én aksje kan
-            maks utgjøre {MAKSVEKT_PROSENT} % av porteføljen.
+          <ul className="space-y-2.5 py-1">
+            {krav.map((k) => (
+              <li key={k.tekst} className="flex items-start gap-2.5 text-sm">
+                {k.ok ? (
+                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <X className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                )}
+                <span className={k.ok ? "text-muted-foreground" : "text-foreground"}>
+                  {k.tekst}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <p className="text-sm text-muted-foreground leading-relaxed border-t border-border pt-3">
+            {gyldig ? (
+              <>
+                Du rangeres på ledertavlen
+                {participant.qualified_at && (
+                  <>
+                    , og avkastningen din måles fra{" "}
+                    {new Date(participant.qualified_at).toLocaleDateString("no-NO", {
+                      day: "numeric",
+                      month: "long",
+                    })}
+                  </>
+                )}
+                . En gyldig portefølje kan ikke selges under {KRAV_ANTALL_AKSJER}{" "}
+                aksjer igjen.
+              </>
+            ) : (
+              <>
+                Avkastningen din begynner først å telle når porteføljen er gyldig —
+                så det lønner seg å komme i gang med én gang.
+              </>
+            )}
           </p>
-          <p className="flex items-start gap-1.5">
-            <Check
-              className="w-4 h-4 flex-shrink-0 mt-0.5"
-              style={{ color: "hsl(var(--competition))" }}
-            />
+        </DialogContent>
+      </Dialog>
+
+      {/* Rød status: hva som mangler, i punkter rett under knappen */}
+      {!gyldig && (
+        <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+          <li className="flex items-center gap-2">
+            <X className="w-4 h-4 text-red-600 flex-shrink-0" />
             <span>
-              Avkastningen din <span className="font-medium text-primary-foreground">begynner å telle når porteføljen er gyldig</span>{" "}
-              — så det lønner seg å komme i gang med én gang.
+              Du eier {antall} av {KRAV_ANTALL_AKSJER} aksjer — kjøp{" "}
+              <span className="font-medium text-foreground">
+                {mangler} aksje{mangler === 1 ? "" : "r"} til
+              </span>{" "}
+              i ulike selskaper
             </span>
-          </p>
-        </div>
-      </div>
+          </li>
+        </ul>
+      )}
     </div>
   );
 };

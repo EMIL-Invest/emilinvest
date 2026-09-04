@@ -10,12 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
-import { Link } from "react-router-dom";
-import {
-  KRAV_ANTALL_AKSJER,
-  MAKSVEKT_PROSENT,
-  MINSTE_FORSTEKJOP,
-} from "@/lib/konkurranseregler";
+import { KRAV_ANTALL_AKSJER } from "@/lib/konkurranseregler";
 
 interface StockTraderProps {
   availableStocks: OsloStock[];
@@ -258,35 +253,9 @@ const StockTrader = ({
 
   return (
     <div className="space-y-6">
-      {/* Handelsregler. Diversifiseringskravene håndheves i databasen
-          (13_konkurranseregler.sql), men de må stå her også — ellers
-          oppdager man dem først når et kjøp blir avslått. */}
-      <Alert>
-        <Clock className="h-4 w-4" />
-        <AlertDescription className="space-y-1.5">
-          <p>
-            <strong>Handelsregler:</strong> Du kan kun handle når børsen er åpen,
-            og du har maks {maxDailyTransactions} transaksjoner per aksje per dag.
-          </p>
-          <p>
-            <strong>Diversifisering:</strong> Én aksje kan maks utgjøre{" "}
-            {MAKSVEKT_PROSENT} % av porteføljen, og et førstegangskjøp må være
-            på minst {MINSTE_FORSTEKJOP.toLocaleString("no-NO")} kr. For å bli
-            rangert på ledertavlen må du eie minst {KRAV_ANTALL_AKSJER} ulike
-            aksjer — og en gyldig portefølje kan ikke selges under den grensen
-            igjen. Avkastningen din måles fra porteføljen først ble gyldig.
-          </p>
-          <p className="text-muted-foreground">
-            Reglene finnes fordi konkurransen skal gi erfaring med å bygge en
-            portefølje. Uten dem ville den beste vinnersjansen vært å satse alt
-            på ett selskap og håpe på flaks — og da lærer man ingenting.{" "}
-            <Link to="/vilkar" className="underline underline-offset-2">
-              Alle reglene
-            </Link>
-            .
-          </p>
-        </AlertDescription>
-      </Alert>
+      {/* Handelsreglene vises ikke lenger som tekstblokk her — de ligger
+          bak «Reglene»-knappen på forsiden av konkurransen, og håndheves
+          uansett automatisk i databasen når man handler. */}
 
       {/* Cash balance reminder */}
       <Card className="bg-primary/5 border-primary/20">
@@ -353,6 +322,38 @@ const StockTrader = ({
 
           {/* Stock list */}
           <div className="rounded-md border max-h-[500px] overflow-auto">
+            {/* Mobil: kun navn og kjøpsknapp — kurs, endring og sektor
+                kommer i dialogen når man trykker Kjøp. Da slipper man å
+                bla bortover i en smal tabell. */}
+            <ul className="md:hidden divide-y divide-border">
+              {filteredStocks.map((stock) => {
+                const quote = quotes[stock.ticker];
+                const owned = stockHoldings.find(h => h.ticker === stock.ticker);
+                return (
+                  <li key={stock.id} className="flex items-center gap-3 py-2.5 px-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{stock.ticker.replace('.OL', '')}</span>
+                        {owned && (
+                          <Badge variant="secondary" className="text-xs flex-shrink-0">Eid</Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground truncate">{stock.name}</div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => handleBuyClick(stock)}
+                      disabled={!quote}
+                      className="flex-shrink-0"
+                    >
+                      Kjøp
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="hidden md:block">
             <Table>
               <TableHeader className="sticky top-0 bg-background">
                 <TableRow>
@@ -431,6 +432,7 @@ const StockTrader = ({
                 })}
               </TableBody>
             </Table>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -440,15 +442,45 @@ const StockTrader = ({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Kjøp {selectedStock?.name}</DialogTitle>
-            <DialogDescription>
-              Ticker: {selectedStock?.ticker} | 
-              Kurs: {selectedStock && quotes[selectedStock.ticker] 
-                ? quotes[selectedStock.ticker].price.toFixed(2) 
-                : '-'} kr
-            </DialogDescription>
+            <DialogDescription>Ticker: {selectedStock?.ticker}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            {/* Nøkkelinfo om aksjen — på mobil er dette første gang man ser
+                kurs og utvikling (listen viser kun navn og kjøpsknapp) */}
+            {selectedStock && (
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
+                <span className="font-mono font-semibold text-base">
+                  {quotes[selectedStock.ticker]
+                    ? `${quotes[selectedStock.ticker].price.toFixed(2)} kr`
+                    : "–"}
+                </span>
+                {quotes[selectedStock.ticker] && (
+                  <span className={`flex items-center gap-1 font-medium ${
+                    quotes[selectedStock.ticker].changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {quotes[selectedStock.ticker].changePercent >= 0 ? (
+                      <TrendingUp className="w-4 h-4" />
+                    ) : (
+                      <TrendingDown className="w-4 h-4" />
+                    )}
+                    {quotes[selectedStock.ticker].changePercent >= 0 ? '+' : ''}
+                    {quotes[selectedStock.ticker].changePercent.toFixed(2)}% i dag
+                  </span>
+                )}
+                <Badge variant="secondary" className="text-xs">
+                  {selectedStock.sector || 'Annet'}
+                </Badge>
+                {(() => {
+                  const eid = stockHoldings.find(h => h.ticker === selectedStock.ticker);
+                  return eid ? (
+                    <span className="text-muted-foreground">
+                      Du eier {Number(eid.quantity).toLocaleString('nb-NO')}
+                    </span>
+                  ) : null;
+                })()}
+              </div>
+            )}
             {/* Trading status */}
             {checkingTrading ? (
               <div className="text-sm text-muted-foreground">Sjekker handelsstatus...</div>

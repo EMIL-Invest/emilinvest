@@ -152,8 +152,7 @@ const Competition = () => {
               Investeringskonkurranse
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Bygg din virtuelle portefølje og konkurrer mot andre. Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr
-              og se hvem som oppnår høyest avkastning!
+              Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr — høyest avkastning vinner.
             </p>
             {/* Reglene skal være ett trykk unna fra forsiden av konkurransen */}
             <div className="mt-5">
