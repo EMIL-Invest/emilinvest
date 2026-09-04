@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToppliste } from "@/hooks/useToppliste";
+import { HovedpremieBilder, SitGavekort, FOTOKREDITT } from "@/components/competition/Premier";
 
 /**
  * Konkurranseseksjonen på forsiden — det mørkegrønne feltet med gull.
@@ -202,6 +203,53 @@ const CompetitionBanner = () => {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Premiene — bilder fremfor tekst. På PC side om side,
+              på mobil hovedpremien øverst og månedspremien under. */}
+          <div
+            className="px-8 md:px-12 lg:px-16 pb-8 md:pb-12"
+            style={{ borderTop: "1px solid hsl(var(--primary-foreground) / 0.12)" }}
+          >
+            <div className="grid lg:grid-cols-[2fr_1fr] gap-8 lg:gap-12 pt-8">
+              {/* Hovedpremien */}
+              <div>
+                <p
+                  className="text-[0.68rem] uppercase tracking-[0.18em] font-medium mb-3"
+                  style={{ color: GULL }}
+                >
+                  Hovedpremie 1. juni — vinneren velger én av tre
+                </p>
+                <HovedpremieBilder moerk />
+              </div>
+
+              {/* Månedspremien */}
+              <div>
+                <p
+                  className="text-[0.68rem] uppercase tracking-[0.18em] font-medium mb-3"
+                  style={{ color: GULL }}
+                >
+                  Månedspremie
+                </p>
+                <div className="flex items-center gap-4">
+                  <SitGavekort className="w-28 sm:w-32 flex-shrink-0 drop-shadow-md" />
+                  <div className="text-sm leading-snug">
+                    <p className="font-medium" style={{ color: "hsl(var(--primary-foreground))" }}>
+                      Sit-gavekort · 150 kr
+                    </p>
+                    <p style={{ color: "hsl(var(--primary-foreground) / 0.6)" }}>
+                      til månedens beste avkastning
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p
+              className="text-[10px] leading-snug mt-4"
+              style={{ color: "hsl(var(--primary-foreground) / 0.35)" }}
+            >
+              {FOTOKREDITT}
+            </p>
           </div>
         </div>
       </div>

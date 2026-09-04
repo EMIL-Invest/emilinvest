@@ -10,14 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCompetition } from "@/hooks/useCompetition";
-import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, ArrowLeftRight, RefreshCw, LogIn, Gift, Utensils, Coffee, Puzzle, TrendingUp } from "lucide-react";
+import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, ArrowLeftRight, RefreshCw, LogIn } from "lucide-react";
 import LeaderboardTable from "@/components/competition/LeaderboardTable";
 import PortfolioManager from "@/components/competition/PortfolioManager";
 import StockTrader from "@/components/competition/StockTrader";
 import { ReglerKnapp, PorteforljeStatus } from "@/components/competition/KonkurranseGuide";
-import middagBilde from "@/assets/premier/middag.jpg";
-import britanniaBilde from "@/assets/premier/britannia.jpg";
-import escapeBilde from "@/assets/premier/escape.jpg";
+import { PremieKnapp } from "@/components/competition/Premier";
 import {
   KRAV_ANTALL_AKSJER,
   MAKSVEKT_PROSENT,
@@ -157,133 +155,11 @@ const Competition = () => {
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr — høyest avkastning vinner.
             </p>
-            {/* Reglene skal være ett trykk unna fra forsiden av konkurransen */}
-            <div className="mt-5">
+            {/* Regler og premier: ett trykk unna, uten å ta plass på siden */}
+            <div className="mt-5 flex items-center justify-center gap-3">
               <ReglerKnapp />
+              <PremieKnapp />
             </div>
-          </div>
-
-          {/* Premiene — synlige for alle, FØR påmelding: dette er
-              grunnen til å bli med. Tall og premier vedtatt på
-              komitémøtet 3. september. */}
-          <div className="max-w-3xl mx-auto mb-8 md:mb-12">
-            <Card className="border-competition/40 overflow-hidden">
-              <CardContent className="pt-5 pb-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <Gift className="w-5 h-5" style={{ color: "hsl(var(--competition))" }} />
-                  <h2 className="font-serif text-xl font-bold">Dette kan du vinne</h2>
-                </div>
-
-                {/* Månedspremien: gavekortet tegnet som et «utklippet» kort */}
-                <div className="flex items-center gap-4">
-                  <svg
-                    viewBox="0 0 200 126"
-                    className="w-32 sm:w-36 flex-shrink-0 drop-shadow-md"
-                    role="img"
-                    aria-label="Gavekort på Sit, 150 kroner"
-                  >
-                    <defs>
-                      <linearGradient id="sitkort" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stopColor="#0b3f8f" />
-                        <stop offset="1" stopColor="#1d6fe0" />
-                      </linearGradient>
-                    </defs>
-                    <rect x="1" y="1" width="198" height="124" rx="12" fill="url(#sitkort)" />
-                    <circle cx="168" cy="-8" r="52" fill="#ffffff" opacity="0.08" />
-                    <circle cx="14" cy="120" r="38" fill="#ffffff" opacity="0.06" />
-                    <text x="16" y="30" fill="#ffffff" opacity="0.85" fontSize="11" letterSpacing="2.5" fontFamily="Calibri, sans-serif">
-                      GAVEKORT
-                    </text>
-                    <text x="16" y="76" fill="#ffffff" fontSize="34" fontWeight="bold" fontFamily="Cambria, serif">
-                      150,-
-                    </text>
-                    <text x="16" y="108" fill="#ffffff" opacity="0.9" fontSize="15" fontWeight="bold" fontFamily="Calibri, sans-serif">
-                      Sit
-                    </text>
-                    <rect x="150" y="92" width="34" height="22" rx="4" fill="#ffffff" opacity="0.22" />
-                  </svg>
-                  <div className="text-sm leading-relaxed">
-                    <Badge className="bg-competition text-competition-foreground mb-1.5">
-                      Hver måned
-                    </Badge>
-                    <p className="font-medium">Gavekort på Sit · 150 kr</p>
-                    <p className="text-muted-foreground">Best avkastning den måneden vinner.</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  <div className="flex items-start gap-3">
-                    <Badge className="bg-competition text-competition-foreground flex-shrink-0 mt-0.5">
-                      1. juni
-                    </Badge>
-                    <p className="text-sm leading-relaxed">
-                      <span className="font-medium">Hovedpremien:</span>{" "}
-                      <span className="text-muted-foreground">vinneren velger én av tre —</span>
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    <div className="rounded-md border border-border bg-secondary/40 overflow-hidden">
-                      <img
-                        src={middagBilde}
-                        alt="Dekket bord for to med levende lys"
-                        className="w-full aspect-[16/10] object-cover"
-                        loading="lazy"
-                      />
-                      <div className="p-3 text-sm">
-                        <p className="font-medium leading-snug flex items-center gap-1.5">
-                          <Utensils className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "hsl(var(--competition))" }} />
-                          Treretters på To Rom og Kjøkken
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">for 2 personer</p>
-                      </div>
-                    </div>
-                    <div className="rounded-md border border-border bg-secondary/40 overflow-hidden">
-                      <img
-                        src={britanniaBilde}
-                        alt="Britannia Hotel i Trondheim"
-                        className="w-full aspect-[16/10] object-cover"
-                        loading="lazy"
-                      />
-                      <div className="p-3 text-sm">
-                        <p className="font-medium leading-snug flex items-center gap-1.5">
-                          <Coffee className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "hsl(var(--competition))" }} />
-                          Frokost på Britannia
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">for 2 personer</p>
-                      </div>
-                    </div>
-                    <div className="rounded-md border border-border bg-secondary/40 overflow-hidden">
-                      <img
-                        src={escapeBilde}
-                        alt="Låst dør med hengelås og kjetting"
-                        className="w-full aspect-[16/10] object-cover"
-                        loading="lazy"
-                      />
-                      <div className="p-3 text-sm">
-                        <p className="font-medium leading-snug flex items-center gap-1.5">
-                          <Puzzle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "hsl(var(--competition))" }} />
-                          Escape room i Trondheim
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">for opptil 4 personer</p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* CC-lisensene krever navngivelse av fotografene */}
-                  <p className="text-[10px] text-muted-foreground/70 leading-snug">
-                    Foto: PattayaPatrol, Ssu, Annatsach / Wikimedia Commons (CC BY-SA 4.0)
-                  </p>
-                </div>
-
-                <p className="flex items-start gap-2 text-sm text-muted-foreground border-t border-border pt-3">
-                  <TrendingUp className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "hsl(var(--competition))" }} />
-                  <span>
-                    <span className="font-medium text-foreground">Det lønner seg å bli med tidlig</span>{" "}
-                    — avkastningen din måles fra porteføljen er gyldig, så jo før du
-                    starter, jo lenger får avkastningen jobbe for deg.
-                  </span>
-                </p>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Not logged in */}
