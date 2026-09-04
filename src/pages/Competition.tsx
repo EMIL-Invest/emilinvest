@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCompetition } from "@/hooks/useCompetition";
-import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, ArrowLeftRight, RefreshCw, LogIn } from "lucide-react";
+import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, ArrowLeftRight, RefreshCw, LogIn, Gift, Utensils, Coffee, Puzzle, TrendingUp } from "lucide-react";
 import LeaderboardTable from "@/components/competition/LeaderboardTable";
 import PortfolioManager from "@/components/competition/PortfolioManager";
 import StockTrader from "@/components/competition/StockTrader";
@@ -158,6 +158,72 @@ const Competition = () => {
             <div className="mt-5">
               <ReglerKnapp />
             </div>
+          </div>
+
+          {/* Premiene — synlige for alle, FØR påmelding: dette er
+              grunnen til å bli med. Tall og premier vedtatt på
+              komitémøtet 3. september. */}
+          <div className="max-w-3xl mx-auto mb-8 md:mb-12">
+            <Card className="border-competition/40 overflow-hidden">
+              <CardContent className="pt-5 pb-5 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Gift className="w-5 h-5" style={{ color: "hsl(var(--competition))" }} />
+                  <h2 className="font-serif text-xl font-bold">Dette kan du vinne</h2>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Badge className="bg-competition text-competition-foreground flex-shrink-0 mt-0.5">
+                    Hver måned
+                  </Badge>
+                  <p className="text-sm leading-relaxed">
+                    <span className="font-medium">Gavekort på Sit til 150 kr</span>{" "}
+                    <span className="text-muted-foreground">
+                      — til den med best avkastning den måneden.
+                    </span>
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="flex items-start gap-3">
+                    <Badge className="bg-competition text-competition-foreground flex-shrink-0 mt-0.5">
+                      1. juni
+                    </Badge>
+                    <p className="text-sm leading-relaxed">
+                      <span className="font-medium">Hovedpremien:</span>{" "}
+                      <span className="text-muted-foreground">
+                        vinneren av skoleåret velger én av tre —
+                      </span>
+                    </p>
+                  </div>
+                  <div className="grid sm:grid-cols-3 gap-2.5">
+                    <div className="rounded-md border border-border bg-secondary/40 p-3 text-sm">
+                      <Utensils className="w-4 h-4 mb-1.5" style={{ color: "hsl(var(--competition))" }} />
+                      <p className="font-medium leading-snug">Treretters på To Rom og Kjøkken</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">for 2 personer</p>
+                    </div>
+                    <div className="rounded-md border border-border bg-secondary/40 p-3 text-sm">
+                      <Coffee className="w-4 h-4 mb-1.5" style={{ color: "hsl(var(--competition))" }} />
+                      <p className="font-medium leading-snug">Frokost på Britannia</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">for 2 personer</p>
+                    </div>
+                    <div className="rounded-md border border-border bg-secondary/40 p-3 text-sm">
+                      <Puzzle className="w-4 h-4 mb-1.5" style={{ color: "hsl(var(--competition))" }} />
+                      <p className="font-medium leading-snug">Escape room i Trondheim</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">for opptil 4 personer</p>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="flex items-start gap-2 text-sm text-muted-foreground border-t border-border pt-3">
+                  <TrendingUp className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "hsl(var(--competition))" }} />
+                  <span>
+                    <span className="font-medium text-foreground">Det lønner seg å bli med tidlig</span>{" "}
+                    — avkastningen din måles fra porteføljen er gyldig, så jo før du
+                    starter, jo lenger får avkastningen jobbe for deg.
+                  </span>
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Not logged in */}
