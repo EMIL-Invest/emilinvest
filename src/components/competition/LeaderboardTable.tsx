@@ -62,6 +62,91 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Mobil: kompakte rader — navn og avkastning i front, verdi
+              som underlinje. Tabellen under er skjult på små skjermer. */}
+          <ul className="md:hidden divide-y divide-border">
+            {rangerte.slice(0, 10).map((entry) => (
+              <li key={entry.participant_id}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedParticipant({
+                    id: entry.participant_id,
+                    name: entry.display_name,
+                  })}
+                  className={`w-full flex items-center gap-3 py-3 text-left active:bg-muted/50 transition-colors ${
+                    entry.participant_id === currentParticipantId ? "bg-primary/5" : ""
+                  }`}
+                >
+                  <span className="flex items-center justify-center w-8 flex-shrink-0">
+                    {getRankIcon(entry.rank)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="font-medium truncate">{entry.display_name}</span>
+                      {entry.participant_id === currentParticipantId && (
+                        <Badge variant="secondary" className="text-xs flex-shrink-0">Deg</Badge>
+                      )}
+                    </span>
+                    <span className="block text-xs text-muted-foreground font-mono">
+                      {entry.portfolio_value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                    </span>
+                  </span>
+                  <span className={`flex items-center gap-1 font-semibold flex-shrink-0 tabular-nums ${
+                    entry.return_percentage >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {entry.return_percentage >= 0 ? (
+                      <TrendingUp className="w-4 h-4" />
+                    ) : (
+                      <TrendingDown className="w-4 h-4" />
+                    )}
+                    {entry.return_percentage >= 0 ? '+' : ''}
+                    {entry.return_percentage.toFixed(2)}%
+                  </span>
+                </button>
+              </li>
+            ))}
+            {ownEntryOutsideTop10 && (
+              <>
+                <li className="text-center text-muted-foreground py-1" aria-hidden="true">⋯</li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedParticipant({
+                      id: ownEntryOutsideTop10.participant_id,
+                      name: ownEntryOutsideTop10.display_name,
+                    })}
+                    className="w-full flex items-center gap-3 py-3 text-left bg-primary/5 active:bg-muted/50 transition-colors"
+                  >
+                    <span className="flex items-center justify-center w-8 flex-shrink-0 text-muted-foreground font-medium">
+                      {ownEntryOutsideTop10.rank}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-2">
+                        <span className="font-medium truncate">{ownEntryOutsideTop10.display_name}</span>
+                        <Badge variant="secondary" className="text-xs flex-shrink-0">Deg</Badge>
+                      </span>
+                      <span className="block text-xs text-muted-foreground font-mono">
+                        {ownEntryOutsideTop10.portfolio_value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                      </span>
+                    </span>
+                    <span className={`flex items-center gap-1 font-semibold flex-shrink-0 tabular-nums ${
+                      ownEntryOutsideTop10.return_percentage >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {ownEntryOutsideTop10.return_percentage >= 0 ? (
+                        <TrendingUp className="w-4 h-4" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4" />
+                      )}
+                      {ownEntryOutsideTop10.return_percentage >= 0 ? '+' : ''}
+                      {ownEntryOutsideTop10.return_percentage.toFixed(2)}%
+                    </span>
+                  </button>
+                </li>
+              </>
+            )}
+          </ul>
+
+          <div className="hidden md:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -161,6 +246,7 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
               )}
             </TableBody>
           </Table>
+          </div>
 
           {rangerte.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-8 max-w-md mx-auto leading-relaxed">

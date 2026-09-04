@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCompetition } from "@/hooks/useCompetition";
-import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, RefreshCw, LogIn } from "lucide-react";
+import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, ArrowLeftRight, RefreshCw, LogIn } from "lucide-react";
 import LeaderboardTable from "@/components/competition/LeaderboardTable";
 import PortfolioManager from "@/components/competition/PortfolioManager";
 import StockTrader from "@/components/competition/StockTrader";
@@ -139,18 +139,19 @@ const Competition = () => {
     <div className="min-h-screen">
       <Navbar />
       
-      <main className="py-24">
+      {/* Mobil: plass i bunnen til den faste navigasjonslinjen */}
+      <main className="pt-16 pb-28 md:py-24">
         <div className="section-container">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-competition text-competition-foreground">
+          {/* Header — kompaktere på mobil så innholdet kommer raskere frem */}
+          <div className="text-center mb-8 md:mb-12">
+            <Badge className="mb-3 md:mb-4 bg-competition text-competition-foreground">
               <Trophy className="w-3 h-3 mr-1" />
               Aksjekonkurranse
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+            <h1 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-3 md:mb-4">
               Investeringskonkurranse
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Bygg din virtuelle portefølje og konkurrer mot andre. Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr
               og se hvem som oppnår høyest avkastning!
             </p>
@@ -226,9 +227,45 @@ const Competition = () => {
             <PorteforljeStatus participant={participant} holdings={holdings} />
           )}
 
-          {/* Participating - Show portfolio overview */}
+          {/* Mobil: ett kompakt statuskort i stedet for tre store kort,
+              slik at topplisten/handelen er synlig uten å scrolle en hel skjerm */}
           {participant && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <Card className="mb-6 md:hidden">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-end justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground mb-0.5">Porteføljeverdi</p>
+                    <p className="text-2xl font-bold leading-tight">
+                      {portfolioValue.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                    </p>
+                  </div>
+                  <div className={`flex items-center gap-1 text-lg font-bold flex-shrink-0 ${
+                    totalReturn >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {totalReturn >= 0 ? (
+                      <ArrowUpRight className="w-5 h-5" />
+                    ) : (
+                      <ArrowDownRight className="w-5 h-5" />
+                    )}
+                    {totalReturn.toFixed(2)}%
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
+                  <Wallet className="w-4 h-4 flex-shrink-0" />
+                  <span>
+                    Tilgjengelig:{" "}
+                    <span className="font-medium text-foreground">
+                      {getCashBalance().toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                    </span>
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Desktop: de tre store kortene som før */}
+          {participant && (
+            <div className="hidden md:grid grid-cols-3 gap-6 mb-12">
               <Card>
                 <CardHeader className="pb-2">
                   <CardDescription>Porteføljeverdi</CardDescription>
@@ -275,7 +312,9 @@ const Competition = () => {
           {/* Main content tabs — nye deltakere lander rett i handelen,
               slik at veien til gyldig portefølje er kortest mulig */}
           <Tabs value={aktivFane} onValueChange={setAktivFane} className="space-y-6">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+            {/* Fanelisten øverst vises bare på desktop — på mobil overtar
+                den faste navigasjonslinjen i bunnen (tommelavstand) */}
+            <TabsList className="hidden md:grid w-full max-w-md mx-auto grid-cols-3">
               <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
               {participant && (
                 <>
@@ -301,7 +340,7 @@ const Competition = () => {
                 </div>
 
                 <Tabs defaultValue="monthly" className="space-y-4">
-                  <TabsList>
+                  <TabsList className="grid w-full grid-cols-3 sm:w-auto sm:inline-flex">
                     <TabsTrigger value="monthly">Denne måneden</TabsTrigger>
                     <TabsTrigger value="yearly">I år</TabsTrigger>
                     <TabsTrigger value="all_time">All-time</TabsTrigger>
@@ -367,6 +406,42 @@ const Competition = () => {
           </Tabs>
         </div>
       </main>
+
+      {/* Mobil: fast navigasjonslinje i bunnen — de tre delene av
+          konkurransen er alltid ett tommeltrykk unna. Skjult på desktop. */}
+      {participant && (
+        <nav
+          className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          aria-label="Konkurransenavigasjon"
+        >
+          <div className="grid grid-cols-3">
+            {[
+              { id: "leaderboard", label: "Toppliste", Ikon: Trophy },
+              { id: "portfolio", label: "Portefølje", Ikon: Wallet },
+              { id: "trade", label: "Handle", Ikon: ArrowLeftRight },
+            ].map(({ id, label, Ikon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => {
+                  setAktivFane(id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                aria-current={aktivFane === id ? "page" : undefined}
+                className={`flex flex-col items-center gap-1 py-2.5 text-xs font-medium transition-colors ${
+                  aktivFane === id
+                    ? "text-competition"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Ikon className="w-5 h-5" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
 
       <Footer />
     </div>
