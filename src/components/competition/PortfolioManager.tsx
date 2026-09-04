@@ -20,6 +20,9 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
   const [selectedHolding, setSelectedHolding] = useState<PortfolioHolding | null>(null);
   const [sellQuantity, setSellQuantity] = useState("");
   const [isSelling, setIsSelling] = useState(false);
+  // Detaljene (antall, kjøpskurs, dagens kurs, avkastning i kr) ligger i
+  // en dialog bak et trykk på aksjen - da slipper tabellen sidescrolling.
+  const [detaljHolding, setDetaljHolding] = useState<PortfolioHolding | null>(null);
 
   const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
   const cashHolding = holdings.find(h => h.ticker === "ASK");
@@ -140,60 +143,35 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
               <p className="text-sm">Gå til "Kjøp/Selg" for å handle aksjer.</p>
             </div>
           ) : (
+            <>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Aksje</TableHead>
-                  <TableHead className="text-right">Antall</TableHead>
-                  <TableHead className="text-right">Snitt kjøpskurs</TableHead>
-                  <TableHead className="text-right">Nåværende kurs</TableHead>
-                  <TableHead className="text-right">Verdi</TableHead>
-                  <TableHead className="text-right">Avkastning (kr)</TableHead>
-                  <TableHead className="text-right">Avkastning (%)</TableHead>
-                  <TableHead className="text-right">Handling</TableHead>
+                  <TableHead className="px-2">Aksje</TableHead>
+                  <TableHead className="text-right px-2">Verdi</TableHead>
+                  <TableHead className="text-right px-2">Avkastning</TableHead>
+                  <TableHead className="text-right px-2">Handling</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stockHoldings.map((holding) => {
-                  const quote = quotes[holding.ticker];
                   const currentValue = calculateHoldingValue(holding);
                   const returnPct = calculateReturn(holding);
 
                   return (
-                    <TableRow key={holding.id}>
-                      <TableCell>
+                    <TableRow
+                      key={holding.id}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => setDetaljHolding(holding)}
+                    >
+                      <TableCell className="px-2">
                         <div className="font-medium">{holding.ticker.replace('.OL', '')}</div>
                       </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {Number(holding.quantity).toLocaleString('nb-NO')}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {Number(holding.average_purchase_price).toFixed(2)} kr
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {quote ? (
-                          `${quote.price.toFixed(2)} kr`
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
+                      <TableCell className="text-right font-mono px-2 whitespace-nowrap">
                         {currentValue.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                       </TableCell>
-                      <TableCell className="text-right">
-                        {(() => {
-                          const currentVal = calculateHoldingValue(holding);
-                          const costBasis = Number(holding.average_purchase_price) * Number(holding.quantity);
-                          const returnKr = currentVal - costBasis;
-                          return (
-                            <div className={`font-mono ${returnKr >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {returnKr >= 0 ? '+' : ''}{returnKr.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
-                            </div>
-                          );
-                        })()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className={`flex items-center justify-end gap-1 ${
+                      <TableCell className="text-right px-2">
+                        <div className={`flex items-center justify-end gap-1 whitespace-nowrap ${
                           returnPct >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {returnPct >= 0 ? (
@@ -204,11 +182,15 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                           {returnPct >= 0 ? '+' : ''}{returnPct.toFixed(2)}%
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button 
-                          variant="outline" 
+                      <TableCell className="text-right px-2">
+                        <Button
+                          variant="outline"
                           size="sm"
-                          onClick={() => handleSellClick(holding)}
+                          className="px-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSellClick(holding);
+                          }}
                         >
                           Selg
                         </Button>
@@ -218,9 +200,69 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                 })}
               </TableBody>
             </Table>
+            <p className="text-xs text-muted-foreground mt-3">
+              Trykk på en aksje for antall, kjøpskurs og avkastning i kroner.
+            </p>
+            </>
           )}
         </CardContent>
       </Card>
+
+      {/* Detaljdialog - tallene som før sto som egne kolonner */}
+      <Dialog open={!!detaljHolding} onOpenChange={(open) => !open && setDetaljHolding(null)}>
+        <DialogContent className="max-w-sm">
+          {detaljHolding && (() => {
+            const quote = quotes[detaljHolding.ticker];
+            const verdi = calculateHoldingValue(detaljHolding);
+            const kostpris = Number(detaljHolding.average_purchase_price) * Number(detaljHolding.quantity);
+            const avkastKr = verdi - kostpris;
+            const avkastPct = calculateReturn(detaljHolding);
+            const rader = [
+              { navn: "Antall aksjer", verdi: Number(detaljHolding.quantity).toLocaleString('nb-NO') },
+              { navn: "Snitt kjøpskurs", verdi: `${Number(detaljHolding.average_purchase_price).toFixed(2)} kr` },
+              { navn: "Nåværende kurs", verdi: quote ? `${quote.price.toFixed(2)} kr` : "-" },
+              { navn: "Verdi", verdi: `${verdi.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr` },
+            ];
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle>{detaljHolding.ticker.replace('.OL', '')}</DialogTitle>
+                  <DialogDescription>Posisjonen din i detalj</DialogDescription>
+                </DialogHeader>
+                <div className="divide-y divide-border text-sm">
+                  {rader.map((r) => (
+                    <div key={r.navn} className="flex items-center justify-between py-2.5">
+                      <span className="text-muted-foreground">{r.navn}</span>
+                      <span className="font-mono text-foreground">{r.verdi}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between py-2.5">
+                    <span className="text-muted-foreground">Avkastning</span>
+                    <span className={`font-mono font-medium ${avkastKr >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {avkastKr >= 0 ? '+' : ''}{avkastKr.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                      {' '}({avkastPct >= 0 ? '+' : ''}{avkastPct.toFixed(2)} %)
+                    </span>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setDetaljHolding(null)}>
+                    Lukk
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const h = detaljHolding;
+                      setDetaljHolding(null);
+                      handleSellClick(h);
+                    }}
+                  >
+                    Selg
+                  </Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       {/* Sell dialog */}
       <Dialog open={sellDialogOpen} onOpenChange={setSellDialogOpen}>
