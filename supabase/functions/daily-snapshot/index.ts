@@ -82,30 +82,68 @@ function getYahooTicker(ticker: string): string {
   return tickerMappings[ticker] || ticker;
 }
 
-// Exchange rates to NOK.
-// NB: "GBp" (pence) må håndteres separat fra "GBP" — LSE-aksjer noteres i
-// pence hos Yahoo. Hold denne i sync med stock-prices/index.ts (FX_TO_NOK).
-function getExchangeRate(currency: string): number {
-  const rates: Record<string, number> = {
-    'NOK': 1,
-    'USD': 11.0,
-    'DKK': 1.55,
-    'EUR': 11.6,
-    'SEK': 1.05,
-    'GBP': 13.5,
-    'GBp': 0.135,
-    'GBX': 0.135,
-    'CHF': 12.6,
-    'JPY': 0.073,
-    'TWD': 0.34,
-    'CAD': 7.7,
-  };
-  const rate = rates[currency];
-  if (rate === undefined) {
-    console.warn(`Ukjent valuta "${currency}" — bruker 1:1 mot NOK. Legg den til i kurstabellen!`);
-    return 1;
+// ============================================================
+// Valutakurser til NOK — hentes LIVE fra Yahoo Finance (USDNOK=X osv.)
+// og caches i én time. Tabellen under er kun nødreserve hvis oppslaget
+// feiler. "GBp"/"GBX" er pence: GBP/100.
+// Hold denne logikken i sync med stock-prices/index.ts.
+// ============================================================
+const FX_FALLBACK: Record<string, number> = {
+  'USD': 11.0,
+  'DKK': 1.55,
+  'EUR': 11.6,
+  'SEK': 1.05,
+  'GBP': 13.5,
+  'CHF': 12.6,
+  'JPY': 0.073,
+  'TWD': 0.34,
+  'CAD': 7.7,
+};
+
+const FX_TTL_MS = 60 * 60 * 1000; // 1 time
+const fxCache = new Map<string, { promise: Promise<number | null>; at: number }>();
+
+async function fetchFxFromYahoo(base: string): Promise<number | null> {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${base}NOK%3DX?interval=1d&range=1d`;
+    const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (!response.ok) {
+      console.error(`Valutaoppslag ${base}NOK feilet: ${response.status}`);
+      return null;
+    }
+    const data = await response.json();
+    const meta = data.chart?.result?.[0]?.meta;
+    const rate = meta?.regularMarketPrice || meta?.previousClose || meta?.chartPreviousClose || null;
+    return rate && rate > 0 ? rate : null;
+  } catch (error) {
+    console.error(`Valutaoppslag ${base}NOK feilet:`, error);
+    return null;
   }
-  return rate;
+}
+
+async function getExchangeRate(currency: string): Promise<number> {
+  if (currency === 'NOK') return 1;
+  const erPence = currency === 'GBp' || currency === 'GBX';
+  const base = erPence ? 'GBP' : currency;
+
+  const now = Date.now();
+  let entry = fxCache.get(base);
+  if (!entry || now - entry.at > FX_TTL_MS) {
+    entry = { promise: fetchFxFromYahoo(base), at: now };
+    fxCache.set(base, entry);
+  }
+
+  let rate = await entry.promise;
+  if (!rate) {
+    fxCache.delete(base);
+    rate = FX_FALLBACK[base];
+    if (rate === undefined) {
+      console.warn(`Ukjent valuta "${currency}" — bruker 1:1 mot NOK. Legg den til i FX_FALLBACK!`);
+      return 1;
+    }
+    console.warn(`Bruker reservekurs for ${base}NOK: ${rate}`);
+  }
+  return erPence ? rate / 100 : rate;
 }
 
 async function fetchStockPrice(ticker: string): Promise<StockQuote | null> {
@@ -303,7 +341,7 @@ Deno.serve(async (req) => {
     for (const holding of holdings || []) {
       const quote = await fetchStockPrice(holding.ticker);
       if (quote && quote.price > 0) {
-        const exchangeRate = getExchangeRate(quote.currency);
+        const exchangeRate = await getExchangeRate(quote.currency);
         const value = quote.price * holding.quantity * exchangeRate;
         portfolioValue += value;
         console.log(`${holding.ticker}: ${quote.price} ${quote.currency} x ${holding.quantity} = ${value.toFixed(0)} NOK`);

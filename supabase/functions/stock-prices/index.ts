@@ -84,31 +84,75 @@ function cleanupRateLimitMap() {
   }
 }
 
-// Convert NOK price based on currency.
-// NB: "GBp" (med liten p) er pence — LSE-aksjer noteres i pence hos Yahoo,
-// så 1 GBp = GBP/100. Uten den nøkkelen verdsettes britiske aksjer ~7x feil.
-const FX_TO_NOK: Record<string, number> = {
-  "NOK": 1,
+// ============================================================
+// Valutakurser til NOK — hentes LIVE fra Yahoo Finance (USDNOK=X osv.,
+// samme åpne API som aksjekursene) og caches i én time. Tidligere sto
+// kursene hardkodet her, og en utdatert USD-kurs ga feil NOK-priser på
+// utenlandske aksjer. Tabellen under er nå kun nødreserve hvis
+// oppslaget feiler, slik at prisene aldri uteblir helt.
+// NB: "GBp" (med liten p) er pence — LSE-aksjer noteres i pence hos
+// Yahoo, så 1 GBp = GBP/100. Uten den verdsettes britiske aksjer ~7x feil.
+// Hold denne logikken i sync med daily-snapshot/index.ts.
+// ============================================================
+const FX_FALLBACK: Record<string, number> = {
   "USD": 11.0,
   "DKK": 1.55,
   "EUR": 11.6,
   "SEK": 1.05,
   "GBP": 13.5,
-  "GBp": 0.135,
-  "GBX": 0.135,
   "CHF": 12.6,
   "JPY": 0.073,
   "TWD": 0.34,
   "CAD": 7.7,
 };
 
-function convertToNOK(price: number, currency: string): number {
-  const rate = FX_TO_NOK[currency];
-  if (rate === undefined) {
-    console.warn(`Ukjent valuta "${currency}" — bruker kurs 1:1 mot NOK. Legg den til i FX_TO_NOK!`);
-    return price;
+const FX_TTL_MS = 60 * 60 * 1000; // 1 time
+const fxCache = new Map<string, { promise: Promise<number | null>; at: number }>();
+
+async function fetchFxFromYahoo(base: string): Promise<number | null> {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${base}NOK%3DX?interval=1d&range=1d`;
+    const response = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+    });
+    if (!response.ok) {
+      console.error(`Valutaoppslag ${base}NOK feilet: ${response.status}`);
+      return null;
+    }
+    const data = await response.json();
+    const meta = data.chart?.result?.[0]?.meta;
+    const rate = meta?.regularMarketPrice || meta?.previousClose || meta?.chartPreviousClose || null;
+    return rate && rate > 0 ? rate : null;
+  } catch (error) {
+    console.error(`Valutaoppslag ${base}NOK feilet:`, error);
+    return null;
   }
-  return price * rate;
+}
+
+async function getFxToNok(currency: string): Promise<number> {
+  if (currency === "NOK") return 1;
+  const erPence = currency === "GBp" || currency === "GBX";
+  const base = erPence ? "GBP" : currency;
+
+  const now = Date.now();
+  let entry = fxCache.get(base);
+  if (!entry || now - entry.at > FX_TTL_MS) {
+    // Promise caches slik at parallelle kall ikke utløser duplikate oppslag
+    entry = { promise: fetchFxFromYahoo(base), at: now };
+    fxCache.set(base, entry);
+  }
+
+  let rate = await entry.promise;
+  if (!rate) {
+    fxCache.delete(base); // prøv på nytt ved neste kall
+    rate = FX_FALLBACK[base];
+    if (rate === undefined) {
+      console.warn(`Ukjent valuta "${currency}" — bruker kurs 1:1 mot NOK. Legg den til i FX_FALLBACK!`);
+      return 1;
+    }
+    console.warn(`Bruker reservekurs for ${base}NOK: ${rate}`);
+  }
+  return erPence ? rate / 100 : rate;
 }
 
 // Map ticker to Yahoo Finance format
@@ -253,8 +297,9 @@ async function fetchYahooQuote(originalTicker: string): Promise<StockQuote | nul
     const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
     
     const currency = meta.currency || "NOK";
-    const priceInNOK = convertToNOK(price, currency);
-    const changeInNOK = convertToNOK(change, currency);
+    const fxRate = await getFxToNok(currency);
+    const priceInNOK = price * fxRate;
+    const changeInNOK = change * fxRate;
     
     console.log(`${originalTicker}: price=${price} ${currency} -> ${priceInNOK} NOK`);
 
