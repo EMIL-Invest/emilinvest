@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { TrendingUp, Landmark } from "lucide-react";
 import {
   ComposedChart,
   Area,
@@ -167,28 +166,39 @@ const PerformanceSection = () => {
           </p>
         </div>
 
-        <div
-          className="rounded-md border border-border bg-card p-6 md:p-9"
-          style={{ boxShadow: "var(--shadow-soft)" }}
-        >
-          {/* Topp: tittel + periodevalg */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <div>
-              <h3 className="font-serif text-2xl md:text-3xl text-foreground">Avkastning</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Utvikling i portefølje sammenlignet med OSEBX
-              </p>
+        {/* Ingen kortramme - nøkkeltall, periodevalg og graf rett på flaten */}
+        <div>
+          {/* Topp: nøkkeltall til venstre, periodevalg som faner til høyre */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-8 border-b border-border pb-6">
+            <div className="flex gap-10">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1">
+                  EMIL Invest
+                </p>
+                <p className={`font-serif text-3xl md:text-4xl tabular-nums ${returns.portfolio >= 0 ? "stock-positive" : "stock-negative"}`}>
+                  {returns.portfolio >= 0 ? "+" : ""}{returns.portfolio.toFixed(2)} %
+                </p>
+              </div>
+              <div className="border-l border-border pl-10">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1">
+                  OSEBX
+                </p>
+                <p className={`font-serif text-3xl md:text-4xl tabular-nums ${returns.osebx >= 0 ? "stock-positive" : "stock-negative"}`}>
+                  {returns.osebx >= 0 ? "+" : ""}{returns.osebx.toFixed(2)} %
+                </p>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-1">
               {filters.map((filter) => (
                 <button
                   key={filter.key}
                   onClick={() => setTimeFilter(filter.key)}
-                  className={`px-4 py-2 rounded-[4px] text-sm font-medium border transition-colors ${
+                  className={`px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${
                     timeFilter === filter.key
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "border-border bg-background text-foreground hover:bg-secondary/60"
+                      ? "text-foreground border-competition"
+                      : "text-muted-foreground border-transparent hover:text-foreground"
                   }`}
+                  style={timeFilter === filter.key ? { borderColor: "hsl(var(--competition))" } : undefined}
                 >
                   {filter.label}
                 </button>
@@ -209,38 +219,6 @@ const PerformanceSection = () => {
             </div>
           ) : (
             <>
-              {/* Nøkkeltall-kort */}
-              <div className="grid sm:grid-cols-2 gap-4 mb-8">
-                <div className="flex items-center gap-4 p-5 rounded-md border border-border bg-background">
-                  <div className="w-12 h-12 rounded-[4px] bg-primary flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">EMIL Invest</p>
-                    <p className={`text-2xl font-serif font-bold tabular-nums ${returns.portfolio >= 0 ? "stock-positive" : "stock-negative"}`}>
-                      {returns.portfolio >= 0 ? "+" : ""}{returns.portfolio.toFixed(2)} %
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Avkastning ({filters.find((f) => f.key === timeFilter)?.label})
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 p-5 rounded-md border border-border bg-background">
-                  <div className="w-12 h-12 rounded-[4px] border border-foreground/25 bg-secondary/50 flex items-center justify-center flex-shrink-0">
-                    <Landmark className="w-5 h-5 text-foreground/70" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">OSEBX</p>
-                    <p className={`text-2xl font-serif font-bold tabular-nums ${returns.osebx >= 0 ? "stock-positive" : "stock-negative"}`}>
-                      {returns.osebx >= 0 ? "+" : ""}{returns.osebx.toFixed(2)} %
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Avkastning ({filters.find((f) => f.key === timeFilter)?.label})
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               {/* Graf: EMIL som fylt areal, OSEBX som stiplet linje */}
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">

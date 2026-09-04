@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { TrendingUp, Coins, Users } from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -90,39 +91,44 @@ export const AllocationSection = ({
   ];
 
   const facts = [
-    { label: "Aksjer", value: `${stockShare.toFixed(1).replace(".", ",")} %` },
-    { label: "Fond og bank", value: `${(100 - stockShare).toFixed(1).replace(".", ",")} %` },
-    { label: "Posisjoner", value: String(slices.length) },
+    { Ikon: TrendingUp, label: "Aksjer", value: `${stockShare.toFixed(1).replace(".", ",")} %` },
+    { Ikon: Coins, label: "Fond og bank", value: `${(100 - stockShare).toFixed(1).replace(".", ",")} %` },
+    { Ikon: Users, label: "Posisjoner", value: String(slices.length) },
   ];
 
   return (
     <div className="section-container pb-16">
-      <div
-        className="rounded-md border border-border bg-card"
-        style={{ boxShadow: "var(--shadow-soft)" }}
-      >
-        <div className="grid lg:grid-cols-[1fr_1.6fr]">
-          {/* Venstre: fakta */}
-          <div className="p-8 md:p-10 border-b lg:border-b-0 lg:border-r border-border">
+      {/* Ingen kortramme - fakta til venstre, smultring til høyre,
+          skilt av en tynn delelinje. */}
+      <div className="grid lg:grid-cols-[1fr_1.6fr]">
+          {/* Venstre: fakta med ikoner */}
+          <div className="pb-10 mb-10 border-b lg:pb-0 lg:mb-0 lg:border-b-0 lg:border-r border-border lg:pr-12">
             <p className="eyebrow mb-3">Porteføljefakta</p>
-            <p className="text-sm text-muted-foreground mb-8">
+            <p className="text-sm text-muted-foreground mb-10">
               Fordelingen mellom aksjer, fond og bankinnskudd - live.
             </p>
-            {facts.map((fact, i) => (
-              <div key={fact.label} className={i > 0 ? "pt-6 mt-6 border-t border-border" : ""}>
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
-                  {fact.label}
-                </p>
-                <p className="font-serif text-3xl md:text-4xl text-foreground tabular-nums">
-                  {fact.value}
-                </p>
-              </div>
-            ))}
+            <div className="space-y-9">
+              {facts.map((fact) => (
+                <div key={fact.label} className="flex items-center gap-5">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <fact.Ikon className="w-6 h-6 text-primary" strokeWidth={1.6} />
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
+                      {fact.label}
+                    </p>
+                    <p className="font-serif text-3xl md:text-4xl text-foreground tabular-nums leading-none">
+                      {fact.value}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Høyre: smultring + brikker */}
-          <div className="p-8 md:p-10">
-            <div className="relative h-72 md:h-80">
+          {/* Høyre: smultring + posisjonsliste */}
+          <div className="lg:pl-12">
+            <div className="relative h-80 md:h-96">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -178,18 +184,12 @@ export const AllocationSection = ({
               </div>
             </div>
 
-            {/* Posisjonsbrikker */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 mt-8">
+            {/* Posisjonsliste - rene rader med delelinje, ingen brikker */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 mt-8">
               {slices.map((slice, i) => {
-                const klasser = `flex items-center justify-between gap-2 rounded-[4px] border bg-background px-3 py-2 transition-all duration-200 ${
-                  slice.lenke ? "cursor-pointer hover:border-foreground/40" : "cursor-default"
-                } ${
-                  activeIndex === i
-                    ? "border-foreground/40 shadow-sm"
-                    : activeIndex !== null
-                    ? "border-border opacity-45"
-                    : "border-border"
-                }`;
+                const klasser = `flex items-center justify-between gap-2 border-b border-border py-2.5 transition-opacity duration-200 ${
+                  slice.lenke ? "cursor-pointer hover:opacity-70" : "cursor-default"
+                } ${activeIndex !== null && activeIndex !== i ? "opacity-40" : ""}`;
                 const pek = {
                   onMouseEnter: () => setActiveIndex(i),
                   onMouseLeave: () => setActiveIndex(null),
@@ -201,9 +201,9 @@ export const AllocationSection = ({
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ background: slice.color }}
                     />
-                    <span className="text-xs font-medium text-foreground truncate">{slice.ticker}</span>
+                    <span className="text-sm font-medium text-foreground truncate">{slice.ticker}</span>
                   </span>
-                  <span className="text-xs text-muted-foreground tabular-nums">
+                  <span className="text-sm text-muted-foreground tabular-nums">
                     {slice.share.toFixed(1).replace(".", ",")} %
                   </span>
                   </>
@@ -221,7 +221,6 @@ export const AllocationSection = ({
               })}
             </div>
           </div>
-        </div>
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ const PortfolioSection = () => {
 
   if (loading) {
     return (
-      <section id="portfolio" className="py-24 bg-secondary/30">
+      <section id="portfolio" className="py-20 md:py-24 bg-card border-y border-border">
         <div className="section-container">
           <div className="text-center">
             <p className="text-muted-foreground">Laster portefølje...</p>
@@ -43,7 +43,7 @@ const PortfolioSection = () => {
   }
 
   return (
-    <section id="portfolio" className="py-24 bg-secondary/30">
+    <section id="portfolio" className="py-20 md:py-24 bg-card border-y border-border">
       <div className="section-container">
         <div className="text-center mb-16">
           <p className="eyebrow mb-5">Portefølje</p>
