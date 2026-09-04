@@ -1,21 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Coins, TrendingUp, Gift, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToppliste } from "@/hooks/useToppliste";
 import { HovedpremieBilder, SitGavekort, FOTOKREDITT } from "@/components/competition/Premier";
 
 /**
- * Konkurranseseksjonen på forsiden — det mørkegrønne feltet med gull.
- * Topplisten er ekte: samme tall og samme kvalifiseringskrav som
- * ledertavlen på /konkurranse, hentet med useToppliste.
+ * Konkurransen på forsiden — tre seksjoner kant til kant, ingen bokser
+ * i bokser:
+ *   1) Mørkegrønt felt med invitasjonen og live-topplisten
+ *   2) Lyst faktabånd (startkapital, live kurser, premie, gratis)
+ *   3) Lys premieseksjon (hovedpremien med bilder + månedspremien)
+ * Topplisten er ekte: samme tall og kvalifiseringskrav som /konkurranse.
  */
 
 const GULL = "hsl(var(--competition))";
 
 const fakta = [
-  { verdi: "100 000 kr", merke: "Startkapital" },
-  { verdi: "Premie", merke: "Hver måned til høyest avkastning" },
-  { verdi: "Gratis", merke: "For alle studenter" },
+  { Ikon: Coins, verdi: "100 000 kr", merke: "Startkapital" },
+  { Ikon: TrendingUp, verdi: "Live kurser", merke: "Fra Oslo Børs" },
+  { Ikon: Gift, verdi: "Premie", merke: "Hver måned" },
+  { Ikon: Users, verdi: "Gratis", merke: "For alle studenter" },
 ];
 
 const prosent = (n: number) =>
@@ -29,19 +33,11 @@ const CompetitionBanner = () => {
   const maks = Math.max(...topp.map((t) => t.avkastning), 0);
 
   return (
-    <section className="py-16 md:py-24">
-      <div className="section-container">
-        <div
-          className="rounded-md overflow-hidden"
-          style={{
-            background: "hsl(var(--band))",
-            boxShadow: "0 18px 50px -24px hsl(var(--band) / 0.9)",
-          }}
-        >
-          {/* Gullstripen øverst */}
-          <div className="h-1 w-full" style={{ background: GULL }} />
-
-          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center p-8 md:p-12 lg:p-16">
+    <>
+      {/* ============ 1) Mørkegrønt felt — kant til kant ============ */}
+      <section style={{ background: "hsl(var(--band))" }}>
+        <div className="section-container py-16 md:py-24">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
             {/* Venstre: invitasjonen */}
             <div>
               <span
@@ -90,32 +86,9 @@ const CompetitionBanner = () => {
                   Les reglene
                 </Link>
               </div>
-
-              {/* Nøkkeltall */}
-              <div
-                className="mt-10 pt-8 grid grid-cols-3 gap-4 sm:gap-6"
-                style={{ borderTop: "1px solid hsl(var(--primary-foreground) / 0.15)" }}
-              >
-                {fakta.map((f) => (
-                  <div key={f.merke}>
-                    <p
-                      className="font-serif text-lg sm:text-2xl md:text-[1.75rem] leading-none mb-2"
-                      style={{ color: "hsl(var(--primary-foreground))" }}
-                    >
-                      {f.verdi}
-                    </p>
-                    <p
-                      className="text-[0.68rem] uppercase tracking-[0.14em] leading-snug"
-                      style={{ color: "hsl(var(--primary-foreground) / 0.55)" }}
-                    >
-                      {f.merke}
-                    </p>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            {/* Høyre: topplistekortet */}
+            {/* Høyre: topplistekortet — det ene hvite kortet gir kontrast */}
             <div className="rounded-md bg-card p-6 md:p-8" style={{ boxShadow: "var(--shadow-soft)" }}>
               <div className="flex items-baseline justify-between gap-4">
                 <h3 className="font-serif text-xl md:text-2xl text-foreground">
@@ -151,9 +124,7 @@ const CompetitionBanner = () => {
                   {topp.map((t, i) => (
                     <li
                       key={t.id}
-                      className={`flex items-center gap-4 px-3 py-3.5 rounded-[4px] ${
-                        i === 0 ? "" : ""
-                      }`}
+                      className="flex items-center gap-4 px-3 py-3.5 rounded-[4px]"
                       style={i === 0 ? { background: "hsl(var(--competition) / 0.1)" } : undefined}
                     >
                       <span
@@ -204,56 +175,70 @@ const CompetitionBanner = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Premiene — bilder fremfor tekst. På PC side om side,
-              på mobil hovedpremien øverst og månedspremien under. */}
-          <div
-            className="px-8 md:px-12 lg:px-16 pb-8 md:pb-12"
-            style={{ borderTop: "1px solid hsl(var(--primary-foreground) / 0.12)" }}
-          >
-            <div className="grid lg:grid-cols-[2fr_1fr] gap-8 lg:gap-12 pt-8">
-              {/* Hovedpremien */}
-              <div>
-                <p
-                  className="text-[0.68rem] uppercase tracking-[0.18em] font-medium mb-3"
-                  style={{ color: GULL }}
-                >
-                  Hovedpremie 1. juni — vinneren velger én av tre
-                </p>
-                <HovedpremieBilder moerk />
-              </div>
-
-              {/* Månedspremien */}
-              <div>
-                <p
-                  className="text-[0.68rem] uppercase tracking-[0.18em] font-medium mb-3"
-                  style={{ color: GULL }}
-                >
-                  Månedspremie
-                </p>
-                <div className="flex items-center gap-4">
-                  <SitGavekort className="w-28 sm:w-32 flex-shrink-0 drop-shadow-md" />
-                  <div className="text-sm leading-snug">
-                    <p className="font-medium" style={{ color: "hsl(var(--primary-foreground))" }}>
-                      Sit-gavekort · 150 kr
-                    </p>
-                    <p style={{ color: "hsl(var(--primary-foreground) / 0.6)" }}>
-                      til månedens beste avkastning
-                    </p>
-                  </div>
+      {/* ============ 2) Faktabåndet — lyst, kant til kant ============ */}
+      <section className="bg-card border-b border-border">
+        <div className="section-container py-7 md:py-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
+            {fakta.map((f) => (
+              <div key={f.merke} className="flex items-center gap-3.5">
+                <f.Ikon className="w-6 h-6 flex-shrink-0 text-foreground/60" strokeWidth={1.5} />
+                <div>
+                  <p className="font-serif text-lg md:text-xl leading-none text-foreground">
+                    {f.verdi}
+                  </p>
+                  <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground mt-1">
+                    {f.merke}
+                  </p>
                 </div>
               </div>
-            </div>
-            <p
-              className="text-[10px] leading-snug mt-4"
-              style={{ color: "hsl(var(--primary-foreground) / 0.35)" }}
-            >
-              {FOTOKREDITT}
-            </p>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* ============ 3) Premiene — lys seksjon, kant til kant ============ */}
+      <section className="py-16 md:py-20">
+        <div className="section-container">
+          <div className="grid lg:grid-cols-[2fr_1fr] gap-12 lg:gap-16">
+            {/* Hovedpremien */}
+            <div>
+              <p className="text-xs uppercase tracking-[0.22em] font-medium mb-3" style={{ color: GULL }}>
+                Hovedpremie 1. juni
+              </p>
+              <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-7">
+                Vinneren velger én av tre
+              </h2>
+              <HovedpremieBilder variant="kontrast" />
+            </div>
+
+            {/* Månedspremien */}
+            <div className="lg:border-l lg:border-border lg:pl-12">
+              <p className="text-xs uppercase tracking-[0.22em] font-medium mb-3" style={{ color: GULL }}>
+                Månedspremie
+              </p>
+              <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-7">
+                Sit-gavekort
+              </h2>
+              <SitGavekort className="w-40 drop-shadow-md" />
+              <p className="text-sm text-muted-foreground leading-relaxed mt-5 max-w-xs">
+                150 kr til månedens beste avkastning — hver eneste måned.
+              </p>
+              <Link
+                to="/konkurranse"
+                className="inline-flex items-center gap-2 text-sm font-medium mt-6 hover:underline underline-offset-4 text-foreground group"
+              >
+                Se alle premier
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+          <p className="text-[10px] text-muted-foreground/60 leading-snug mt-6">{FOTOKREDITT}</p>
+        </div>
+      </section>
+    </>
   );
 };
 

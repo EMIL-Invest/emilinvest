@@ -37,15 +37,11 @@ const AboutSection = () => {
             </p>
           </div>
 
-          {/* Høyre: prinsippene som rolig liste.
-              Rene tekstrader — ingen pil, ingen hover-effekt. Radene lenker
-              ikke noe sted, så de skal heller ikke se klikkbare ut. */}
-          <div
-            className="rounded-md border border-border bg-card divide-y divide-border"
-            style={{ boxShadow: "var(--shadow-soft)" }}
-          >
+          {/* Høyre: prinsippene som rolig liste — rene tekstrader med
+              delelinjer, ingen kortramme (mindre «boks i boks»). */}
+          <div className="divide-y divide-border border-y border-border">
             {philosophy.map((item) => (
-              <div key={item.title} className="flex items-center gap-5 p-6 md:p-7">
+              <div key={item.title} className="flex items-center gap-5 py-6 md:py-7">
                 <div className="w-12 h-12 rounded-full border border-foreground/20 flex items-center justify-center flex-shrink-0">
                   <item.icon className="w-5 h-5 text-foreground/70" />
                 </div>

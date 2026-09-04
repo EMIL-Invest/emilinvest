@@ -83,42 +83,62 @@ export const SitGavekort = ({ className }: { className?: string }) => (
 );
 
 /**
- * De tre hovedpremiene som bildekort.
- * moerk = true gir hvit tekst uten kortbakgrunn (til det mørke
- * konkurransefeltet på forsiden).
+ * De tre hovedpremiene som bildekort. Tre varianter:
+ *   "lys"      — kort med ramme på lys bakgrunn (dialogen)
+ *   "moerk"    — hvit tekst uten kortbakgrunn (mørke flater)
+ *   "kontrast" — bilde med mørkegrønn tekstfot (premieseksjonen på
+ *                forsiden; footeren gir kontrast uten kortramme)
  */
-export const HovedpremieBilder = ({ moerk = false }: { moerk?: boolean }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-    {HOVEDPREMIER.map((p) => (
-      <div
-        key={p.tittel}
-        className={
-          moerk
-            ? "rounded-md overflow-hidden"
-            : "rounded-md border border-border bg-secondary/40 overflow-hidden"
-        }
-        style={moerk ? { background: "hsl(var(--primary-foreground) / 0.06)" } : undefined}
-      >
-        <img src={p.bilde} alt={p.alt} className="w-full aspect-[16/10] object-cover" />
-        <div className="p-2.5 text-sm">
-          <p
-            className={`font-medium leading-snug flex items-center gap-1.5 ${moerk ? "" : "text-foreground"}`}
-            style={moerk ? { color: "hsl(var(--primary-foreground))" } : undefined}
+export const HovedpremieBilder = ({
+  moerk = false,
+  variant,
+}: {
+  moerk?: boolean;
+  variant?: "lys" | "moerk" | "kontrast";
+}) => {
+  const stil = variant || (moerk ? "moerk" : "lys");
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {HOVEDPREMIER.map((p) => (
+        <div
+          key={p.tittel}
+          className={
+            stil === "lys"
+              ? "rounded-md border border-border bg-secondary/40 overflow-hidden"
+              : "rounded-md overflow-hidden"
+          }
+          style={
+            stil === "moerk"
+              ? { background: "hsl(var(--primary-foreground) / 0.06)" }
+              : undefined
+          }
+        >
+          <img src={p.bilde} alt={p.alt} className="w-full aspect-[16/10] object-cover" />
+          <div
+            className={`text-sm ${stil === "kontrast" ? "p-3.5" : "p-2.5"}`}
+            style={stil === "kontrast" ? { background: "hsl(var(--band))" } : undefined}
           >
-            <p.Ikon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GULL }} />
-            {p.tittel}
-          </p>
-          <p
-            className={`text-xs mt-0.5 ${moerk ? "" : "text-muted-foreground"}`}
-            style={moerk ? { color: "hsl(var(--primary-foreground) / 0.6)" } : undefined}
-          >
-            {p.under}
-          </p>
+            <p
+              className={`font-medium leading-snug flex items-center gap-1.5 ${
+                stil === "lys" ? "text-foreground" : ""
+              }`}
+              style={stil !== "lys" ? { color: "hsl(var(--primary-foreground))" } : undefined}
+            >
+              <p.Ikon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GULL }} />
+              {p.tittel}
+            </p>
+            <p
+              className={`text-xs mt-0.5 ${stil === "lys" ? "text-muted-foreground" : ""}`}
+              style={stil !== "lys" ? { color: "hsl(var(--primary-foreground) / 0.6)" } : undefined}
+            >
+              {p.under}
+            </p>
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-);
+      ))}
+    </div>
+  );
+};
 
 /**
  * Gullknappen «Premie» på konkurransesiden — alt premieinnholdet i en
