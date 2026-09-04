@@ -9,7 +9,7 @@ const Footer = () => {
           <div className="flex flex-col items-center md:items-start gap-3">
             <BrandLogo variant="icon" tone="white" size="md" />
             <p className="text-sm text-primary-foreground/70 max-w-xs text-center md:text-left">
-              Investeringskomiteen i EMIL — Energi- og miljøingeniørenes
+              Investeringskomiteen i EMIL - Energi- og miljøingeniørenes
               linjeforening, NTNU.
             </p>
             {/* Kontaktpunkt. Samme adresse som i personvernerklæringen. */}

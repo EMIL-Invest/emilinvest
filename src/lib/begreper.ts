@@ -1,5 +1,5 @@
 /**
- * Begrepsbanken bak /spill — snu-kortene.
+ * Begrepsbanken bak /spill - snu-kortene.
  *
  * Forsiden er begrepet, baksiden forklaringen. Nivået er nybegynner til
  * middels: en fersk student skal kunne lese en kvartalsrapport eller en
@@ -43,7 +43,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Aksje",
     forklaring:
-      "En eierandel i et selskap. Eier du én av hundre aksjer, eier du én prosent av selskapet — og har krav på din del av verdiene og et eventuelt utbytte.",
+      "En eierandel i et selskap. Eier du én av hundre aksjer, eier du én prosent av selskapet - og har krav på din del av verdiene og et eventuelt utbytte.",
     kategori: "Aksjer og børs",
   },
   {
@@ -85,7 +85,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Emisjon",
     forklaring:
-      "Selskapet utsteder nye aksjer for å hente inn penger. Eksisterende eiere blir utvannet — de eier en mindre andel etterpå, med mindre de deltar.",
+      "Selskapet utsteder nye aksjer for å hente inn penger. Eksisterende eiere blir utvannet - de eier en mindre andel etterpå, med mindre de deltar.",
     kategori: "Aksjer og børs",
   },
   {
@@ -97,7 +97,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Aksjesplitt",
     forklaring:
-      "Hver aksje deles i flere, og kursen deles tilsvarende. Verdien av beholdningen din er uendret — den blir bare stykket opp i mindre biter.",
+      "Hver aksje deles i flere, og kursen deles tilsvarende. Verdien av beholdningen din er uendret - den blir bare stykket opp i mindre biter.",
     kategori: "Aksjer og børs",
   },
   {
@@ -115,7 +115,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Ex-dato",
     forklaring:
-      "Første dag aksjen handles uten rett til det neste utbyttet. Kjøper du på ex-datoen, får selgeren utbyttet — og kursen faller typisk tilsvarende.",
+      "Første dag aksjen handles uten rett til det neste utbyttet. Kjøper du på ex-datoen, får selgeren utbyttet - og kursen faller typisk tilsvarende.",
     kategori: "Aksjer og børs",
   },
   {
@@ -187,7 +187,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "OSEBX",
     forklaring:
-      "Hovedindeksen på Oslo Børs — et utvalg av de mest omsatte aksjene, brukt som målestokk for hvordan det norske aksjemarkedet går.",
+      "Hovedindeksen på Oslo Børs - et utvalg av de mest omsatte aksjene, brukt som målestokk for hvordan det norske aksjemarkedet går.",
     kategori: "Aksjer og børs",
   },
 
@@ -195,7 +195,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "P/E",
     forklaring:
-      "Kurs delt på fortjeneste per aksje. Sier hvor mange års overskudd du betaler for aksjen — P/E 15 betyr at prisen er 15 ganger fjorårets fortjeneste.",
+      "Kurs delt på fortjeneste per aksje. Sier hvor mange års overskudd du betaler for aksjen - P/E 15 betyr at prisen er 15 ganger fjorårets fortjeneste.",
     kategori: "Nøkkeltall",
   },
   {
@@ -213,7 +213,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "EPS",
     forklaring:
-      "Earnings per share — fortjeneste per aksje. Resultatet etter skatt delt på antall aksjer.",
+      "Earnings per share - fortjeneste per aksje. Resultatet etter skatt delt på antall aksjer.",
     kategori: "Nøkkeltall",
   },
   {
@@ -261,7 +261,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "ROIC",
     forklaring:
-      "Avkastning på investert kapital — overskuddet målt mot all kapital som er satt i arbeid, både egenkapital og gjeld.",
+      "Avkastning på investert kapital - overskuddet målt mot all kapital som er satt i arbeid, både egenkapital og gjeld.",
     kategori: "Nøkkeltall",
   },
   {
@@ -329,7 +329,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Bunnlinje",
     forklaring:
-      "Resultatet etter skatt — det som faktisk er igjen til eierne når absolutt alt er betalt.",
+      "Resultatet etter skatt - det som faktisk er igjen til eierne når absolutt alt er betalt.",
     kategori: "Regnskap",
   },
   {
@@ -353,7 +353,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Egenkapital",
     forklaring:
-      "Eiendeler minus gjeld — den delen av selskapet som tilhører eierne.",
+      "Eiendeler minus gjeld - den delen av selskapet som tilhører eierne.",
     kategori: "Regnskap",
   },
   {
@@ -371,7 +371,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Arbeidskapital",
     forklaring:
-      "Omløpsmidler minus kortsiktig gjeld — pengene som er bundet opp i varelager og kundefordringer for å drive den daglige virksomheten.",
+      "Omløpsmidler minus kortsiktig gjeld - pengene som er bundet opp i varelager og kundefordringer for å drive den daglige virksomheten.",
     kategori: "Regnskap",
   },
   {
@@ -389,7 +389,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Goodwill",
     forklaring:
-      "Det et selskap betalte utover de identifiserbare verdiene ved et oppkjøp — merkevare, kunderelasjoner, forventninger. Må testes for nedskrivning.",
+      "Det et selskap betalte utover de identifiserbare verdiene ved et oppkjøp - merkevare, kunderelasjoner, forventninger. Må testes for nedskrivning.",
     kategori: "Regnskap",
   },
   {
@@ -439,13 +439,13 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Bid",
     forklaring:
-      "Høyeste pris noen er villig til å betale for aksjen akkurat nå — kursen du får hvis du selger umiddelbart.",
+      "Høyeste pris noen er villig til å betale for aksjen akkurat nå - kursen du får hvis du selger umiddelbart.",
     kategori: "Handel",
   },
   {
     ord: "Ask",
     forklaring:
-      "Laveste pris noen er villig til å selge aksjen for akkurat nå — kursen du betaler hvis du kjøper umiddelbart.",
+      "Laveste pris noen er villig til å selge aksjen for akkurat nå - kursen du betaler hvis du kjøper umiddelbart.",
     kategori: "Handel",
   },
   {
@@ -499,13 +499,13 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Shorting",
     forklaring:
-      "Å låne aksjer, selge dem, og satse på å kjøpe dem tilbake billigere. Tjener penger når kursen faller — og har i teorien ubegrenset tapspotensial.",
+      "Å låne aksjer, selge dem, og satse på å kjøpe dem tilbake billigere. Tjener penger når kursen faller - og har i teorien ubegrenset tapspotensial.",
     kategori: "Handel",
   },
   {
     ord: "Belåning",
     forklaring:
-      "Å investere for lånte penger. Gir større gevinst når det går bra og større tap når det går galt — også kalt giring.",
+      "Å investere for lånte penger. Gir større gevinst når det går bra og større tap når det går galt - også kalt giring.",
     kategori: "Handel",
   },
   {
@@ -535,7 +535,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "ETF",
     forklaring:
-      "Exchange Traded Fund — et fond som handles på børsen som en aksje. De fleste følger en indeks og har lave kostnader.",
+      "Exchange Traded Fund - et fond som handles på børsen som en aksje. De fleste følger en indeks og har lave kostnader.",
     kategori: "Handel",
   },
   {
@@ -561,7 +561,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Korreksjon",
     forklaring:
-      "Et kursfall på rundt ti prosent fra toppen. Ubehagelig, men normalt — det skjer omtrent årlig.",
+      "Et kursfall på rundt ti prosent fra toppen. Ubehagelig, men normalt - det skjer omtrent årlig.",
     kategori: "Marked og risiko",
   },
   {
@@ -585,7 +585,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Systematisk risiko",
     forklaring:
-      "Risiko som rammer hele markedet — renter, krig, resesjon. Den kan du ikke diversifisere deg bort fra.",
+      "Risiko som rammer hele markedet - renter, krig, resesjon. Den kan du ikke diversifisere deg bort fra.",
     kategori: "Marked og risiko",
   },
   {
@@ -609,7 +609,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Inflasjon",
     forklaring:
-      "Generell prisvekst. At pengene dine kjøper litt mindre for hvert år — og grunnen til at penger under madrassen taper verdi.",
+      "Generell prisvekst. At pengene dine kjøper litt mindre for hvert år - og grunnen til at penger under madrassen taper verdi.",
     kategori: "Marked og risiko",
   },
   {
@@ -627,7 +627,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Syklisk selskap",
     forklaring:
-      "Et selskap hvis inntjening svinger med konjunkturene — shipping, bygg og råvarer. Motsatt av defensive selskaper som mat og strøm.",
+      "Et selskap hvis inntjening svinger med konjunkturene - shipping, bygg og råvarer. Motsatt av defensive selskaper som mat og strøm.",
     kategori: "Marked og risiko",
   },
   {
@@ -745,7 +745,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Fundamental analyse",
     forklaring:
-      "Å vurdere selskapet selv — regnskap, marked, ledelse og konkurranse — for å anslå hva det er verdt.",
+      "Å vurdere selskapet selv - regnskap, marked, ledelse og konkurranse - for å anslå hva det er verdt.",
     kategori: "Analyse og verdsettelse",
   },
   {
@@ -769,7 +769,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Terminalverdi",
     forklaring:
-      "Verdien av alt som skjer etter den perioden du har regnet på i detalj. Utgjør ofte mesteparten av svaret i en DCF — og er det mest usikre leddet.",
+      "Verdien av alt som skjer etter den perioden du har regnet på i detalj. Utgjør ofte mesteparten av svaret i en DCF - og er det mest usikre leddet.",
     kategori: "Analyse og verdsettelse",
   },
   {
@@ -823,7 +823,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Due diligence",
     forklaring:
-      "Den grundige gjennomgangen av et selskap før man investerer eller kjøper det — tall, kontrakter, juss og risiko.",
+      "Den grundige gjennomgangen av et selskap før man investerer eller kjøper det - tall, kontrakter, juss og risiko.",
     kategori: "Analyse og verdsettelse",
   },
   {
@@ -843,7 +843,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "LLM",
     forklaring:
-      "Large language model — en språkmodell trent på enorme mengder tekst, som svarer ved å forutsi hva som er den mest sannsynlige fortsettelsen.",
+      "Large language model - en språkmodell trent på enorme mengder tekst, som svarer ved å forutsi hva som er den mest sannsynlige fortsettelsen.",
     kategori: "Kunstig intelligens",
   },
   {
@@ -855,7 +855,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "Token",
     forklaring:
-      "Tekstbiten en språkmodell regner på — ofte et ord eller en orddel. Både lengde og pris måles i tokens.",
+      "Tekstbiten en språkmodell regner på - ofte et ord eller en orddel. Både lengde og pris måles i tokens.",
     kategori: "Kunstig intelligens",
   },
   {
@@ -867,7 +867,7 @@ export const BEGREPER: Begrep[] = [
   {
     ord: "MCP",
     forklaring:
-      "Model Context Protocol — en åpen standard for å koble KI-modeller til verktøy og datakilder, slik at de kan hente informasjon og utføre handlinger.",
+      "Model Context Protocol - en åpen standard for å koble KI-modeller til verktøy og datakilder, slik at de kan hente informasjon og utføre handlinger.",
     kategori: "Kunstig intelligens",
   },
   {

@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* Krem + dyp grønn — hentet fra EI-logoen. Rolig, redaksjonelt uttrykk. */
+    /* Krem + dyp grønn - hentet fra EI-logoen. Rolig, redaksjonelt uttrykk. */
     --background: 40 21% 95%;
     --foreground: 156 18% 13%;
 
@@ -16,7 +16,7 @@
     --popover: 40 30% 97%;
     --popover-foreground: 156 18% 13%;
 
-    /* Dyp skogsgrønn — primærfargen */
+    /* Dyp skogsgrønn - primærfargen */
     --primary: 155 15% 19%;
     --primary-foreground: 40 25% 96%;
 
@@ -56,7 +56,7 @@
     --stock-negative: 0 72% 51%;
     --stock-neutral: 200 65% 45%;
 
-    /* Konkurransefarge — varm gull/rav som skiller seg fra resten av paletten
+    /* Konkurransefarge - varm gull/rav som skiller seg fra resten av paletten
        og gir premie-/konkurransefølelse. Mørk tekst for god kontrast. */
     --competition: 38 92% 48%;
     --competition-foreground: 156 18% 13%;
@@ -130,7 +130,7 @@
     font-family: 'Playfair Display', serif;
   }
 
-  /* Tynnere ikonstrek overalt — hever kvalitetsinntrykket */
+  /* Tynnere ikonstrek overalt - hever kvalitetsinntrykket */
   .lucide {
     stroke-width: 1.5px;
   }
@@ -148,13 +148,13 @@
     background-clip: text;
   }
 
-  /* Flat, rolig kortstil — tynn strek og myk skygge i stedet for glass-effekt */
+  /* Flat, rolig kortstil - tynn strek og myk skygge i stedet for glass-effekt */
   .glass-card {
     @apply bg-card border border-border;
     box-shadow: var(--shadow-soft);
   }
 
-  /* Liten overlinje i versaler — brukes over alle seksjonstitler */
+  /* Liten overlinje i versaler - brukes over alle seksjonstitler */
   .eyebrow {
     @apply text-xs md:text-sm uppercase tracking-[0.22em] text-muted-foreground font-medium;
   }

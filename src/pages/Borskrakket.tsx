@@ -24,13 +24,13 @@ import {
 import { lagreResultat } from "@/lib/invest-game/ledertavle";
 
 /**
- * Børskrakket — tominutterskonkurransen.
+ * Børskrakket - tominutterskonkurransen.
  *
  * Én sentral spillklokke styrer alt: tSek regnes fra Date.now() minus
  * starttidspunktet, aldri fra antall renders eller intervall-ticks.
  * Kursene, nedtellingen og nyhetene er alle rene funksjoner av tSek, så
  * en hakkete nettleser eller en fane som mister fokus forskyver
- * ingenting — neste render lander bare på riktig sted på tidslinjen.
+ * ingenting - neste render lander bare på riktig sted på tidslinjen.
  */
 
 type Fase = "intro" | "spill" | "resultat";
@@ -57,7 +57,7 @@ const Borskrakket = () => {
   const [lagringOk, setLagringOk] = useState<boolean | null>(null);
   const lagretRef = useRef(false);
 
-  /** Sekunder inn i spillet akkurat nå — den ene kilden til sannhet. */
+  /** Sekunder inn i spillet akkurat nå - den ene kilden til sannhet. */
   const naaTSek = useCallback((): number => {
     if (startetTid === null) return 0;
     const naa = pausetVed ?? Date.now();

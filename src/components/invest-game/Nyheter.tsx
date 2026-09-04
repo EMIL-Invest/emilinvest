@@ -53,7 +53,7 @@ export const NyhetsFeed = ({ nyheter }: { nyheter: Nyhet[] }) => (
     <p className="eyebrow mb-4">Nyheter</p>
     {nyheter.length === 0 ? (
       <p className="text-sm text-muted-foreground leading-relaxed">
-        Ingen nyheter ennå. Følg med — de forteller hvor markedet er på vei.
+        Ingen nyheter ennå. Følg med - de forteller hvor markedet er på vei.
       </p>
     ) : (
       <ol className="space-y-4">

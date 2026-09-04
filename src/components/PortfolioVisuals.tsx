@@ -17,7 +17,7 @@ import type { Holding, StockQuote } from "@/hooks/usePortfolioData";
 /**
  * Visualiseringer for porteføljesiden: fordeling (smultring + fakta +
  * posisjonsbrikker) og bidrag per posisjon (liggende stolper).
- * Egen palett i grønt og sand — dus og rolig, med gull for kontanter/fond.
+ * Egen palett i grønt og sand - dus og rolig, med gull for kontanter/fond.
  */
 
 export interface StockRow {
@@ -106,7 +106,7 @@ export const AllocationSection = ({
           <div className="p-8 md:p-10 border-b lg:border-b-0 lg:border-r border-border">
             <p className="eyebrow mb-3">Porteføljefakta</p>
             <p className="text-sm text-muted-foreground mb-8">
-              Fordelingen mellom aksjer, fond og bankinnskudd — live.
+              Fordelingen mellom aksjer, fond og bankinnskudd - live.
             </p>
             {facts.map((fact, i) => (
               <div key={fact.label} className={i > 0 ? "pt-6 mt-6 border-t border-border" : ""}>
@@ -267,7 +267,7 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
           </h2>
           <div className="w-10 h-px bg-foreground/30 mb-6" />
           <p className="text-muted-foreground leading-relaxed">
-            Stolpene viser urealisert gevinst og tap per posisjon — hvem som
+            Stolpene viser urealisert gevinst og tap per posisjon - hvem som
             drar lasset, og hvem som skuffer. Målt fra kursen da komiteen tok
             over porteføljen dette semesteret, samme utgangspunkt som grafen
             lenger ned. Bytt mellom kroner og prosentvis avkastning.

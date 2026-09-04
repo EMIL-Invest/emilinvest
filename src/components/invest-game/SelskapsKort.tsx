@@ -11,7 +11,7 @@ import {
 } from "@/lib/invest-game/motor";
 
 /**
- * Én mini-graf per selskap: opp, ned, hvor kraftig — mer skal den ikke si.
+ * Én mini-graf per selskap: opp, ned, hvor kraftig - mer skal den ikke si.
  * Kursen er en ren funksjon av tiden, så grafen tegnes ved å sample
  * historien fra start til nå. Ingen historikk å vedlikeholde.
  */

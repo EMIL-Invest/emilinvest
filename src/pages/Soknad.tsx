@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { FRIST, EPOST, MAILTO } from "@/lib/opptak";
 
 /**
- * Søknadssiden — hit kommer man fra opptaksboksen på forsiden.
+ * Søknadssiden - hit kommer man fra opptaksboksen på forsiden.
  *
  * Tonen er bevisst lav terskel: den som leser dette lurer på om hun er
  * «flink nok» til å søke, og svaret skal komme før alt annet. Frist og
@@ -18,7 +18,7 @@ const PUNKTER = [
     ikon: GraduationCap,
     tittel: "Du trenger ingen forkunnskaper",
     tekst:
-      "Vi forventer ikke at du kan noe om aksjer fra før — de fleste av oss kunne lite da vi begynte. Har du likevel noe med deg, enten det er fag i finans, egen sparing eller bare at du følger markedet, er det hyggelig å høre om i e-posten. Men det er ingen forutsetning.",
+      "Vi forventer ikke at du kan noe om aksjer fra før - de fleste av oss kunne lite da vi begynte. Har du likevel noe med deg, enten det er fag i finans, egen sparing eller bare at du følger markedet, er det hyggelig å høre om i e-posten. Men det er ingen forutsetning.",
   },
   {
     ikon: Heart,
@@ -36,7 +36,7 @@ const PUNKTER = [
     ikon: Briefcase,
     tittel: "Ekte penger og ekte erfaring",
     tekst:
-      "Som medlem er du med på å forvalte linjeforeningens midler — du analyserer selskaper, pitcher ideer og er med på beslutningene. Det er lærerikt i seg selv, og det er erfaring næringslivet faktisk bryr seg om når du søker jobb eller sommerjobb.",
+      "Som medlem er du med på å forvalte linjeforeningens midler - du analyserer selskaper, pitcher ideer og er med på beslutningene. Det er lærerikt i seg selv, og det er erfaring næringslivet faktisk bryr seg om når du søker jobb eller sommerjobb.",
   },
 ];
 
@@ -87,7 +87,7 @@ const Soknad = () => {
             ))}
           </div>
 
-          {/* Selve oppskriften — det siste man skal lese før man sender. */}
+          {/* Selve oppskriften - det siste man skal lese før man sender. */}
           <section
             className="rounded-md bg-primary text-primary-foreground p-7 md:p-10"
             style={{ boxShadow: "var(--shadow-card)" }}
@@ -101,7 +101,7 @@ const Soknad = () => {
             <p className="text-primary-foreground/75 leading-relaxed mb-6">
               Skriv noen ord om hvem du er og hvilket studieprogram og trinn du
               går på, hvorfor du har lyst til å være med, og eventuelle
-              forkunnskaper hvis du har noen. Noen få avsnitt er nok — du trenger
+              forkunnskaper hvis du har noen. Noen få avsnitt er nok - du trenger
               verken CV, karakterutskrift eller en formell søknad.
             </p>
 
@@ -115,7 +115,7 @@ const Soknad = () => {
             </a>
 
             <p className="text-sm text-primary-foreground/60 leading-relaxed mt-7 pt-6 border-t border-primary-foreground/20">
-              Lurer du på noe før du søker? Send en e-post til samme adresse —
+              Lurer du på noe før du søker? Send en e-post til samme adresse -
               vi svarer gjerne, og det er ingen spørsmål som er for små.
             </p>
           </section>

@@ -1,12 +1,12 @@
 /**
- * Børskrakket — spillmotoren.
+ * Børskrakket - spillmotoren.
  *
  * Alt her er rene funksjoner uten React og uten klokke: kursen er en
  * funksjon av tidspunktet t (sekunder siden start), og porteføljen er en
  * verdi som transformeres av kjøp og salg. Det gjør to ting mulig:
  *
  *  1. UI-et kan spørre «hva er kursen NÅ» basert på ekte klokketid
- *     (Date.now() minus starttidspunkt) — hakker nettleseren eller mister
+ *     (Date.now() minus starttidspunkt) - hakker nettleseren eller mister
  *     fanen fokus, er markedet fortsatt nøyaktig der det skal være.
  *  2. Motoren kan testes i node uten nettleser.
  */
@@ -30,7 +30,7 @@ import {
 /**
  * Multiplikatoren til en tidslinje ved tid t. Cosinus-glatting mellom
  * punktene gjør at bevegelsene starter og slutter mykt i stedet for i
- * knekk — det ser ut som et marked, ikke som en trapp.
+ * knekk - det ser ut som et marked, ikke som en trapp.
  */
 export const multiplikator = (tidslinje: Punkt[], t: number): number => {
   if (t <= tidslinje[0].t) return tidslinje[0].v;
@@ -52,10 +52,10 @@ export const multiplikator = (tidslinje: Punkt[], t: number): number => {
  * Liten deterministisk «uro» per selskap, maks ±0,5 %. Stor nok til at
  * grafene lever, alt for liten til å endre hvilken strategi som vinner.
  * Deterministisk (ingen Math.random) slik at alle grupper møter nøyaktig
- * samme marked — ellers ville konkurransen ikke vært rettferdig.
+ * samme marked - ellers ville konkurransen ikke vært rettferdig.
  */
 const uro = (selskapIndeks: number, t: number): number => {
-  const fase = selskapIndeks * 2.399; // gyllent vinkelsprang — ulik fase per selskap
+  const fase = selskapIndeks * 2.399; // gyllent vinkelsprang - ulik fase per selskap
   return 0.005 * (0.7 * Math.sin(t / 6.3 + fase) + 0.3 * Math.sin(t / 17 + fase * 2));
 };
 
@@ -115,7 +115,7 @@ export const kjop = (p: Portefolje, selskap: Selskap, belop: number, t: number):
   };
 };
 
-/** Selg en andel (0–1) av beholdningen til gjeldende kurs. */
+/** Selg en andel (0-1) av beholdningen til gjeldende kurs. */
 export const selg = (p: Portefolje, selskap: Selskap, andel: number, t: number): Portefolje => {
   const post = hentPost(p, selskap.id);
   const klippet = Math.min(Math.max(andel, 0), 1);
@@ -160,7 +160,7 @@ export interface Investeringsresultat {
 }
 
 /**
- * Beste og dårligste investering GRUPPEN faktisk gjorde — ikke hvilken
+ * Beste og dårligste investering GRUPPEN faktisk gjorde - ikke hvilken
  * aksje som steg mest på børsen. Måles per selskap som alt de fikk ut
  * (salg + sluttverdi) mot alt de puttet inn.
  */

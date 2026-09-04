@@ -53,7 +53,7 @@ const TeamSection = () => {
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Vi er rundt 15 engasjerte studenter som forvalter linjeforeningens
-            midler sammen — og lærer finans i praksis mens vi gjør det.
+            midler sammen - og lærer finans i praksis mens vi gjør det.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ const TeamSection = () => {
           ))}
         </div>
 
-        {/* Join CTA — det uformelle gruppebildet + blå-grønn gradient fra logoen */}
+        {/* Join CTA - det uformelle gruppebildet + blå-grønn gradient fra logoen */}
         <div
           className="mt-16 rounded-2xl overflow-hidden text-primary-foreground shadow-card"
           style={{ background: "var(--gradient-brand)" }}
@@ -104,7 +104,7 @@ const TeamSection = () => {
             <div className="md:max-h-[420px] overflow-hidden">
               <img
                 src={joinPhoto}
-                alt="EMIL Invest-komiteen — den uformelle varianten"
+                alt="EMIL Invest-komiteen - den uformelle varianten"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -114,7 +114,7 @@ const TeamSection = () => {
               </h3>
               <p className="text-primary-foreground/80 mb-6 max-w-xl mx-auto md:mx-0">
                 Er du student på energi og miljø og nysgjerrig på finans? Vi
-                rekrutterer hver høst — ta kontakt, så forteller vi mer!
+                rekrutterer hver høst - ta kontakt, så forteller vi mer!
               </p>
               <div>
                 <a

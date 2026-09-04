@@ -198,7 +198,7 @@ const PerformanceSection = () => {
 
           {filteredData.length === 0 ? (
             <div className="h-80 flex items-center justify-center">
-              {/* Vises bare når valgt periode ikke har nok datapunkter —
+              {/* Vises bare når valgt periode ikke har nok datapunkter -
                   enten rett etter oppstart, eller hvis noen velger «1 mnd»
                   på en historikk som ennå er kortere enn det. */}
               <p className="text-muted-foreground text-center max-w-md leading-relaxed">

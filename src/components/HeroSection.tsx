@@ -86,7 +86,7 @@ const HeroSection = () => {
       {/* Øvre del: tekst til venstre, gruppebildet fullt ut mot høyre kant */}
       <div className="relative overflow-hidden">
         {/* Organisk kurve som skiller tekstflaten fra bildet.
-            clipPathUnits="objectBoundingBox" gjør kurven responsiv —
+            clipPathUnits="objectBoundingBox" gjør kurven responsiv -
             koordinatene er andeler av elementets egen størrelse, så den
             holder formen uansett skjermbredde. */}
         <svg width="0" height="0" aria-hidden="true" className="absolute">
@@ -124,7 +124,7 @@ const HeroSection = () => {
               Følg vår portefølje, se våre investeringer og bli kjent med oss.
             </p>
 
-            {/* Dagens verdi — nedtonet, som en del av beskrivelsen */}
+            {/* Dagens verdi - nedtonet, som en del av beskrivelsen */}
             <p className="text-sm text-muted-foreground tabular-nums mb-10">
               Porteføljens verdi i dag:{" "}
               <span className="font-semibold text-foreground">
@@ -139,10 +139,12 @@ const HeroSection = () => {
               )}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4">
-              {/* Opptaket er åpent — søknadsknappen står først. Den går rett
+            {/* Én knappelinje på store skjermer. På mobil: to kolonner der
+                konkurranseknappen spenner over begge - symmetrisk blokk. */}
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-nowrap sm:items-center sm:gap-3">
+              {/* Opptaket er åpent - søknadsknappen står først. Den går rett
                   til e-post, med emnefeltet forhåndsfylt. */}
-              <Button size="lg" className="px-7" asChild>
+              <Button size="lg" className="px-4 sm:px-5" asChild>
                 <a href="mailto:kontakt@emilinvest.no?subject=Søknad%20til%20EMIL%20Invest">
                   Søk EMIL Invest
                 </a>
@@ -150,14 +152,14 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="px-7 border-foreground/25 bg-transparent text-foreground hover:bg-foreground/5"
+                className="px-4 sm:px-5 border-foreground/25 bg-transparent text-foreground hover:bg-foreground/5"
                 onClick={() => scrollTo("#portfolio")}
               >
                 Se porteføljen
               </Button>
               <Button
                 size="lg"
-                className="group px-7 bg-competition text-competition-foreground hover:bg-competition/90 font-semibold"
+                className="group col-span-2 px-4 sm:px-5 bg-competition text-competition-foreground hover:bg-competition/90 font-semibold"
                 onClick={() => navigate("/konkurranse")}
               >
                 Bli med i konkurransen

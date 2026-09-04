@@ -5,7 +5,7 @@ import { AllocationSection } from "@/components/PortfolioVisuals";
 
 /**
  * Forsidens porteføljeseksjon: viser fordelingsdiagrammet (smultringen)
- * fra porteføljesiden — den fulle aksjetabellen bor på /portefolje.
+ * fra porteføljesiden - den fulle aksjetabellen bor på /portefolje.
  */
 const PortfolioSection = () => {
   const { holdings, quotes, loading, calculateHoldingValue, calculatePortfolioValue } =
@@ -51,7 +51,7 @@ const PortfolioSection = () => {
             Våre investeringer
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Slik er porteføljen fordelt — live. Pek på et felt for detaljer.
+            Slik er porteføljen fordelt - live. Pek på et felt for detaljer.
           </p>
         </div>
       </div>
@@ -63,7 +63,7 @@ const PortfolioSection = () => {
           to="/portefolje"
           className="group inline-flex items-center gap-2 text-sm font-medium text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground transition-colors"
         >
-          Se hele porteføljen — alle aksjene, verdier og utvikling
+          Se hele porteføljen - alle aksjene, verdier og utvikling
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>

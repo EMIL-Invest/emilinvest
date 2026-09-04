@@ -32,7 +32,7 @@ const SALGSVALG = [
 ];
 
 /**
- * Ett trykk = én handel. Ingen bekreftelsessteg — i et femminutterspill
+ * Ett trykk = én handel. Ingen bekreftelsessteg - i et femminutterspill
  * er farten en del av moroa, og en feilhandel kan alltid reverseres med
  * neste trykk.
  */
@@ -80,7 +80,7 @@ const HandelsDialog = ({
               disabled={kontanter <= 0}
               onClick={() => onKjop(kontanter)}
             >
-              Maks — {formatMill(kontanter)}
+              Maks - {formatMill(kontanter)}
             </Button>
           </div>
         ) : (

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BEGREPER, KATEGORIER, type Kategori } from "@/lib/begreper";
 
 /**
- * Snu kortet — begrepsspillet. Ligger på /spill/begreper; oversikten
+ * Snu kortet - begrepsspillet. Ligger på /spill/begreper; oversikten
  * over spill ligger på /spill.
  *
  * Ingen poeng, ingen tid, ingen framgang som lagres. Du snur kort til du
@@ -17,7 +17,7 @@ import { BEGREPER, KATEGORIER, type Kategori } from "@/lib/begreper";
 
 type Valg = Kategori | "Alle";
 
-/** Fisher–Yates. Vi stokker en indeksliste, ikke selve kortene. */
+/** Fisher-Yates. Vi stokker en indeksliste, ikke selve kortene. */
 const stokk = (antall: number): number[] => {
   const rekke = Array.from({ length: antall }, (_, i) => i);
   for (let i = rekke.length - 1; i > 0; i--) {
@@ -100,7 +100,7 @@ const Begreper = () => {
           </h1>
           <div className="w-10 h-px bg-foreground/30 mb-8" />
           <p className="text-lg text-muted-foreground leading-relaxed mb-10">
-            {BEGREPER.length} begreper fra aksjeverdenen — og noen fra kunstig
+            {BEGREPER.length} begreper fra aksjeverdenen - og noen fra kunstig
             intelligens. Les ordet, tenk selv, og snu kortet for å se om du traff.
             Ingen poeng og ingen tid: du er ferdig når du er lei.
           </p>
@@ -222,7 +222,7 @@ const Begreper = () => {
           </div>
 
           <p className="text-sm text-muted-foreground leading-relaxed mt-10">
-            Forklaringene er ment som en pekepinn, ikke som fasit i en eksamen —
+            Forklaringene er ment som en pekepinn, ikke som fasit i en eksamen -
             og ingenting her er investeringsråd. Mangler et begrep du synes burde
             vært med? Si fra på{" "}
             <a

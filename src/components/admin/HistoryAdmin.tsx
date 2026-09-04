@@ -21,7 +21,7 @@ interface CapitalFlow {
 }
 
 /**
- * Innskudd/uttak av penger føres her — og KUN her. Aksjebytter skal aldri
+ * Innskudd/uttak av penger føres her - og KUN her. Aksjebytter skal aldri
  * registreres som kapitalflyt. Daily-snapshot leser summen av disse radene
  * som «investert kapital», som gjør at avkastningsgrafen (TWR) ikke
  * påvirkes av at komiteen får tilført mer penger.
@@ -37,7 +37,7 @@ const CapitalFlowsAdmin = () => {
   });
   const { toast } = useToast();
 
-  // capital_flows er ikke med i de genererte typene ennå — bruk untyped klient.
+  // capital_flows er ikke med i de genererte typene ennå - bruk untyped klient.
   const db = supabase as unknown as {
     from: (t: string) => ReturnType<typeof supabase.from>;
   };
@@ -107,7 +107,7 @@ const CapitalFlowsAdmin = () => {
               Innskudd og uttak
             </CardTitle>
             <CardDescription>
-              Registrer penger inn/ut av porteføljen — dette holder
+              Registrer penger inn/ut av porteføljen - dette holder
               avkastningsprosenten riktig. Aksjebytter skal IKKE føres her.
             </CardDescription>
           </div>
@@ -190,7 +190,7 @@ const CapitalFlowsAdmin = () => {
                     <td className={`py-2 px-3 text-sm text-right font-medium ${Number(flow.amount) < 0 ? "text-destructive" : ""}`}>
                       {Number(flow.amount).toLocaleString("no-NO")} kr
                     </td>
-                    <td className="py-2 px-3 text-sm text-muted-foreground">{flow.note || "–"}</td>
+                    <td className="py-2 px-3 text-sm text-muted-foreground">{flow.note || "-"}</td>
                     <td className="py-2 px-3 text-right">
                       <Button variant="ghost" size="sm" onClick={() => handleDelete(flow)}>
                         <Trash2 className="w-3 h-3 text-destructive" />
@@ -223,7 +223,7 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
   const { toast } = useToast();
 
   /**
-   * Kjør daily-snapshot manuelt — samme funksjon som cron-jobben kaller
+   * Kjør daily-snapshot manuelt - samme funksjon som cron-jobben kaller
    * hverdager kl. 10. Funksjonen godtar innloggede administratorer, så
    * dette virker uten cron-hemmeligheten. Brukes når en kjøring har
    * feilet, eller etter en nullstilling for å få første datapunkt inn
@@ -346,7 +346,7 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
           )}
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          «Ta snapshot nå» henter dagens kurser og lagrer dagens datapunkt —
+          «Ta snapshot nå» henter dagens kurser og lagrer dagens datapunkt -
           det samme som den automatiske jobben gjør hverdager kl. 10.
         </p>
       </CardHeader>
@@ -403,7 +403,7 @@ const HistoryAdmin = ({ history, onRefresh }: HistoryAdminProps) => {
             </div>
             <p className="text-xs text-muted-foreground mt-2">
               «Investert kapital» brukes til å skille innskudd fra avkastning i grafen.
-              Oppgi total innskutt kapital per denne datoen — uten den antas ingen
+              Oppgi total innskutt kapital per denne datoen - uten den antas ingen
               kapitalendring siden forrige punkt.
             </p>
             <div className="flex gap-2 mt-4">

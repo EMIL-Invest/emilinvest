@@ -6,12 +6,12 @@ import { KRAV_ANTALL_AKSJER } from "@/hooks/useCompetition";
  * Lett variant av ledertavlen for forsiden.
  *
  * useCompetition henter auth, hele aksjeuniverset og brukerens egen
- * portefølje i tillegg — mer enn en teaser på forsiden trenger. Denne
+ * portefølje i tillegg - mer enn en teaser på forsiden trenger. Denne
  * gjør tre spørringer og regner ut det samme månedstallet, med samme
  * kvalifiseringskrav (KRAV_ANTALL_AKSJER) slik at plasseringene her og
  * på /konkurranse aldri spriker.
  *
- * Tabellene er lesbare uten innlogging — ledertavlen er åpen, og det
+ * Tabellene er lesbare uten innlogging - ledertavlen er åpen, og det
  * står i personvernerklæringen at visningsnavn og avkastning vises.
  */
 
@@ -60,7 +60,7 @@ export const useToppliste = (antall = 3) => {
     const alle = (poster ?? []) as Post[];
     const tickere = [...new Set(alle.map((p) => p.ticker).filter((t) => t !== "ASK"))];
 
-    // Live-kurser. Feiler kallet, faller vi tilbake på kjøpskurs — da
+    // Live-kurser. Feiler kallet, faller vi tilbake på kjøpskurs - da
     // blir avkastningen for lav, men ingen rad forsvinner.
     const kurser: Record<string, number> = {};
     if (tickere.length > 0) {
@@ -72,7 +72,7 @@ export const useToppliste = (antall = 3) => {
           if (q?.ticker && q.price > 0) kurser[q.ticker] = q.price;
         }
       } catch {
-        // stille — fallback under
+        // stille - fallback under
       }
     }
 

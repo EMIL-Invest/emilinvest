@@ -90,7 +90,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-      {/* Vercel Web Analytics — teller besøk og sidevisninger (personvernvennlig, uten cookies) */}
+      {/* Vercel Web Analytics - teller besøk og sidevisninger (personvernvennlig, uten cookies) */}
       <Analytics />
     </TooltipProvider>
   </QueryClientProvider>

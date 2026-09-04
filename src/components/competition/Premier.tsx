@@ -15,7 +15,7 @@ import britanniaBilde from "@/assets/premier/britannia.jpg";
 import escapeBilde from "@/assets/premier/escape.jpg";
 
 /**
- * Premiene i konkurransen — én kilde til sannhet, brukt to steder:
+ * Premiene i konkurransen - én kilde til sannhet, brukt to steder:
  *   - PremieKnapp: gullknappen ved siden av «Reglene» på /konkurranse,
  *     med alt innholdet i en dialog (tar ingen plass på siden).
  *   - Forsiden (CompetitionBanner) bruker HovedpremieBilder og
@@ -84,9 +84,9 @@ export const SitGavekort = ({ className }: { className?: string }) => (
 
 /**
  * De tre hovedpremiene som bildekort. Tre varianter:
- *   "lys"      — kort med ramme på lys bakgrunn (dialogen)
- *   "moerk"    — hvit tekst uten kortbakgrunn (mørke flater)
- *   "kontrast" — bilde med mørkegrønn tekstfot (premieseksjonen på
+ *   "lys"      - kort med ramme på lys bakgrunn (dialogen)
+ *   "moerk"    - hvit tekst uten kortbakgrunn (mørke flater)
+ *   "kontrast" - bilde med mørkegrønn tekstfot (premieseksjonen på
  *                forsiden; footeren gir kontrast uten kortramme)
  */
 export const HovedpremieBilder = ({
@@ -141,7 +141,7 @@ export const HovedpremieBilder = ({
 };
 
 /**
- * Gullknappen «Premie» på konkurransesiden — alt premieinnholdet i en
+ * Gullknappen «Premie» på konkurransesiden - alt premieinnholdet i en
  * dialog, så det ikke tar plass i selve konkurransen.
  */
 export const PremieKnapp = () => {
@@ -157,7 +157,7 @@ export const PremieKnapp = () => {
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl">Dette kan du vinne</DialogTitle>
-          <DialogDescription>Premier hver måned — og en hovedpremie 1. juni.</DialogDescription>
+          <DialogDescription>Premier hver måned - og en hovedpremie 1. juni.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5">
@@ -177,7 +177,7 @@ export const PremieKnapp = () => {
               <Badge className="bg-competition text-competition-foreground flex-shrink-0 mt-0.5">1. juni</Badge>
               <p className="text-sm leading-relaxed">
                 <span className="font-medium">Hovedpremien:</span>{" "}
-                <span className="text-muted-foreground">vinneren velger én av tre —</span>
+                <span className="text-muted-foreground">vinneren velger én av tre -</span>
               </p>
             </div>
             <HovedpremieBilder />
@@ -188,7 +188,7 @@ export const PremieKnapp = () => {
             <TrendingUp className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: GULL }} />
             <span>
               <span className="font-medium text-foreground">Det lønner seg å bli med tidlig</span>{" "}
-              — avkastningen din måles fra porteføljen er gyldig, så jo før du starter,
+              - avkastningen din måles fra porteføljen er gyldig, så jo før du starter,
               jo lenger får avkastningen jobbe for deg.
             </span>
           </p>

@@ -1,5 +1,5 @@
 /**
- * Reglene i aksjekonkurransen — ett sted.
+ * Reglene i aksjekonkurransen - ett sted.
  *
  * Tallene sto tidligere som løs tekst i StockTrader, LeaderboardTable og
  * vilkårene, og kunne dermed sprike. Databasen håndhever dem i
@@ -32,7 +32,7 @@ export const REGLER: Regel[] = [
   {
     tittel: `Minst ${KRAV_ANTALL_AKSJER} ulike aksjer for å bli rangert`,
     tekst:
-      "Har du færre, står du i en egen liste under rangeringen med hvor mange du mangler. Avkastningen din måles først fra det øyeblikket porteføljen blir gyldig — å bygge den ferdig siste dagen gir deg altså ingen snarvei.",
+      "Har du færre, står du i en egen liste under rangeringen med hvor mange du mangler. Avkastningen din måles først fra det øyeblikket porteføljen blir gyldig - å bygge den ferdig siste dagen gir deg altså ingen snarvei.",
   },
   {
     tittel: `Maks ${MAKS_AKSJER} ulike aksjer`,
@@ -42,12 +42,12 @@ export const REGLER: Regel[] = [
   {
     tittel: `Én aksje kan maks utgjøre ${MAKSVEKT_PROSENT} %`,
     tekst:
-      "Grensen gjelder på kjøpstidspunktet. Vokser en posisjon forbi grensen fordi kursen stiger, er det helt greit — du får bare ikke kjøpe mer av den.",
+      "Grensen gjelder på kjøpstidspunktet. Vokser en posisjon forbi grensen fordi kursen stiger, er det helt greit - du får bare ikke kjøpe mer av den.",
   },
   {
     tittel: "En gyldig portefølje forblir gyldig",
     tekst:
-      `Når du først har ${KRAV_ANTALL_AKSJER} aksjer, får du ikke solgt deg under grensen — handelen blir avvist med en forklaring. Vil du helt ut av en aksje, kjøper du en ny først.`,
+      `Når du først har ${KRAV_ANTALL_AKSJER} aksjer, får du ikke solgt deg under grensen - handelen blir avvist med en forklaring. Vil du helt ut av en aksje, kjøper du en ny først.`,
   },
   {
     tittel: `Førstegangskjøp må være minst ${kr(MINSTE_FORSTEKJOP)}`,
@@ -76,6 +76,6 @@ export const REGLER: Regel[] = [
   },
 ];
 
-/** Hvorfor reglene finnes — brukes både i vilkårene og i handelsboksen. */
+/** Hvorfor reglene finnes - brukes både i vilkårene og i handelsboksen. */
 export const HVORFOR_REGLER =
-  "Reglene finnes fordi konkurransen skal gi erfaring med å bygge en portefølje. Uten en øvre grense per aksje ville den beste vinnersjansen vært å legge alt i det mest volatile selskapet man fant og håpe på flaks — som er både dårlig læring og dårlig investering. Diversifisering er ikke en begrensning vi har funnet på; det er selve poenget.";
+  "Reglene finnes fordi konkurransen skal gi erfaring med å bygge en portefølje. Uten en øvre grense per aksje ville den beste vinnersjansen vært å legge alt i det mest volatile selskapet man fant og håpe på flaks - som er både dårlig læring og dårlig investering. Diversifisering er ikke en begrensning vi har funnet på; det er selve poenget.";

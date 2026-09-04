@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FRIST } from "@/lib/opptak";
 
 /**
- * Rekruttering — egen LYS seksjon kant til kant, rett under toppen mens
+ * Rekruttering - egen LYS seksjon kant til kant, rett under toppen mens
  * opptaket er åpent. Ingen boks: hvit flate med delelinjer skiller den
  * fra kremen rundt, og innholdet ligger redaksjonelt i to kolonner.
  *
@@ -26,7 +26,7 @@ const RecruitmentSection = () => {
             <p className="text-muted-foreground leading-relaxed max-w-2xl">
               EMIL Invest utvider komiteen, og vi ser etter flere studenter som
               har lyst til å lære om investeringer og forvalte linjeforeningens
-              midler sammen med oss. Du trenger ingen forkunnskaper — bare
+              midler sammen med oss. Du trenger ingen forkunnskaper - bare
               interesse og lyst til å bidra.
             </p>
           </div>

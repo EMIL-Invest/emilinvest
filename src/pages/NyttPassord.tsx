@@ -11,7 +11,7 @@ import BrandLogo from "@/components/BrandLogo";
 
 /**
  * Landingsside for «glemt passord»-lenken fra e-posten. Supabase logger
- * brukeren inn med en midlertidig gjenopprettingsøkt når lenken åpnes —
+ * brukeren inn med en midlertidig gjenopprettingsøkt når lenken åpnes -
  * her setter de nytt passord med updateUser.
  */
 const NyttPassord = () => {
@@ -23,7 +23,7 @@ const NyttPassord = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Gjenopprettingslenken setter økten via URL-fragmentet — lytt på begge.
+    // Gjenopprettingslenken setter økten via URL-fragmentet - lytt på begge.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setHasSession(!!session);
     });

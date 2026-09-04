@@ -6,7 +6,7 @@ import { BEGREPER } from "@/lib/begreper";
 import { VARIGHET_SEK } from "@/config/invest-game/spillet";
 
 /**
- * Spilloversikten — /spill er en liste over spillene, ikke et spill i seg
+ * Spilloversikten - /spill er en liste over spillene, ikke et spill i seg
  * selv. Nye spill legges til i SPILL-listen under; kortene er identiske i
  * form, slik at siden tåler å vokse.
  */
@@ -25,7 +25,7 @@ const SPILL: Spilloppforing[] = [
     merke: "Begreper",
     navn: "Snu kortet",
     beskrivelse:
-      "Les begrepet, tenk selv, snu kortet. Fra IPO og P/E til MCP og LLM — ingen poeng, ingen tid.",
+      "Les begrepet, tenk selv, snu kortet. Fra IPO og P/E til MCP og LLM - ingen poeng, ingen tid.",
     fakta: [`${BEGREPER.length} kort`, "Alene", "Ingen tid"],
   },
   {
@@ -33,7 +33,7 @@ const SPILL: Spilloppforing[] = [
     merke: "Gruppekonkurranse",
     navn: "Børskrakket",
     beskrivelse:
-      "Dere får 100 millioner og to minutter. Nyheter flytter markedet underveis — den som følger best med, vinner.",
+      "Dere får 100 millioner og to minutter. Nyheter flytter markedet underveis - den som følger best med, vinner.",
     fakta: ["100 mill.", `${VARIGHET_SEK / 60} minutter`, "I grupper"],
   },
   {
@@ -41,7 +41,7 @@ const SPILL: Spilloppforing[] = [
     merke: "Standspill",
     navn: "Spinn hjulet",
     beskrivelse:
-      "Trykk på hjulet og se hvor det lander. Én av ti sektorer gir en Red Bull — resten gir ingenting.",
+      "Trykk på hjulet og se hvor det lander. Én av ti sektorer gir en Red Bull - resten gir ingenting.",
     fakta: ["1 av 10 vinner", "Red Bull", "Ett trykk"],
   },
 ];
@@ -110,7 +110,7 @@ const Spill = () => (
         </h1>
         <div className="w-10 h-px bg-foreground/30 mb-8" />
         <p className="text-lg text-muted-foreground leading-relaxed mb-10">
-          To spill om aksjer og investering — ett du kan ta alene når du vil, og
+          To spill om aksjer og investering - ett du kan ta alene når du vil, og
           ett vi bruker som gruppekonkurranse på arrangementer. Begge er åpne
           for alle, uten innlogging.
         </p>
@@ -123,7 +123,7 @@ const Spill = () => (
 
         <p className="text-sm text-muted-foreground leading-relaxed mt-10">
           Ingenting i spillene er investeringsråd, og tallene i Børskrakket er
-          en simulering — ikke et bilde av et virkelig marked. Har du en idé til
+          en simulering - ikke et bilde av et virkelig marked. Har du en idé til
           et spill vi burde lage? Si fra på{" "}
           <a
             href="mailto:kontakt@emilinvest.no?subject=Idé%20til%20spill"

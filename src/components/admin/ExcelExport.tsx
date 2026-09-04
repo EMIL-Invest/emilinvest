@@ -137,9 +137,9 @@ const ExcelExport = () => {
         <div className="text-sm text-muted-foreground space-y-2">
           <p>Excel-filen inneholder tre ark:</p>
           <ul className="list-disc list-inside space-y-1 ml-2">
-            <li><strong>Aksjekurser</strong> – kurs per aksje per dato (i originalvaluta)</li>
-            <li><strong>Verdier (NOK)</strong> – total verdi per aksje per dato (kurs × antall × valutakurs)</li>
-            <li><strong>Antall</strong> – antall aksjer per dato</li>
+            <li><strong>Aksjekurser</strong> - kurs per aksje per dato (i originalvaluta)</li>
+            <li><strong>Verdier (NOK)</strong> - total verdi per aksje per dato (kurs × antall × valutakurs)</li>
+            <li><strong>Antall</strong> - antall aksjer per dato</li>
           </ul>
           <p className="mt-3">Oslo Børs (OSEBX) er inkludert som en egen rad i alle ark.</p>
         </div>

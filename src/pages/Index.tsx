@@ -16,7 +16,7 @@ const Index = () => {
       <HeroSection />
       {/* Opptaket ligger rett under toppen mens det er åpent */}
       <RecruitmentSection />
-      {/* Konkurransen etter opptaket — saldo → bilde → opptak → konkurranse */}
+      {/* Konkurransen etter opptaket - saldo → bilde → opptak → konkurranse */}
       <CompetitionBanner />
       <PortfolioSection />
       <PerformanceSection />

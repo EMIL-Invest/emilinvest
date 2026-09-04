@@ -7,7 +7,7 @@ import { AllocationSection, ContributionSection } from "@/components/PortfolioVi
 import { usePortfolioData, StockQuote } from "@/hooks/usePortfolioData";
 
 /**
- * Dedikert porteføljeside — viser alle plasseringene med vekting,
+ * Dedikert porteføljeside - viser alle plasseringene med vekting,
  * inspirert av profesjonelle fondssider. Aksjer med live-kurs,
  * fond og bankinnskudd med bokført verdi.
  */
@@ -84,24 +84,24 @@ const Portefolje = () => {
           </h1>
           <div className="w-10 h-px bg-foreground/30 mb-7" />
           <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Hele porteføljen, helt åpent — hver aksje, hvert fond og hver krone.
+            Hele porteføljen, helt åpent - hver aksje, hvert fond og hver krone.
             Kursene oppdateres automatisk gjennom børsdagen.
           </p>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-md overflow-hidden mt-10">
             {[
-              { label: "Markedsverdi", value: loading ? "–" : formatKr(totalValue) },
+              { label: "Markedsverdi", value: loading ? "-" : formatKr(totalValue) },
               {
                 label: "Avkastning i år",
-                value: ytd.portfolio == null ? "–" : `${ytd.portfolio >= 0 ? "+" : ""}${ytd.portfolio.toFixed(1)} %`,
+                value: ytd.portfolio == null ? "-" : `${ytd.portfolio >= 0 ? "+" : ""}${ytd.portfolio.toFixed(1)} %`,
                 positive: (ytd.portfolio ?? 0) >= 0,
                 colored: ytd.portfolio != null,
               },
               {
                 label: "OSEBX i år",
-                value: ytd.osebx == null ? "–" : `${ytd.osebx >= 0 ? "+" : ""}${ytd.osebx.toFixed(1)} %`,
+                value: ytd.osebx == null ? "-" : `${ytd.osebx >= 0 ? "+" : ""}${ytd.osebx.toFixed(1)} %`,
               },
-              { label: "Plasseringer", value: loading ? "–" : String(holdings.length) },
+              { label: "Plasseringer", value: loading ? "-" : String(holdings.length) },
             ].map((stat) => (
               <div key={stat.label} className="bg-card p-6">
                 <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">
@@ -120,7 +120,7 @@ const Portefolje = () => {
           {lastUpdated && (
             <p className="text-xs text-muted-foreground mt-3">
               Kurser oppdatert {lastUpdated.toLocaleTimeString("no-NO", { hour: "2-digit", minute: "2-digit" })}.
-              Avkastning måles tidsvektet — innskudd og uttak påvirker ikke prosenten.
+              Avkastning måles tidsvektet - innskudd og uttak påvirker ikke prosenten.
             </p>
           )}
         </div>
@@ -168,15 +168,15 @@ const Portefolje = () => {
                         </Link>
                         <p className="text-xs text-muted-foreground">{holding.ticker}</p>
                       </td>
-                      <td className="py-4 px-4 text-sm text-muted-foreground">{holding.sector || "–"}</td>
+                      <td className="py-4 px-4 text-sm text-muted-foreground">{holding.sector || "-"}</td>
                       <td className="py-4 px-4 text-sm text-right tabular-nums">{holding.quantity.toLocaleString("no-NO")}</td>
                       <td className={`py-4 px-4 text-sm text-right tabular-nums ${
                         quote ? (quote.changePercent >= 0 ? "stock-positive" : "stock-negative") : "text-muted-foreground"
                       }`}>
-                        {quote ? `${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(2)} %` : "–"}
+                        {quote ? `${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(2)} %` : "-"}
                       </td>
                       <td className="py-4 px-4 text-sm text-right font-medium tabular-nums">{formatKr(value)}</td>
-                      {/* Bare tallet — stolpen ga samme informasjon to ganger,
+                      {/* Bare tallet - stolpen ga samme informasjon to ganger,
                           og smultringen over tabellen viser fordelingen bedre. */}
                       <td className="py-4 px-6 text-sm text-right text-muted-foreground tabular-nums">
                         {weight(value).toFixed(1).replace(".", ",")} %
@@ -218,7 +218,7 @@ const Portefolje = () => {
         {/* Bidrag per posisjon */}
         {!loading && <ContributionSection stocks={stocks} />}
 
-        {/* Utviklingsgrafen — samme som på forsiden */}
+        {/* Utviklingsgrafen - samme som på forsiden */}
         <PerformanceSection />
       </main>
 

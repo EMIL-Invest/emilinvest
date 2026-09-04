@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { REGLER, HVORFOR_REGLER } from "@/lib/konkurranseregler";
 
 /**
- * Vilkår for bruk — inkluderer ansvarsfraskrivelsen (ikke investeringsråd)
+ * Vilkår for bruk - inkluderer ansvarsfraskrivelsen (ikke investeringsråd)
  * og reglene for aksjekonkurransen.
  */
 
@@ -29,7 +29,7 @@ const Vilkar = () => {
           <p className="text-lg text-muted-foreground leading-relaxed mb-12">
             Ved å bruke emilinvest.no og delta i aksjekonkurransen godtar du
             disse vilkårene. De er korte og skrevet for å leses. Reglene i
-            konkurransen står først — resten er det formelle.
+            konkurransen står først - resten er det formelle.
           </p>
 
           {/* Reglene øverst, punktvis. Folk som trykker «Les reglene» skal
@@ -64,7 +64,7 @@ const Vilkar = () => {
             </p>
 
             <p className="text-sm text-muted-foreground mt-5">
-              Reglene håndheves automatisk når du handler — et kjøp som bryter
+              Reglene håndheves automatisk når du handler - et kjøp som bryter
               en av dem blir avvist med en forklaring.{" "}
               <Link to="/konkurranse" className="text-primary underline underline-offset-2">
                 Til konkurransen
@@ -75,7 +75,7 @@ const Vilkar = () => {
           <Section title="Om tjenesten">
             <p>
               emilinvest.no drives av EMIL Invest, den studentdrevne
-              investeringskomiteen i EMIL — Energi- og miljøingeniørenes
+              investeringskomiteen i EMIL - Energi- og miljøingeniørenes
               linjeforening ved NTNU. Nettsiden viser komiteens portefølje
               åpent og tilbyr en aksjekonkurranse for studenter. Tjenesten er
               gratis.
@@ -84,8 +84,8 @@ const Vilkar = () => {
 
           <Section title="Ikke investeringsråd">
             <p>
-              Alt innhold på nettsiden — porteføljen vår, analyser, grafer og
-              tall — er laget av studenter med pedagogisk formål og deles for
+              Alt innhold på nettsiden - porteføljen vår, analyser, grafer og
+              tall - er laget av studenter med pedagogisk formål og deles for
               åpenhet og læring. Ingenting her er investeringsrådgivning eller
               en anbefaling om å kjøpe eller selge verdipapirer. Historisk
               avkastning er ingen garanti for fremtidige resultater. Gjør
@@ -119,7 +119,7 @@ const Vilkar = () => {
               fulle navnet ditt.
             </p>
             <p>
-              Velg visningsnavn med det i tanke — du kan godt bruke et
+              Velg visningsnavn med det i tanke - du kan godt bruke et
               kallenavn. Se{" "}
               <Link to="/personvern" className="underline underline-offset-2 hover:text-foreground">
                 personvernerklæringen
@@ -131,7 +131,7 @@ const Vilkar = () => {
           <Section title="Din konto">
             <p>
               Du er selv ansvarlig for å holde passordet ditt hemmelig. Velg
-              et visningsnavn som ikke er støtende eller villedende — vi
+              et visningsnavn som ikke er støtende eller villedende - vi
               forbeholder oss retten til å endre eller fjerne upassende navn.
               Du kan når som helst slette kontoen din under «Min konto».
             </p>

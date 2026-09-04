@@ -5,10 +5,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 /**
- * Spinn hjulet — standspill: trykk på hjulet, 1 av 10 vinner en Red Bull.
+ * Spinn hjulet - standspill: trykk på hjulet, 1 av 10 vinner en Red Bull.
  *
  * Utfallet trekkes FØR animasjonen starter (Math.random() < 0.1), og
- * hjulet spinner deretter til riktig sektor — ikke omvendt. Sektor 0 er
+ * hjulet spinner deretter til riktig sektor - ikke omvendt. Sektor 0 er
  * gevinsten; de ni andre gir ingenting. Gevinstbanneret viser klokkeslett,
  * slik at et skjermbilde ikke kan gjenbrukes på standen dagen etter.
  */
@@ -78,7 +78,7 @@ const Hjulet = () => {
           </h1>
           <div className="w-10 h-px bg-foreground/30 mb-8" />
           <p className="text-lg text-muted-foreground leading-relaxed mb-10">
-            Trykk på hjulet. Én av ti sektorer gir en Red Bull — resten gir
+            Trykk på hjulet. Én av ti sektorer gir en Red Bull - resten gir
             deg æren av å ha prøvd. Vinner du, viser du skjermen til oss på
             standen.
           </p>
@@ -96,7 +96,7 @@ const Hjulet = () => {
               aria-hidden="true"
             />
 
-            {/* Hjulet — hele flaten er knappen */}
+            {/* Hjulet - hele flaten er knappen */}
             <button
               type="button"
               onClick={spinn}

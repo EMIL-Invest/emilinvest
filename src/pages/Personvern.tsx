@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 /**
- * Personvernerklæring — kravet følger av GDPR/personopplysningsloven siden
+ * Personvernerklæring - kravet følger av GDPR/personopplysningsloven siden
  * nettsiden lagrer brukerkontoer, konkurransedata og bilder av komiteen.
  */
 
@@ -34,8 +34,8 @@ const Personvern = () => {
 
           <Section title="Hvem er behandlingsansvarlig?">
             <p>
-              EMIL Invest, investeringskomiteen i EMIL — Energi- og
-              miljøingeniørenes linjeforening ved NTNU — er ansvarlig for
+              EMIL Invest, investeringskomiteen i EMIL - Energi- og
+              miljøingeniørenes linjeforening ved NTNU - er ansvarlig for
               behandlingen av personopplysninger på dette nettstedet. Har du
               spørsmål, kontakt oss på{" "}
               <a href="mailto:kontakt@emilinvest.no" className="text-primary underline underline-offset-2">
@@ -83,7 +83,7 @@ const Personvern = () => {
               navnet ditt eller noe annet fra kontoen.
             </p>
             <p>
-              Dette er kjernen i konkurransen — poenget er å kunne sammenligne
+              Dette er kjernen i konkurransen - poenget er å kunne sammenligne
               og lære av hverandres valg. Men det betyr at du bør velge
               visningsnavn med det i tanke. Du står fritt til å bruke et
               kallenavn i stedet for ditt eget navn, og du kan endre
@@ -98,7 +98,7 @@ const Personvern = () => {
           <Section title="Hvorfor behandler vi opplysningene?">
             <p>
               Vi behandler kontoopplysninger og konkurransedata for å levere
-              tjenesten du melder deg på (avtale, GDPR art. 6 nr. 1 b) — det
+              tjenesten du melder deg på (avtale, GDPR art. 6 nr. 1 b) - det
               omfatter at visningsnavn, avkastning og portefølje vises på
               ledertavlen, siden en konkurranse uten resultatliste ikke er en
               konkurranse. Bilder av komiteen behandles på grunnlag av samtykke
@@ -122,7 +122,7 @@ const Personvern = () => {
             <p>
               Kontoen din, porteføljen og handelshistorikken lagres så lenge du
               har en aktiv konto. Sletter du kontoen under Konto, slettes
-              opplysningene dine — også handlene og plasseringen på ledertavlen.
+              opplysningene dine - også handlene og plasseringen på ledertavlen.
               Bilder og navn på komitémedlemmer fjernes når medlemmet trer ut
               av komiteen eller trekker samtykket.
             </p>
@@ -132,7 +132,7 @@ const Personvern = () => {
             <p>
               Du har rett til innsyn i hvilke opplysninger vi har om deg, og
               til å få dem rettet eller slettet. Kontoen kan du slette selv
-              under «Min konto» når du er innlogget — da fjernes alt vi har
+              under «Min konto» når du er innlogget - da fjernes alt vi har
               lagret om deg. Du kan også kontakte oss på{" "}
               <a href="mailto:kontakt@emilinvest.no" className="text-primary underline underline-offset-2">
                 kontakt@emilinvest.no

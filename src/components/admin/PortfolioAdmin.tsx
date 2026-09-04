@@ -387,7 +387,7 @@ const PortfolioAdmin = ({ holdings, quotes, onRefresh }: PortfolioAdminProps) =>
           </form>
         )}
 
-        {/* Kostpriser — utgangspunktet grafene måler fra */}
+        {/* Kostpriser - utgangspunktet grafene måler fra */}
         {stocks.length > 0 && !showAddForm && !editingId && (
           <div className="p-4 rounded-lg border border-border bg-muted/30 mb-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -396,7 +396,7 @@ const PortfolioAdmin = ({ holdings, quotes, onRefresh }: PortfolioAdminProps) =>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   «Avkastning per aksje» måler dagens kurs mot kostprisen på
                   posisjonen. Er aksjene nettopp kjøpt til omtrent dagens kurs,
-                  skal utslaget være nær null — viser grafen store tall, står
+                  skal utslaget være nær null - viser grafen store tall, står
                   det gamle kjøpskurser i basen.
                 </p>
               </div>
@@ -427,18 +427,18 @@ const PortfolioAdmin = ({ holdings, quotes, onRefresh }: PortfolioAdminProps) =>
                             {Math.round(f.gammelKostpris).toLocaleString("no-NO")} kr
                           </td>
                           <td className="py-2 pr-4 text-right tabular-nums">
-                            {f.kurs === null ? "–" : `${f.kurs.toLocaleString("no-NO")} kr`}
+                            {f.kurs === null ? "-" : `${f.kurs.toLocaleString("no-NO")} kr`}
                           </td>
                           <td className="py-2 pr-4 text-right tabular-nums">
                             {f.nyKostpris === null
-                              ? "–"
+                              ? "-"
                               : `${Math.round(f.nyKostpris).toLocaleString("no-NO")} kr`}
                           </td>
                           <td className={`py-2 text-right tabular-nums ${
                             f.utslag === null ? "" : f.utslag >= 0 ? "text-emerald-700" : "text-destructive"
                           }`}>
                             {f.utslag === null
-                              ? "–"
+                              ? "-"
                               : `${f.utslag >= 0 ? "+" : ""}${f.utslag.toFixed(1).replace(".", ",")} %`}
                           </td>
                         </tr>
@@ -452,14 +452,14 @@ const PortfolioAdmin = ({ holdings, quotes, onRefresh }: PortfolioAdminProps) =>
                     <AlertTriangle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
                     <span>
                       Mangler kurs for {utenKurs.map((f) => f.holding.ticker).join(", ")}. Disse
-                      blir stående som de er — sett kjøpsprisen manuelt under «Rediger».
+                      blir stående som de er - sett kjøpsprisen manuelt under «Rediger».
                     </span>
                   </p>
                 )}
 
                 <div className="flex flex-wrap gap-2 mt-4">
                   <Button size="sm" onClick={nullstillKostpriser} disabled={nullstiller}>
-                    {nullstiller ? "Oppdaterer…" : "Bekreft — sett kostpris og kjøpsdato til i dag"}
+                    {nullstiller ? "Oppdaterer…" : "Bekreft - sett kostpris og kjøpsdato til i dag"}
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => setVisKostpris(false)}>
                     Avbryt

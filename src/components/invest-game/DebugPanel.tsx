@@ -20,7 +20,7 @@ interface DebugPanelProps {
 
 /**
  * Utviklingspanel for testing og balansering. Vises KUN med ?debug i
- * URL-en (håndteres av siden) — det renderes aldri for vanlige spillere,
+ * URL-en (håndteres av siden) - det renderes aldri for vanlige spillere,
  * og det finnes ingen knapp som leder hit.
  */
 const DebugPanel = ({
@@ -33,14 +33,14 @@ const DebugPanel = ({
 }: DebugPanelProps) => {
   const [visTidslinjer, setVisTidslinjer] = useState(false);
   const [visNyheter, setVisNyheter] = useState(false);
-  // Hoppunkter hvert 30. sekund, avledet av varigheten — ikke hardkodet,
+  // Hoppunkter hvert 30. sekund, avledet av varigheten - ikke hardkodet,
   // så panelet følger med hvis spillet endrer lengde igjen.
   const stopp: number[] = [];
   for (let s = 30; s < VARIGHET_SEK; s += 30) stopp.push(s);
   const sektorer = Object.keys(SEKTOR_TIDSLINJER) as SektorId[];
   const mmss = (s: number) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-  // Kolonnene i tidslinjetabellen — seks jevne nedslag gjennom løpet.
+  // Kolonnene i tidslinjetabellen - seks jevne nedslag gjennom løpet.
   const tabelltider = Array.from({ length: 6 }, (_, i) => Math.round((VARIGHET_SEK * i) / 5));
 
   return (

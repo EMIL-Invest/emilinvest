@@ -5,7 +5,7 @@ import { useToppliste } from "@/hooks/useToppliste";
 import { HovedpremieBilder, SitGavekort, FOTOKREDITT } from "@/components/competition/Premier";
 
 /**
- * Konkurransen på forsiden — tre seksjoner kant til kant, ingen bokser
+ * Konkurransen på forsiden - tre seksjoner kant til kant, ingen bokser
  * i bokser:
  *   1) Mørkegrønt felt med invitasjonen og live-topplisten
  *   2) Lyst faktabånd (startkapital, live kurser, premie, gratis)
@@ -34,7 +34,7 @@ const CompetitionBanner = () => {
 
   return (
     <>
-      {/* ============ 1) Mørkegrønt felt — kant til kant ============ */}
+      {/* ============ 1) Mørkegrønt felt - kant til kant ============ */}
       <section style={{ background: "hsl(var(--band))" }}>
         <div className="section-container py-16 md:py-24">
           <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
@@ -52,7 +52,7 @@ const CompetitionBanner = () => {
                 className="font-serif text-4xl md:text-5xl leading-[1.08] mt-7 mb-6"
                 style={{ color: "hsl(var(--primary-foreground))" }}
               >
-                Kan du slå <span style={{ color: GULL }}>markedet</span> — og de
+                Kan du slå <span style={{ color: GULL }}>markedet</span> - og de
                 andre?
               </h2>
 
@@ -88,7 +88,7 @@ const CompetitionBanner = () => {
               </div>
             </div>
 
-            {/* Høyre: topplistekortet — det ene hvite kortet gir kontrast */}
+            {/* Høyre: topplistekortet - det ene hvite kortet gir kontrast */}
             <div className="rounded-md bg-card p-6 md:p-8" style={{ boxShadow: "var(--shadow-soft)" }}>
               <div className="flex items-baseline justify-between gap-4">
                 <h3 className="font-serif text-xl md:text-2xl text-foreground">
@@ -115,7 +115,7 @@ const CompetitionBanner = () => {
                 </div>
               ) : topp.length === 0 ? (
                 <p className="text-sm text-muted-foreground leading-relaxed py-6">
-                  Ingen har kvalifisert seg ennå denne måneden — det kreves fem
+                  Ingen har kvalifisert seg ennå denne måneden - det kreves fem
                   ulike aksjer for å bli rangert. Den første som er i gang,
                   ligger øverst.
                 </p>
@@ -137,7 +137,7 @@ const CompetitionBanner = () => {
                         <span className="block text-sm font-medium text-foreground truncate">
                           {t.navn}
                         </span>
-                        {/* Stolpen er relativ til lederen — den sier hvor stor
+                        {/* Stolpen er relativ til lederen - den sier hvor stor
                             avstanden er, ikke hvor mye avkastning er i seg selv. */}
                         <span className="block h-[3px] rounded-full mt-1.5 bg-secondary overflow-hidden">
                           <span
@@ -178,7 +178,7 @@ const CompetitionBanner = () => {
         </div>
       </section>
 
-      {/* ============ 2) Faktabåndet — lyst, kant til kant ============ */}
+      {/* ============ 2) Faktabåndet - lyst, kant til kant ============ */}
       <section className="bg-card border-b border-border">
         <div className="section-container py-7 md:py-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
@@ -199,7 +199,7 @@ const CompetitionBanner = () => {
         </div>
       </section>
 
-      {/* ============ 3) Premiene — lys seksjon, kant til kant ============ */}
+      {/* ============ 3) Premiene - lys seksjon, kant til kant ============ */}
       <section className="py-16 md:py-20">
         <div className="section-container">
           <div className="grid lg:grid-cols-[2fr_1fr] gap-12 lg:gap-16">
@@ -224,7 +224,7 @@ const CompetitionBanner = () => {
               </h2>
               <SitGavekort className="w-40 drop-shadow-md" />
               <p className="text-sm text-muted-foreground leading-relaxed mt-5 max-w-xs">
-                150 kr til månedens beste avkastning — hver eneste måned.
+                150 kr til månedens beste avkastning - hver eneste måned.
               </p>
               <Link
                 to="/konkurranse"

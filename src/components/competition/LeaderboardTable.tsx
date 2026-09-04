@@ -21,7 +21,7 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
   const rangerte = entries.filter((e) => e.kvalifisert);
   const ikkeKvalifisert = entries.filter((e) => !e.kvalifisert);
 
-  // Din egen rad hvis du er utenfor topp 10 — vises som egen rad nederst
+  // Din egen rad hvis du er utenfor topp 10 - vises som egen rad nederst
   const ownEntryOutsideTop10 = currentParticipantId
     ? rangerte.find(e => e.participant_id === currentParticipantId && e.rank > 10)
     : undefined;
@@ -62,7 +62,7 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Mobil: kompakte rader — navn og avkastning i front, verdi
+          {/* Mobil: kompakte rader - navn og avkastning i front, verdi
               som underlinje. Tabellen under er skjult på små skjermer. */}
           <ul className="md:hidden divide-y divide-border">
             {rangerte.slice(0, 10).map((entry) => (

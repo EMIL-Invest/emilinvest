@@ -39,7 +39,7 @@ export interface LeaderboardEntry {
   display_name: string;
   portfolio_value: number;
   return_percentage: number;
-  /** 0 for de som ennå ikke er kvalifisert — de rangeres ikke. */
+  /** 0 for de som ennå ikke er kvalifisert - de rangeres ikke. */
   rank: number;
   antall_aksjer: number;
   kvalifisert: boolean;
@@ -152,7 +152,7 @@ export const useCompetition = () => {
 
     setQuotesLoading(true);
     try {
-      // Edge-funksjonen godtar maks 250 tickere per kall — del opp i bolker
+      // Edge-funksjonen godtar maks 250 tickere per kall - del opp i bolker
       // så kurslisten skalerer når aksjeuniverset vokser.
       const CHUNK = 150;
       const chunks: string[][] = [];
@@ -353,7 +353,7 @@ export const useCompetition = () => {
 
     if (error) {
       console.error("Error joining competition:", error);
-      // Vis den faktiske årsaken — «Kunne ikke melde deg på» uten forklaring
+      // Vis den faktiske årsaken - «Kunne ikke melde deg på» uten forklaring
       // gjorde mobilfeilsøkingen 1. september unødvendig vanskelig.
       return {
         error: new Error(
@@ -375,7 +375,7 @@ export const useCompetition = () => {
 
   // Check daily transaction count for a specific stock.
   // NB: bruker UTC-midnatt slik at grensen samsvarer eksakt med serverens
-  // date_trunc('day', now()) — ellers spriker UI og server med 1-2 timer i Norge.
+  // date_trunc('day', now()) - ellers spriker UI og server med 1-2 timer i Norge.
   const getDailyTransactionCount = async (participantId: string, ticker: string): Promise<number> => {
     const now = new Date();
     const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -420,7 +420,7 @@ export const useCompetition = () => {
       const info = getExchangeInfo(exchange);
       const exchangeName = getExchangeName(exchange);
       return { 
-        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}–${info.closeTime} norsk tid (${info.tradingDays})`) 
+        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} norsk tid (${info.tradingDays})`) 
       };
     }
 
@@ -457,7 +457,7 @@ export const useCompetition = () => {
       const info = getExchangeInfo(exchange);
       const exchangeName = getExchangeName(exchange);
       return { 
-        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}–${info.closeTime} norsk tid (${info.tradingDays})`) 
+        error: new Error(`${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} norsk tid (${info.tradingDays})`) 
       };
     }
 
@@ -491,7 +491,7 @@ export const useCompetition = () => {
       const exchangeName = getExchangeName(exchange);
       return { 
         allowed: false, 
-        reason: `${exchangeName} er stengt. Åpningstider: ${info.openTime}–${info.closeTime} norsk tid (${info.tradingDays})` 
+        reason: `${exchangeName} er stengt. Åpningstider: ${info.openTime}-${info.closeTime} norsk tid (${info.tradingDays})` 
       };
     }
 

@@ -1,9 +1,9 @@
 /**
- * Børskrakket — all konfigurasjon for tominutterskonkurransen.
+ * Børskrakket - all konfigurasjon for tominutterskonkurransen.
  *
  * ALT som styrer spilløpet ligger i denne fila: selskapene, hvordan hver
  * sektor beveger seg gjennom de to minuttene, og nyhetene. Komponentene
- * leser bare herfra — vil du rebalansere spillet før et arrangement,
+ * leser bare herfra - vil du rebalansere spillet før et arrangement,
  * endrer du tall her og lar resten av koden være.
  *
  * Slik leses en tidslinje: en liste av punkter {t, v} der t er sekunder
@@ -14,14 +14,14 @@
  *
  * Balansen er bevisst: en gruppe som fordeler likt på alt og sover,
  * ender rundt +8 %. En gruppe som følger nyhetene og flytter pengene,
- * kan hente langt mer. Nyheten kommer alltid 2–5 sekunder FØR bevegelsen
+ * kan hente langt mer. Nyheten kommer alltid 2-5 sekunder FØR bevegelsen
  * starter, så det går an å reagere.
  *
  * MERK om varigheten: spillet er kortet fra fem til tre til to minutter.
  * Tidslinjene og nyhetene er satt opp for 120 sekunder, med
  * nyhetstidspunktene justert slik at avstanden mellom nyhet og
- * kursbevegelse fortsatt er 2–3 sekunder. Endrer du VARIGHET_SEK igjen,
- * må tidslinjene og nyhetstidspunktene skrives om sammen med den — og
+ * kursbevegelse fortsatt er 2-3 sekunder. Endrer du VARIGHET_SEK igjen,
+ * må tidslinjene og nyhetstidspunktene skrives om sammen med den - og
  * fasittabellen i scripts/test-borskrakket.ts må følge etter. Kjør
  * motortesten etterpå: npx tsx scripts/test-borskrakket.ts
  */
@@ -109,7 +109,7 @@ export const SEKTOR_TIDSLINJER: Record<SektorId, Punkt[]> = {
     { t: 84, v: 1.38 },
     { t: 120, v: 1.44 },
   ],
-  // Jevnt pent helt til sykdomsnyheten (68 s) — så rett ned.
+  // Jevnt pent helt til sykdomsnyheten (68 s) - så rett ned.
   sjomat: [
     { t: 0, v: 1.0 },
     { t: 24, v: 1.03 },
@@ -131,7 +131,7 @@ export const SEKTOR_TIDSLINJER: Record<SektorId, Punkt[]> = {
     { t: 96, v: 0.87 },
     { t: 120, v: 0.86 },
   ],
-  // Ingen nyhet — vandrer rolig. Trygg, men aldri spektakulær.
+  // Ingen nyhet - vandrer rolig. Trygg, men aldri spektakulær.
   fornybar: [
     { t: 0, v: 1.0 },
     { t: 20, v: 0.96 },
@@ -159,7 +159,7 @@ export const SEKTOR_TIDSLINJER: Record<SektorId, Punkt[]> = {
     { t: 84, v: 1.1 },
     { t: 120, v: 1.12 },
   ],
-  // Ingen nyhet — opp, ned, opp. Belønner ikke passivitet spesielt.
+  // Ingen nyhet - opp, ned, opp. Belønner ikke passivitet spesielt.
   romfart: [
     { t: 0, v: 1.0 },
     { t: 18, v: 1.08 },

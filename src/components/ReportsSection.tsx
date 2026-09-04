@@ -102,7 +102,7 @@ const ReportsSection = () => {
     setUploading(true);
 
     try {
-      // Supabase Storage avviser nøkler med æ/ø/å, mellomrom og spesialtegn —
+      // Supabase Storage avviser nøkler med æ/ø/å, mellomrom og spesialtegn -
       // saniter filnavnet før opplasting.
       const safeName = file.name
         .replace(/[æÆ]/g, "ae").replace(/[øØ]/g, "o").replace(/[åÅ]/g, "a")
@@ -314,7 +314,7 @@ const ReportsSection = () => {
               Vi starter med kvartalsrapporter høsten 2026
             </p>
             <p className="text-muted-foreground max-w-md mx-auto">
-              Den første rapporten publiseres her etter tredje kvartal — som
+              Den første rapporten publiseres her etter tredje kvartal - som
               alt annet vi gjør, helt åpent for alle.
             </p>
           </div>

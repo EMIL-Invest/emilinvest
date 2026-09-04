@@ -32,12 +32,12 @@ const AboutSection = () => {
             <p className="text-muted-foreground leading-relaxed max-w-md">
               EMIL Invest er investeringskomiteen i linjeforeningen EMIL. Vi
               forvalter foreningens midler med mål om å skape langsiktig
-              avkastning gjennom grundig analyse, risikostyring og åpenhet —
+              avkastning gjennom grundig analyse, risikostyring og åpenhet -
               og å slå Oslo Børs over tid.
             </p>
           </div>
 
-          {/* Høyre: prinsippene som rolig liste — rene tekstrader med
+          {/* Høyre: prinsippene som rolig liste - rene tekstrader med
               delelinjer, ingen kortramme (mindre «boks i boks»). */}
           <div className="divide-y divide-border border-y border-border">
             {philosophy.map((item) => (

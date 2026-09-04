@@ -229,7 +229,7 @@ const TeamAdmin = () => {
           ))}
           {members.length === 0 && (
             <p className="text-muted-foreground text-center py-8">
-              Ingen medlemmer ennå — kjør 03_team_medlemmer.sql eller legg til manuelt.
+              Ingen medlemmer ennå - kjør 03_team_medlemmer.sql eller legg til manuelt.
             </p>
           )}
         </div>

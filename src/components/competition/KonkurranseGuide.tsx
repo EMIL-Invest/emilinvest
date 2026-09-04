@@ -23,10 +23,10 @@ import {
  * Regelknappen og porteføljestatusen på konkurransesiden.
  *
  * ReglerKnapp: alle reglene i en dialog, tilgjengelig rett fra forsiden
- * av konkurransen — også uten innlogging. Ingen skal måtte finne /vilkar
+ * av konkurransen - også uten innlogging. Ingen skal måtte finne /vilkar
  * for å vite hva de er med på.
  *
- * PorteforljeStatus: én kompakt knapp — grønn når porteføljen er gyldig,
+ * PorteforljeStatus: én kompakt knapp - grønn når porteføljen er gyldig,
  * rød når den ikke er det. Detaljene (kravlisten) ligger i en dialog bak
  * knappen, og er den rød står det i punkter under hva som mangler.
  * Erstatter de gamle tekstbannerne, som tok mye plass på siden.
@@ -48,7 +48,7 @@ export const ReglerKnapp = ({ variant }: { variant?: "outline" | "default" }) =>
             Reglene i konkurransen
           </DialogTitle>
           <DialogDescription>
-            Kort og fullstendig — dette er alt du trenger å vite.
+            Kort og fullstendig - dette er alt du trenger å vite.
           </DialogDescription>
         </DialogHeader>
 
@@ -104,11 +104,11 @@ export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
     },
     {
       ok: true,
-      tekst: `Førstekjøp på minst ${MINSTE_FORSTEKJOP.toLocaleString("no-NO")} kr per aksje — håndheves automatisk ved kjøp`,
+      tekst: `Førstekjøp på minst ${MINSTE_FORSTEKJOP.toLocaleString("no-NO")} kr per aksje - håndheves automatisk ved kjøp`,
     },
     {
       ok: true,
-      tekst: `Maks ${MAKSVEKT_PROSENT} % av porteføljen i én aksje — håndheves automatisk ved kjøp`,
+      tekst: `Maks ${MAKSVEKT_PROSENT} % av porteføljen i én aksje - håndheves automatisk ved kjøp`,
     },
   ];
 
@@ -173,7 +173,7 @@ export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
               </>
             ) : (
               <>
-                Avkastningen din begynner først å telle når porteføljen er gyldig —
+                Avkastningen din begynner først å telle når porteføljen er gyldig -
                 så det lønner seg å komme i gang med én gang.
               </>
             )}
@@ -187,7 +187,7 @@ export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
           <li className="flex items-center gap-2">
             <X className="w-4 h-4 text-red-600 flex-shrink-0" />
             <span>
-              Du eier {antall} av {KRAV_ANTALL_AKSJER} aksjer — kjøp{" "}
+              Du eier {antall} av {KRAV_ANTALL_AKSJER} aksjer - kjøp{" "}
               <span className="font-medium text-foreground">
                 {mangler} aksje{mangler === 1 ? "" : "r"} til
               </span>{" "}

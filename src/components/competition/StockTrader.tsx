@@ -182,7 +182,7 @@ const StockTrader = ({
 
     // Tillat desimalsalg både for dyre aksjer OG når beholdningen selv er
     // en desimal (kjøpt som brøkdel da kursen var >30 000, men kursen har
-    // falt under grensen siden) — ellers blir slike poster usalgbare.
+    // falt under grensen siden) - ellers blir slike poster usalgbare.
     const allowFractional = isExpensiveStock(selectedHolding.ticker) || !Number.isInteger(Number(selectedHolding.quantity));
     const quantity = parseFloat(sellQuantity);
     if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
@@ -234,7 +234,7 @@ const StockTrader = ({
 
   /**
    * Vil dette salget tømme posisjonen og ta en gyldig portefølje under
-   * 5 aksjer? Serveren avviser det uansett — men beskjeden skal komme
+   * 5 aksjer? Serveren avviser det uansett - men beskjeden skal komme
    * FØR man trykker, ikke som en avvist handel.
    */
   const sperretSalg = (holding: PortfolioHolding | null, antall: string): boolean => {
@@ -253,7 +253,7 @@ const StockTrader = ({
 
   return (
     <div className="space-y-6">
-      {/* Handelsreglene vises ikke lenger som tekstblokk her — de ligger
+      {/* Handelsreglene vises ikke lenger som tekstblokk her - de ligger
           bak «Reglene»-knappen på forsiden av konkurransen, og håndheves
           uansett automatisk i databasen når man handler. */}
 
@@ -322,7 +322,7 @@ const StockTrader = ({
 
           {/* Stock list */}
           <div className="rounded-md border max-h-[500px] overflow-auto">
-            {/* Mobil: kun navn og kjøpsknapp — kurs, endring og sektor
+            {/* Mobil: kun navn og kjøpsknapp - kurs, endring og sektor
                 kommer i dialogen når man trykker Kjøp. Da slipper man å
                 bla bortover i en smal tabell. */}
             <ul className="md:hidden divide-y divide-border">
@@ -446,14 +446,14 @@ const StockTrader = ({
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Nøkkelinfo om aksjen — på mobil er dette første gang man ser
+            {/* Nøkkelinfo om aksjen - på mobil er dette første gang man ser
                 kurs og utvikling (listen viser kun navn og kjøpsknapp) */}
             {selectedStock && (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
                 <span className="font-mono font-semibold text-base">
                   {quotes[selectedStock.ticker]
                     ? `${quotes[selectedStock.ticker].price.toFixed(2)} kr`
-                    : "–"}
+                    : "-"}
                 </span>
                 {quotes[selectedStock.ticker] && (
                   <span className={`flex items-center gap-1 font-medium ${
@@ -521,7 +521,7 @@ const StockTrader = ({
                   </p>
                   {isExpensiveStock(selectedStock.ticker) && (
                     <p className="text-xs text-primary">
-                      💡 Denne aksjen koster over 30 000 kr — du kan kjøpe deler av en aksje
+                      💡 Denne aksjen koster over 30 000 kr - du kan kjøpe deler av en aksje
                     </p>
                   )}
                 </>
@@ -610,7 +610,7 @@ const StockTrader = ({
               />
               {selectedHolding && isExpensiveStock(selectedHolding.ticker) && (
                 <p className="text-xs text-primary">
-                  💡 Denne aksjen koster over 30 000 kr — du kan selge deler
+                  💡 Denne aksjen koster over 30 000 kr - du kan selge deler
                 </p>
               )}
             </div>
@@ -621,7 +621,7 @@ const StockTrader = ({
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
                   Dette salget ville tømt posisjonen og tatt porteføljen din under{" "}
-                  {KRAV_ANTALL_AKSJER} aksjer — det tillater ikke reglene. Kjøp en
+                  {KRAV_ANTALL_AKSJER} aksjer - det tillater ikke reglene. Kjøp en
                   annen aksje først, eller selg bare deler av posisjonen.
                 </AlertDescription>
               </Alert>

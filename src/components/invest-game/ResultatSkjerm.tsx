@@ -13,7 +13,7 @@ import Ledertavle from "@/components/invest-game/Ledertavle";
 interface ResultatSkjermProps {
   portefolje: Portefolje;
   gruppenavn: string;
-  /** Tidspunktet resultatet ble lagret med — brukes til å utheve raden i tavlen. */
+  /** Tidspunktet resultatet ble lagret med - brukes til å utheve raden i tavlen. */
   lagretTidspunkt: string;
   /** null mens lagringen pågår, false hvis den havnet i offline-køen. */
   lagringOk: boolean | null;
@@ -120,7 +120,7 @@ const ResultatSkjerm = ({
         <Ledertavle antall={10} uthevTidspunkt={lagretTidspunkt} nokkel={lagretTidspunkt} />
         {lagringOk === false && (
           <p className="text-sm stock-negative mt-4 leading-relaxed">
-            Resultatet kunne ikke lagres akkurat nå — nettforbindelsen sviktet.
+            Resultatet kunne ikke lagres akkurat nå - nettforbindelsen sviktet.
             Det er lagret lokalt og sendes automatisk neste gang siden åpnes
             med nett.
           </p>

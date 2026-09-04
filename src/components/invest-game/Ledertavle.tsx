@@ -5,7 +5,7 @@ import { hentLedertavle, type Ledertavleresultat } from "@/lib/invest-game/leder
 interface LedertavleProps {
   /** Hvor mange plasseringer som vises. */
   antall?: number;
-  /** Tidspunktet til rundens eget resultat — den raden uthever vi. */
+  /** Tidspunktet til rundens eget resultat - den raden uthever vi. */
   uthevTidspunkt?: string;
   /** Bumpes for å tvinge en ny henting (f.eks. etter at et resultat er lagret). */
   nokkel?: string | number;

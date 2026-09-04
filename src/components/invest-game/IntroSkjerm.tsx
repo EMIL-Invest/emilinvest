@@ -31,7 +31,7 @@ const IntroSkjerm = ({ forrigeNavn, onStart }: IntroSkjermProps) => {
           mens markedet beveger seg.
         </p>
         <p>
-          Følg med på nyhetene — de gir hint om hva som kommer til å skje. Gruppen med
+          Følg med på nyhetene - de gir hint om hva som kommer til å skje. Gruppen med
           høyest avkastning vinner.
         </p>
       </div>

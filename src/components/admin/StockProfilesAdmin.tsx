@@ -271,7 +271,7 @@ const StockProfilesAdmin = () => {
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Alle felt er valgfrie bortsett fra navn. Tomme felt vises som «–» på siden.
+                Alle felt er valgfrie bortsett fra navn. Tomme felt vises som «-» på siden.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -432,7 +432,7 @@ const StockProfilesAdmin = () => {
                           </td>
                           {BELOPSFELT.map(({ felt }) => (
                             <td key={felt as string} className="py-2.5 px-2 text-right tabular-nums">
-                              {p[felt] === null ? "–" : Number(p[felt]).toLocaleString("no-NO")}
+                              {p[felt] === null ? "-" : Number(p[felt]).toLocaleString("no-NO")}
                             </td>
                           ))}
                           <td className="py-2.5">

@@ -50,7 +50,7 @@ const Competition = () => {
   /**
    * Fanen styres manuelt: en ny deltaker uten gyldig portefølje skal lande
    * rett i Kjøp/Selg. Auth og deltakerdata kommer asynkront, så en ren
-   * defaultValue på <Tabs> rekker ikke — den er låst før dataene finnes.
+   * defaultValue på <Tabs> rekker ikke - den er låst før dataene finnes.
    */
   const [aktivFane, setAktivFane] = useState("leaderboard");
   const [faneAutovalgt, setFaneAutovalgt] = useState(false);
@@ -85,7 +85,7 @@ const Competition = () => {
 
   /**
    * Kjøpet går via en wrapper slik at siden kan feire øyeblikket
-   * porteføljen blir gyldig — serveren sier fra via nylig_kvalifisert.
+   * porteføljen blir gyldig - serveren sier fra via nylig_kvalifisert.
    */
   const handleBuy = async (ticker: string, quantity: number, price: number) => {
     const result = await buyStock(ticker, quantity, price);
@@ -143,7 +143,7 @@ const Competition = () => {
       {/* Mobil: plass i bunnen til den faste navigasjonslinjen */}
       <main className="pt-16 pb-28 md:py-24">
         <div className="section-container">
-          {/* Header — kompaktere på mobil så innholdet kommer raskere frem */}
+          {/* Header - kompaktere på mobil så innholdet kommer raskere frem */}
           <div className="text-center mb-8 md:mb-12">
             <Badge className="mb-3 md:mb-4 bg-competition text-competition-foreground">
               <Trophy className="w-3 h-3 mr-1" />
@@ -153,7 +153,7 @@ const Competition = () => {
               Investeringskonkurranse
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr — høyest avkastning vinner.
+              Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr - høyest avkastning vinner.
             </p>
             {/* Regler og premier: ett trykk unna, uten å ta plass på siden */}
             <div className="mt-5 flex items-center justify-center gap-3">
@@ -310,10 +310,10 @@ const Competition = () => {
             </div>
           )}
 
-          {/* Main content tabs — nye deltakere lander rett i handelen,
+          {/* Main content tabs - nye deltakere lander rett i handelen,
               slik at veien til gyldig portefølje er kortest mulig */}
           <Tabs value={aktivFane} onValueChange={setAktivFane} className="space-y-6">
-            {/* Fanelisten øverst vises bare på desktop — på mobil overtar
+            {/* Fanelisten øverst vises bare på desktop - på mobil overtar
                 den faste navigasjonslinjen i bunnen (tommelavstand) */}
             <TabsList className="hidden md:grid w-full max-w-md mx-auto grid-cols-3">
               <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
@@ -408,7 +408,7 @@ const Competition = () => {
         </div>
       </main>
 
-      {/* Mobil: fast navigasjonslinje i bunnen — de tre delene av
+      {/* Mobil: fast navigasjonslinje i bunnen - de tre delene av
           konkurransen er alltid ett tommeltrykk unna. Skjult på desktop. */}
       {participant && (
         <nav

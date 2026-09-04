@@ -20,7 +20,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   // Samtykke til vilkår og personvern. Kreves for å opprette konto, ikke
-  // for å logge inn — og lagres implisitt ved at kontoen opprettes.
+  // for å logge inn - og lagres implisitt ved at kontoen opprettes.
   const [godtarVilkar, setGodtarVilkar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingInvitation, setCheckingInvitation] = useState(false);

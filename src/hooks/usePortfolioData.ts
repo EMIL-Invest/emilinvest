@@ -11,7 +11,7 @@ export interface Holding {
   holding_type: string;
   sector: string | null;
   exchange: string | null;
-  /** Datoen posisjonen ble kjøpt — utgangspunktet avkastningen måles fra. */
+  /** Datoen posisjonen ble kjøpt - utgangspunktet avkastningen måles fra. */
   purchase_date: string | null;
 }
 
@@ -124,7 +124,7 @@ export const usePortfolioData = () => {
       if (holding.holding_type === "stock") {
         totalValue += calculateHoldingValue(holding, quotesMap[holding.ticker]);
       } else {
-        // Fond og andre beholdninger har ingen live-kurs — bruk kostbasis
+        // Fond og andre beholdninger har ingen live-kurs - bruk kostbasis
         // slik at totalverdien ikke underrapporterer klubbens verdi.
         totalValue += holding.cost_basis || (holding.purchase_price * holding.quantity);
       }
@@ -147,7 +147,7 @@ export const usePortfolioData = () => {
   }, []);
 
   // Automatisk kursoppdatering hvert 5. minutt.
-  // NB: fetchQuotes må stå i deps — den gjenskapes når holdings endres,
+  // NB: fetchQuotes må stå i deps - den gjenskapes når holdings endres,
   // ellers fryser intervallet på en tom holdings-liste (stale closure).
   useEffect(() => {
     const interval = setInterval(() => fetchQuotes(), 5 * 60 * 1000);

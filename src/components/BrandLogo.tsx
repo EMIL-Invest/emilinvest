@@ -1,4 +1,4 @@
-// «navy»-tonen peker nå på de grønne variantene — profilfargen er
+// «navy»-tonen peker nå på de grønne variantene - profilfargen er
 // logo-grønn (#3B563F) etter redesignet. Prop-navnet beholdes for
 // bakoverkompatibilitet: navy = mørk (lys bakgrunn), white = lys (mørk bakgrunn).
 import wordmarkNavy from "@/assets/logo-wordmark-green.png";

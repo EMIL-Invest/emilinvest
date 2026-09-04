@@ -1,5 +1,5 @@
 /**
- * Opptaket — én kilde til frist og e-postadresse.
+ * Opptaket - én kilde til frist og e-postadresse.
  *
  * Brukes av rekrutteringsboksen på forsiden og av søknadssiden (/soknad).
  * Neste opptak: endre FRIST her, så følger begge stedene etter.

@@ -223,7 +223,7 @@ function tzOffsetMinutes(timezone: string, at: Date): number {
 
 /**
  * Convert a time from one timezone to Oslo time (for display purposes).
- * Uses the offset difference at the current instant, computed with Intl —
+ * Uses the offset difference at the current instant, computed with Intl -
  * robust across DST, unlike Date-parsing of locale strings.
  */
 function convertToOsloTime(hour: number, minute: number, fromTimezone: string): { hour: number; minute: number } {

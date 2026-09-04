@@ -105,7 +105,7 @@ const Aksje = () => {
     [valgte],
   );
 
-  // Vår posisjon — bare hvis vi faktisk eier aksjen
+  // Vår posisjon - bare hvis vi faktisk eier aksjen
   const posisjon = useMemo(() => {
     if (!holding) return null;
     const verdi = calculateHoldingValue(holding, quotes[holding.ticker]);
@@ -186,7 +186,7 @@ const Aksje = () => {
               </p>
             </div>
           ) : !profil ? (
-            /* Tomtilstand — profilen er ikke fylt inn ennå */
+            /* Tomtilstand - profilen er ikke fylt inn ennå */
             <div
               className="rounded-md border border-border bg-card p-8 md:p-10 max-w-2xl"
               style={{ boxShadow: "var(--shadow-soft)" }}
@@ -293,14 +293,14 @@ const Aksje = () => {
                 </div>
 
                 {/* KI-forbehold. Står her, rett under tallene, fordi det er
-                    her leseren faktisk trenger det — ikke nederst på siden. */}
+                    her leseren faktisk trenger det - ikke nederst på siden. */}
                 <div className="flex items-start gap-3 mt-4 px-1">
                   <AlertTriangle className="w-4 h-4 text-foreground/50 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-3xl">
                     Tallene på denne siden er hentet inn ved hjelp av kunstig
                     intelligens og er <span className="text-foreground">ikke kvalitetssikret</span>{" "}
                     mot selskapets offisielle rapporter. De kan inneholde feil.
-                    Bruk dem som et utgangspunkt for egen research, ikke som fasit —
+                    Bruk dem som et utgangspunkt for egen research, ikke som fasit -
                     gå til selskapets kvartals- og årsrapport for tall du skal
                     stole på.
                   </p>
@@ -445,7 +445,7 @@ const Aksje = () => {
                               const m = margin(p.ebit, p.omsetning);
                               return (
                                 <td key={p.id} className="py-3 px-3 text-right tabular-nums text-foreground">
-                                  {m === null ? "–" : `${formatTall(m, 1)} %`}
+                                  {m === null ? "-" : `${formatTall(m, 1)} %`}
                                 </td>
                               );
                             })}
@@ -479,7 +479,7 @@ const Aksje = () => {
               {/* Ansvarsfraskrivelse */}
               <p className="text-xs text-muted-foreground/80 leading-relaxed max-w-3xl">
                 Tallene er samlet inn med KI-hjelp, lagt inn manuelt og oppdateres ikke
-                automatisk — se datoen over nøkkeltallene for hvor ferske de er. Historisk
+                automatisk - se datoen over nøkkeltallene for hvor ferske de er. Historisk
                 avkastning er ingen garanti for framtidig avkastning, og ingenting på denne
                 siden er investeringsrådgivning. Se{" "}
                 <Link to="/vilkar" className="underline underline-offset-2 hover:text-foreground">

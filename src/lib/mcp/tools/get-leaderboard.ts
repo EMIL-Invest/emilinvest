@@ -19,7 +19,7 @@ export default defineTool({
     }
     const supabase = supabaseForUser(ctx);
 
-    // Finn siste snapshot-dato først, og filtrer på den — uten dette blandes
+    // Finn siste snapshot-dato først, og filtrer på den - uten dette blandes
     // rader fra eldre snapshots inn og samme deltaker dukker opp flere ganger.
     const { data: latest, error: latestError } = await supabase
       .from("competition_leaderboard")

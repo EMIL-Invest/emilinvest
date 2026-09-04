@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Børskrakket — ledertavlen.
+ * Børskrakket - ledertavlen.
  *
  * Resultatene ligger i Supabase-tabellen game_leaderboard, så alle ser
  * samme tavle uansett enhet: gruppene kan spille fra egne telefoner og
@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
  * rader, admin kan rydde).
  *
  * OFFLINE-KØ: mister nettleseren nettet i det tiden går ut, ville
- * resultatet vært tapt for godt — og på et arrangement er det en gruppe
+ * resultatet vært tapt for godt - og på et arrangement er det en gruppe
  * som har spilt for ingenting. Derfor legges et mislykket lagringsforsøk
  * i localStorage og sendes på nytt neste gang tavlen hentes.
  */

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
  * Datalag for aksjesidene (nøkkeltall, regnskap, bransjeforklaring).
  *
  * Tabellene stock_profiles og stock_financials finnes ikke i den
- * autogenererte types.ts ennå — den regenereres med
+ * autogenererte types.ts ennå - den regenereres med
  * `supabase gen types typescript`. Til da ligger den ene nødvendige
  * type-omgåelsen samlet HER, med egne typer under, slik at resten av
  * koden er fullt typet.
@@ -16,7 +16,7 @@ const db = supabase as unknown as {
 /**
  * Tabellene finnes ikke før 10_aksjeprofiler.sql er kjørt i Supabase.
  * Da svarer PostgREST med 42P01 («relation does not exist»). Det skal
- * ikke gi en feilmelding til brukeren — siden skal bare se tom ut, slik
+ * ikke gi en feilmelding til brukeren - siden skal bare se tom ut, slik
  * at koden kan deployes før SQL-skriptet kjøres.
  */
 const manglerTabell = (feil: { code?: string; message?: string } | null): boolean =>
@@ -136,10 +136,10 @@ export const slettProfil = async (ticker: string) => {
   if (error) throw error;
 };
 
-/** «12 345» / «–» for tall som mangler. Beløp er i millioner. */
+/** «12 345» / «-» for tall som mangler. Beløp er i millioner. */
 export const formatTall = (v: number | null | undefined, desimaler = 0): string =>
   v === null || v === undefined || !isFinite(v)
-    ? "–"
+    ? "-"
     : v.toLocaleString("no-NO", {
         minimumFractionDigits: desimaler,
         maximumFractionDigits: desimaler,
