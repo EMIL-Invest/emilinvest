@@ -32,3 +32,7 @@ dist-ssr
 
 # Midlertidige overføringsmapper fra Claude
 _to_delete_pakke/
+
+# Midlertidig soppelmappe for git-laasfiler (skyokten kan ikke slette filer)
+_to_delete_gitlock/
+_to_delete/
