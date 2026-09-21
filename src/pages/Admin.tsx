@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, Shield, Briefcase, LineChart, FileSpreadsheet, BookOpen } from "lucide-react";
+import { ArrowLeft, Users, Shield, Briefcase, LineChart, FileSpreadsheet, BookOpen, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import PortfolioAdmin from "@/components/admin/PortfolioAdmin";
@@ -14,6 +14,7 @@ import TeamAdmin from "@/components/admin/TeamAdmin";
 import StockProfilesAdmin from "@/components/admin/StockProfilesAdmin";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import ExcelExport from "@/components/admin/ExcelExport";
+import AnalyseAdmin from "@/components/admin/analyse/AnalyseAdmin";
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -100,7 +101,7 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <Link 
           to="/" 
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors"
@@ -115,7 +116,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Portefølje
@@ -123,6 +124,10 @@ const Admin = () => {
             <TabsTrigger value="history" className="flex items-center gap-2">
               <LineChart className="w-4 h-4" />
               Historikk
+            </TabsTrigger>
+            <TabsTrigger value="analyse" className="flex items-center gap-2">
+              <Calculator className="w-4 h-4" />
+              Analyse
             </TabsTrigger>
             <TabsTrigger value="excel" className="flex items-center gap-2">
               <FileSpreadsheet className="w-4 h-4" />
@@ -155,6 +160,10 @@ const Admin = () => {
               history={portfolioData.history} 
               onRefresh={portfolioData.refresh} 
             />
+          </TabsContent>
+
+          <TabsContent value="analyse">
+            <AnalyseAdmin holdings={portfolioData.holdings} quotes={portfolioData.quotes} />
           </TabsContent>
 
           <TabsContent value="excel">
