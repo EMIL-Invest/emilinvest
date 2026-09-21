@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import RecruitmentSection from "@/components/RecruitmentSection";
 import AboutSection from "@/components/AboutSection";
 import PortfolioSection from "@/components/PortfolioSection";
 import PerformanceSection from "@/components/PerformanceSection";
@@ -14,9 +13,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <HeroSection />
-      {/* Opptaket ligger rett under toppen mens det er åpent */}
-      <RecruitmentSection />
-      {/* Konkurransen etter opptaket - saldo → bilde → opptak → konkurranse */}
+      {/* Konkurransen rett under toppen */}
       <CompetitionBanner />
       <PortfolioSection />
       <PerformanceSection />

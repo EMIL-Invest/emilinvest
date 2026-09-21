@@ -139,16 +139,8 @@ const HeroSection = () => {
               )}
             </p>
 
-            {/* Én knappelinje på store skjermer. På mobil: to kolonner der
-                konkurranseknappen spenner over begge - symmetrisk blokk. */}
-            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-nowrap sm:items-center sm:gap-3">
-              {/* Opptaket er åpent - søknadsknappen står først. Den går rett
-                  til e-post, med emnefeltet forhåndsfylt. */}
-              <Button size="lg" className="px-4 sm:px-5" asChild>
-                <a href="mailto:kontakt@emilinvest.no?subject=Søknad%20til%20EMIL%20Invest">
-                  Søk EMIL Invest
-                </a>
-              </Button>
+            {/* Én knappelinje på store skjermer, stablet på mobil. */}
+            <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-nowrap sm:items-center sm:gap-3">
               <Button
                 size="lg"
                 variant="outline"
@@ -159,7 +151,7 @@ const HeroSection = () => {
               </Button>
               <Button
                 size="lg"
-                className="group col-span-2 px-4 sm:px-5 bg-competition text-competition-foreground hover:bg-competition/90 font-semibold"
+                className="group px-4 sm:px-5 bg-competition text-competition-foreground hover:bg-competition/90 font-semibold"
                 onClick={() => navigate("/konkurranse")}
               >
                 Bli med i konkurransen

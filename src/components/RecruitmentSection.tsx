@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { FRIST } from "@/lib/opptak";
 
 /**
+ * PARKERT (sept. 2026): komiteen tar ikke opp flere medlemmer, så denne
+ * seksjonen er koblet fra Index.tsx og vises ikke på siden. Den er beholdt
+ * for neste opptak - sett <RecruitmentSection /> tilbake i Index.tsx,
+ * legg ruten /soknad tilbake i App.tsx, og oppdater FRIST i lib/opptak.ts.
+ *
  * Rekruttering - egen LYS seksjon kant til kant, rett under toppen mens
  * opptaket er åpent. Ingen boks: hvit flate med delelinjer skiller den
  * fra kremen rundt, og innholdet ligger redaksjonelt i to kolonner.

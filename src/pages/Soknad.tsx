@@ -1,3 +1,8 @@
+/**
+ * PARKERT (sept. 2026): ruten /soknad er fjernet fra App.tsx fordi komiteen
+ * ikke tar opp flere medlemmer. Siden er beholdt for neste opptak - legg
+ * ruten tilbake og oppdater FRIST i lib/opptak.ts.
+ */
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Bot, Briefcase, GraduationCap, Heart, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
