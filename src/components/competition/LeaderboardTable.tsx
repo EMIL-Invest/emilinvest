@@ -16,10 +16,8 @@ interface LeaderboardTableProps {
 const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }: LeaderboardTableProps) => {
   const [selectedParticipant, setSelectedParticipant] = useState<{ id: string; name: string } | null>(null);
 
-  // Bare de som oppfyller diversifiseringskravet rangeres. De øvrige
-  // vises i en egen gruppe under, med hva som mangler.
+  // Bare de som oppfyller diversifiseringskravet rangeres.
   const rangerte = entries.filter((e) => e.kvalifisert);
-  const ikkeKvalifisert = entries.filter((e) => !e.kvalifisert);
 
   // Din egen rad hvis du er utenfor topp 10 - vises som egen rad nederst
   const ownEntryOutsideTop10 = currentParticipantId
@@ -253,40 +251,6 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
               Ingen deltakere er kvalifisert ennå. Du kommer på ledertavlen når
               du eier minst {KRAV_ANTALL_AKSJER} ulike aksjer.
             </p>
-          )}
-
-          {ikkeKvalifisert.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-border">
-              <h3 className="text-sm font-medium text-foreground mb-1">
-                Ikke kvalifisert ennå ({ikkeKvalifisert.length})
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4 max-w-2xl leading-relaxed">
-                For å bli rangert må porteføljen inneholde minst{" "}
-                {KRAV_ANTALL_AKSJER} ulike aksjer. Konkurransen skal gi erfaring
-                med å bygge en portefølje, ikke belønne den som satser alt på ett
-                selskap og har flaks.
-              </p>
-              <ul className="space-y-2">
-                {ikkeKvalifisert.map((e) => (
-                  <li
-                    key={e.participant_id}
-                    className={`flex items-center justify-between gap-3 text-sm rounded-[4px] border border-border px-3 py-2 ${
-                      e.participant_id === currentParticipantId ? "bg-primary/5" : ""
-                    }`}
-                  >
-                    <span className="flex items-center gap-2 min-w-0">
-                      <span className="truncate">{e.display_name}</span>
-                      {e.participant_id === currentParticipantId && (
-                        <Badge variant="secondary" className="text-xs">Deg</Badge>
-                      )}
-                    </span>
-                    <span className="text-muted-foreground tabular-nums flex-shrink-0">
-                      {e.antall_aksjer} av {KRAV_ANTALL_AKSJER} aksjer
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           )}
         </CardContent>
       </Card>
