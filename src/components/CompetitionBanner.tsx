@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Coins, TrendingUp, Gift, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { useToppliste } from "@/hooks/useToppliste";
+import { KRAV_ANTALL_AKSJER } from "@/hooks/useCompetition";
 import { HovedpremieBilder, SitGavekort, FOTOKREDITT } from "@/components/competition/Premier";
 
 /**
@@ -25,8 +28,51 @@ const fakta = [
 const prosent = (n: number) =>
   `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(1).replace(".", ",")} %`;
 
+/**
+ * Den innloggedes deltaker-id, hvis hen er med i konkurransen.
+ * null = ikke innlogget eller ikke påmeldt; undefined = vet ikke ennå.
+ */
+const useMinDeltaker = () => {
+  const [deltakerId, setDeltakerId] = useState<string | null | undefined>(undefined);
+  const [innlogget, setInnlogget] = useState(false);
+
+  useEffect(() => {
+    let aktiv = true;
+    const slaaOpp = async (userId: string | undefined) => {
+      if (!userId) {
+        if (aktiv) {
+          setInnlogget(false);
+          setDeltakerId(null);
+        }
+        return;
+      }
+      setInnlogget(true);
+      const { data } = await supabase
+        .from("competition_participants")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (aktiv) setDeltakerId(data?.id ?? null);
+    };
+    supabase.auth.getSession().then(({ data: { session } }) => slaaOpp(session?.user?.id));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      slaaOpp(session?.user?.id);
+    });
+    return () => {
+      aktiv = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  return { deltakerId, innlogget };
+};
+
 const CompetitionBanner = () => {
-  const { topp, laster } = useToppliste(3);
+  const { topp, laster, finnPlass } = useToppliste(3);
+  const { deltakerId, innlogget } = useMinDeltaker();
+  const min = finnPlass(deltakerId);
+  const erPaaToppen = !!deltakerId && topp.some((t) => t.id === deltakerId);
 
   // Stolpene skaleres mot den beste avkastningen. Ligger alle i minus,
   // gir stolper ingen mening, og da dropper vi dem.
@@ -125,7 +171,13 @@ const CompetitionBanner = () => {
                     <li
                       key={t.id}
                       className="flex items-center gap-4 px-3 py-3.5 rounded-[4px]"
-                      style={i === 0 ? { background: "hsl(var(--competition) / 0.1)" } : undefined}
+                      style={
+                        i === 0
+                          ? { background: "hsl(var(--competition) / 0.1)" }
+                          : t.id === deltakerId
+                            ? { background: "hsl(var(--secondary))" }
+                            : undefined
+                      }
                     >
                       <span
                         className="font-serif text-lg w-4 tabular-nums"
@@ -136,6 +188,11 @@ const CompetitionBanner = () => {
                       <span className="flex-1 min-w-0">
                         <span className="block text-sm font-medium text-foreground truncate">
                           {t.navn}
+                          {t.id === deltakerId && (
+                            <span className="ml-2 text-[0.65rem] uppercase tracking-[0.16em] font-semibold" style={{ color: GULL }}>
+                              deg
+                            </span>
+                          )}
                         </span>
                         {/* Stolpen er relativ til lederen - den sier hvor stor
                             avstanden er, ikke hvor mye avkastning er i seg selv. */}
@@ -162,17 +219,67 @@ const CompetitionBanner = () => {
                 </ol>
               )}
 
-              <div className="border-t border-dashed border-border mt-2 pt-4 flex items-center gap-4 px-3">
-                <span className="text-muted-foreground text-sm w-4">…</span>
-                <span className="flex-1 text-sm text-muted-foreground">Din plass venter</span>
-                <Link
-                  to="/konkurranse"
-                  className="text-sm font-semibold hover:underline underline-offset-4"
-                  style={{ color: GULL }}
+              {/* Nederste rad: den innloggedes egen plass. Fire tilstander:
+                  ikke innlogget/ikke påmeldt -> invitasjon; påmeldt men under
+                  fem aksjer -> hva som mangler; rangert utenfor topp 3 -> plass
+                  og avkastning; rangert i topp 3 -> markeres i selve listen. */}
+              {!laster && min && min.kvalifisert && min.plass !== null ? (
+                <div
+                  className="border-t border-dashed border-border mt-2 pt-2 flex items-center gap-4 px-3 py-3.5 rounded-[4px]"
+                  style={erPaaToppen ? undefined : { background: "hsl(var(--secondary))" }}
                 >
-                  Bli med
-                </Link>
-              </div>
+                  <span className="font-serif text-lg w-4 tabular-nums text-foreground">{min.plass}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm font-medium text-foreground">
+                      {erPaaToppen ? "Du ligger på topplisten" : "Din plass"}
+                    </span>
+                    <span className="block text-xs text-muted-foreground mt-0.5">
+                      {min.plass === 1
+                        ? "Du leder denne måneden"
+                        : `Nr. ${min.plass} av ${min.antallRangerte} rangerte`}
+                    </span>
+                  </span>
+                  <span className={`font-serif text-lg tabular-nums ${min.avkastning >= 0 ? "stock-positive" : "stock-negative"}`}>
+                    {prosent(min.avkastning)}
+                  </span>
+                  <Link
+                    to="/konkurranse"
+                    className="text-sm font-semibold hover:underline underline-offset-4 whitespace-nowrap"
+                    style={{ color: GULL }}
+                  >
+                    Se porteføljen
+                  </Link>
+                </div>
+              ) : !laster && min && !min.kvalifisert ? (
+                <div className="border-t border-dashed border-border mt-2 pt-4 flex items-center gap-4 px-3">
+                  <span className="text-muted-foreground text-sm w-4">…</span>
+                  <span className="flex-1 text-sm text-muted-foreground">
+                    Du mangler {KRAV_ANTALL_AKSJER - min.antallAksjer}{" "}
+                    {KRAV_ANTALL_AKSJER - min.antallAksjer === 1 ? "aksje" : "aksjer"} for å bli rangert
+                  </span>
+                  <Link
+                    to="/konkurranse"
+                    className="text-sm font-semibold hover:underline underline-offset-4 whitespace-nowrap"
+                    style={{ color: GULL }}
+                  >
+                    Fullfør porteføljen
+                  </Link>
+                </div>
+              ) : (
+                <div className="border-t border-dashed border-border mt-2 pt-4 flex items-center gap-4 px-3">
+                  <span className="text-muted-foreground text-sm w-4">…</span>
+                  <span className="flex-1 text-sm text-muted-foreground">
+                    {innlogget ? "Du er ikke med ennå" : "Din plass venter"}
+                  </span>
+                  <Link
+                    to="/konkurranse"
+                    className="text-sm font-semibold hover:underline underline-offset-4"
+                    style={{ color: GULL }}
+                  >
+                    Bli med
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

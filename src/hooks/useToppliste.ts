@@ -21,6 +21,16 @@ export interface ToppNavn {
   avkastning: number;
 }
 
+/** Den innloggedes egen status i månedslisten - til «din plass»-raden på forsiden. */
+export interface MinPlass {
+  /** 1-basert plassering blant de kvalifiserte, eller null hvis ikke kvalifisert. */
+  plass: number | null;
+  avkastning: number;
+  antallAksjer: number;
+  kvalifisert: boolean;
+  antallRangerte: number;
+}
+
 interface Deltaker {
   id: string;
   display_name: string;
@@ -34,8 +44,14 @@ interface Post {
   average_purchase_price: number;
 }
 
+interface Rad extends ToppNavn {
+  kvalifisert: boolean;
+  antallAksjer: number;
+}
+
 export const useToppliste = (antall = 3) => {
   const [topp, setTopp] = useState<ToppNavn[]>([]);
+  const [alle, setAlle] = useState<Rad[]>([]);
   const [antallDeltakere, setAntallDeltakere] = useState(0);
   const [laster, setLaster] = useState(true);
 
@@ -47,6 +63,7 @@ export const useToppliste = (antall = 3) => {
 
     if (error || !deltakere || deltakere.length === 0) {
       setTopp([]);
+      setAlle([]);
       setAntallDeltakere(0);
       setLaster(false);
       return;
@@ -90,22 +107,50 @@ export const useToppliste = (antall = 3) => {
         navn: d.display_name,
         avkastning: start > 0 ? ((verdi - start) / start) * 100 : 0,
         kvalifisert: aksjer >= KRAV_ANTALL_AKSJER,
-      };
+        antallAksjer: aksjer,
+      } satisfies Rad;
     });
 
+    // Kvalifiserte først, sortert på avkastning - det er rangeringen.
+    const sortert = [...rader].sort((a, b) => {
+      if (a.kvalifisert !== b.kvalifisert) return a.kvalifisert ? -1 : 1;
+      return b.avkastning - a.avkastning;
+    });
+    setAlle(sortert);
     setTopp(
-      rader
+      sortert
         .filter((r) => r.kvalifisert)
-        .sort((a, b) => b.avkastning - a.avkastning)
         .slice(0, antall)
         .map(({ id, navn, avkastning }) => ({ id, navn, avkastning }))
     );
     setLaster(false);
   }, [antall]);
 
+  /**
+   * Plasseringen til en deltaker, regnet på nøyaktig samme liste som
+   * toppen vises fra - så «du er nr. 7» og topplisten aldri spriker.
+   */
+  const finnPlass = useCallback(
+    (participantId: string | null | undefined): MinPlass | null => {
+      if (!participantId) return null;
+      const rangerte = alle.filter((r) => r.kvalifisert);
+      const i = rangerte.findIndex((r) => r.id === participantId);
+      const meg = alle.find((r) => r.id === participantId);
+      if (!meg) return null;
+      return {
+        plass: i >= 0 ? i + 1 : null,
+        avkastning: meg.avkastning,
+        antallAksjer: meg.antallAksjer,
+        kvalifisert: meg.kvalifisert,
+        antallRangerte: rangerte.length,
+      };
+    },
+    [alle],
+  );
+
   useEffect(() => {
     hent();
   }, [hent]);
 
-  return { topp, antallDeltakere, laster };
+  return { topp, antallDeltakere, laster, finnPlass };
 };
