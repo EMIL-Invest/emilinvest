@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
 import { KRAV_ANTALL_AKSJER } from "@/lib/konkurranseregler";
+import { sektorGruppe, aksjeMarked, markedNavn, sorterMarkeder } from "@/lib/aksjefilter";
 
 interface StockTraderProps {
   availableStocks: OsloStock[];
@@ -43,6 +44,7 @@ const StockTrader = ({
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [sectorFilter, setSectorFilter] = useState<string>("all");
+  const [marketFilter, setMarketFilter] = useState<string>("all");
   const [buyDialogOpen, setBuyDialogOpen] = useState(false);
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState<OsloStock | null>(null);
@@ -54,10 +56,30 @@ const StockTrader = ({
   const [tradingCheck, setTradingCheck] = useState<{ allowed: boolean; reason?: string; dailyCount?: number } | null>(null);
   const [checkingTrading, setCheckingTrading] = useState(false);
 
-  const sectors = useMemo(() => {
-    const uniqueSectors = new Set(availableStocks.map(s => s.sector).filter(Boolean));
-    return Array.from(uniqueSectors).sort();
+  const markets = useMemo(() => {
+    const unique = new Set(availableStocks.map(aksjeMarked));
+    return sorterMarkeder(Array.from(unique));
   }, [availableStocks]);
+
+  // Sektorlisten følger valgt marked, så man ikke får tomme valg
+  const sectors = useMemo(() => {
+    const unique = new Set(
+      availableStocks
+        .filter(s => marketFilter === "all" || aksjeMarked(s) === marketFilter)
+        .map(s => sektorGruppe(s.sector))
+    );
+    return Array.from(unique).sort((a, b) => a.localeCompare(b, "nb"));
+  }, [availableStocks, marketFilter]);
+
+  const handleMarketChange = (value: string) => {
+    setMarketFilter(value);
+    if (sectorFilter !== "all" && sectorFilter !== "mine") {
+      const finnes = availableStocks.some(
+        s => (value === "all" || aksjeMarked(s) === value) && sektorGruppe(s.sector) === sectorFilter
+      );
+      if (!finnes) setSectorFilter("all");
+    }
+  };
 
   const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
 
@@ -66,6 +88,8 @@ const StockTrader = ({
       const matchesSearch = 
         stock.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         stock.ticker.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesMarket = marketFilter === "all" || aksjeMarked(stock) === marketFilter;
+      if (!matchesMarket) return false;
       
       // Handle "mine" filter - only show stocks user owns
       if (sectorFilter === "mine") {
@@ -73,10 +97,10 @@ const StockTrader = ({
         return matchesSearch && isOwned;
       }
       
-      const matchesSector = sectorFilter === "all" || stock.sector === sectorFilter;
+      const matchesSector = sectorFilter === "all" || sektorGruppe(stock.sector) === sectorFilter;
       return matchesSearch && matchesSector;
     });
-  }, [availableStocks, searchTerm, sectorFilter, stockHoldings]);
+  }, [availableStocks, searchTerm, sectorFilter, marketFilter, stockHoldings]);
 
   const handleBuyClick = async (stock: OsloStock) => {
     setSelectedStock(stock);
@@ -294,6 +318,20 @@ const StockTrader = ({
                 className="pl-10"
               />
             </div>
+            <div className="grid grid-cols-2 gap-4 sm:flex">
+            <Select value={marketFilter} onValueChange={handleMarketChange}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Alle markeder" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle markeder</SelectItem>
+                {markets.map((market) => (
+                  <SelectItem key={market} value={market}>
+                    {markedNavn(market)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Select value={sectorFilter} onValueChange={setSectorFilter}>
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Alle sektorer" />
@@ -304,12 +342,13 @@ const StockTrader = ({
                   ⭐ Mine aksjer ({stockHoldings.length})
                 </SelectItem>
                 {sectors.map((sector) => (
-                  <SelectItem key={sector} value={sector!}>
+                  <SelectItem key={sector} value={sector}>
                     {sector}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            </div>
             <Button 
               variant="outline" 
               onClick={onRefreshQuotes}
@@ -379,7 +418,7 @@ const StockTrader = ({
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="text-xs">
-                          {stock.sector || 'Annet'}
+                          {sektorGruppe(stock.sector)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-mono">
@@ -469,7 +508,7 @@ const StockTrader = ({
                   </span>
                 )}
                 <Badge variant="secondary" className="text-xs">
-                  {selectedStock.sector || 'Annet'}
+                  {sektorGruppe(selectedStock.sector)}
                 </Badge>
                 {(() => {
                   const eid = stockHoldings.find(h => h.ticker === selectedStock.ticker);
