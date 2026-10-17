@@ -5,12 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
 import { KRAV_ANTALL_AKSJER } from "@/lib/konkurranseregler";
+import FlervalgFilter from "./FlervalgFilter";
+import { sektorGruppe, aksjeMarked, markedNavn, sorterMarkeder } from "@/lib/aksjefilter";
+
+const iValgtMarked = (stock: OsloStock, valgte: string[]) =>
+  valgte.length === 0 || valgte.includes(aksjeMarked(stock));
 
 interface StockTraderProps {
   availableStocks: OsloStock[];
@@ -42,7 +46,9 @@ const StockTrader = ({
 }: StockTraderProps) => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sectorFilter, setSectorFilter] = useState<string>("all");
+  // Tom liste = alle. "mine" i sektorlisten betyr bare aksjer man eier.
+  const [sectorFilter, setSectorFilter] = useState<string[]>([]);
+  const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [buyDialogOpen, setBuyDialogOpen] = useState(false);
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState<OsloStock | null>(null);
@@ -54,29 +60,45 @@ const StockTrader = ({
   const [tradingCheck, setTradingCheck] = useState<{ allowed: boolean; reason?: string; dailyCount?: number } | null>(null);
   const [checkingTrading, setCheckingTrading] = useState(false);
 
-  const sectors = useMemo(() => {
-    const uniqueSectors = new Set(availableStocks.map(s => s.sector).filter(Boolean));
-    return Array.from(uniqueSectors).sort();
+  const markets = useMemo(() => {
+    const unique = new Set(availableStocks.map(aksjeMarked));
+    return sorterMarkeder(Array.from(unique));
   }, [availableStocks]);
+
+  // Sektorlisten følger valgte markeder, så man ikke får tomme valg
+  const sectors = useMemo(() => {
+    const unique = new Set(
+      availableStocks.filter(s => iValgtMarked(s, marketFilter)).map(s => sektorGruppe(s.sector))
+    );
+    return Array.from(unique).sort((a, b) => a.localeCompare(b, "nb"));
+  }, [availableStocks, marketFilter]);
+
+  const handleMarketChange = (valgte: string[]) => {
+    setMarketFilter(valgte);
+    // Fjern sektorer som ikke finnes i de nye markedene
+    setSectorFilter(prev =>
+      prev.filter(sektor =>
+        sektor === "mine" ||
+        availableStocks.some(s => iValgtMarked(s, valgte) && sektorGruppe(s.sector) === sektor)
+      )
+    );
+  };
 
   const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
 
   const filteredStocks = useMemo(() => {
+    const kunMine = sectorFilter.includes("mine");
+    const valgteSektorer = sectorFilter.filter(s => s !== "mine");
+    const søk = searchTerm.toLowerCase();
     return availableStocks.filter(stock => {
-      const matchesSearch = 
-        stock.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        stock.ticker.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      // Handle "mine" filter - only show stocks user owns
-      if (sectorFilter === "mine") {
-        const isOwned = stockHoldings.some(h => h.ticker === stock.ticker);
-        return matchesSearch && isOwned;
-      }
-      
-      const matchesSector = sectorFilter === "all" || stock.sector === sectorFilter;
-      return matchesSearch && matchesSector;
+      const matchesSearch =
+        stock.name.toLowerCase().includes(søk) ||
+        stock.ticker.toLowerCase().includes(søk);
+      if (!matchesSearch || !iValgtMarked(stock, marketFilter)) return false;
+      if (kunMine && !stockHoldings.some(h => h.ticker === stock.ticker)) return false;
+      return valgteSektorer.length === 0 || valgteSektorer.includes(sektorGruppe(stock.sector));
     });
-  }, [availableStocks, searchTerm, sectorFilter, stockHoldings]);
+  }, [availableStocks, searchTerm, sectorFilter, marketFilter, stockHoldings]);
 
   const handleBuyClick = async (stock: OsloStock) => {
     setSelectedStock(stock);
@@ -294,22 +316,27 @@ const StockTrader = ({
                 className="pl-10"
               />
             </div>
-            <Select value={sectorFilter} onValueChange={setSectorFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Alle sektorer" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle sektorer</SelectItem>
-                <SelectItem value="mine" className="font-medium text-primary">
-                  ⭐ Mine aksjer ({stockHoldings.length})
-                </SelectItem>
-                {sectors.map((sector) => (
-                  <SelectItem key={sector} value={sector!}>
-                    {sector}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-4">
+            <FlervalgFilter
+              alleTekst="Alle markeder"
+              flertall="markeder"
+              valg={markets.map(m => ({ value: m, label: markedNavn(m) }))}
+              valgte={marketFilter}
+              onChange={handleMarketChange}
+              className="sm:w-48"
+            />
+            <FlervalgFilter
+              alleTekst="Alle sektorer"
+              flertall="sektorer"
+              valg={[
+                { value: "mine", label: `⭐ Mine aksjer (${stockHoldings.length})`, fremhevet: true },
+                ...sectors.map(sektor => ({ value: sektor, label: sektor })),
+              ]}
+              valgte={sectorFilter}
+              onChange={setSectorFilter}
+              className="sm:w-48"
+            />
+            </div>
             <Button 
               variant="outline" 
               onClick={onRefreshQuotes}
@@ -379,7 +406,7 @@ const StockTrader = ({
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="text-xs">
-                          {stock.sector || 'Annet'}
+                          {sektorGruppe(stock.sector)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-mono">
@@ -469,7 +496,7 @@ const StockTrader = ({
                   </span>
                 )}
                 <Badge variant="secondary" className="text-xs">
-                  {selectedStock.sector || 'Annet'}
+                  {sektorGruppe(selectedStock.sector)}
                 </Badge>
                 {(() => {
                   const eid = stockHoldings.find(h => h.ticker === selectedStock.ticker);
