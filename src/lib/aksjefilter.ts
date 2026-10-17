@@ -18,7 +18,7 @@ const SEKTOR_ALIAS: Record<string, string> = {
   hydrogen: "Fornybar energi",
   "grønn energi": "Fornybar energi",
   forsikring: "Finans",
-  rådgivning: "Industri",
+  rådgivning: "Rådgivning og ingeniør",
   detaljhandel: "Handel",
   forbruk: "Konsumvarer",
   luksus: "Konsumvarer",
