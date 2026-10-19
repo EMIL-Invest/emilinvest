@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
-import { KRAV_ANTALL_AKSJER } from "@/lib/konkurranseregler";
+import { KRAV_ANTALL_AKSJER, ANTALL_DESIMALER, rundAntall, visAntall } from "@/lib/konkurranseregler";
 import FlervalgFilter from "./FlervalgFilter";
 import { sektorGruppe, aksjeMarked, markedNavn, sorterMarkeder } from "@/lib/aksjefilter";
 
@@ -124,8 +124,8 @@ const StockTrader = ({
     if (!selectedStock) return;
 
     const allowFractional = isExpensiveStock(selectedStock.ticker);
-    const quantity = parseFloat(buyQuantity);
-    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity)) || (allowFractional && quantity < 0.01)) {
+    const quantity = rundAntall(parseFloat(buyQuantity));
+    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
       toast({
         title: "Ugyldig antall",
         description: "Angi et gyldig antall aksjer å kjøpe",
@@ -269,7 +269,7 @@ const StockTrader = ({
 
   const getMaxBuyable = (price: number): number => {
     if (price <= 0) return 0;
-    if (price > 30000) return Math.floor((cashBalance / price) * 100) / 100; // 2 decimals for expensive
+    if (price > 30000) return Math.floor((cashBalance / price) * 10 ** ANTALL_DESIMALER) / 10 ** ANTALL_DESIMALER;
     return Math.floor(cashBalance / price);
   };
 
@@ -502,7 +502,7 @@ const StockTrader = ({
                   const eid = stockHoldings.find(h => h.ticker === selectedStock.ticker);
                   return eid ? (
                     <span className="text-muted-foreground">
-                      Du eier {Number(eid.quantity).toLocaleString('nb-NO')}
+                      Du eier {visAntall(eid.quantity)}
                     </span>
                   ) : null;
                 })()}
@@ -537,14 +537,14 @@ const StockTrader = ({
                 placeholder={selectedStock && isExpensiveStock(selectedStock.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
                 value={buyQuantity}
                 onChange={(e) => setBuyQuantity(e.target.value)}
-                min={selectedStock && isExpensiveStock(selectedStock.ticker) ? 0.01 : 1}
-                step={selectedStock && isExpensiveStock(selectedStock.ticker) ? 0.01 : 1}
+                min={selectedStock && isExpensiveStock(selectedStock.ticker) ? 0 : 1}
+                step={selectedStock && isExpensiveStock(selectedStock.ticker) ? "any" : 1}
                 disabled={tradingCheck && !tradingCheck.allowed}
               />
               {selectedStock && quotes[selectedStock.ticker] && (
                 <>
                   <p className="text-xs text-muted-foreground">
-                    Maks du kan kjøpe: {getMaxBuyable(quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: isExpensiveStock(selectedStock.ticker) ? 4 : 0 })} {isExpensiveStock(selectedStock.ticker) ? 'enheter' : 'aksjer'}
+                    Maks du kan kjøpe: {getMaxBuyable(quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: isExpensiveStock(selectedStock.ticker) ? ANTALL_DESIMALER : 0 })} {isExpensiveStock(selectedStock.ticker) ? 'enheter' : 'aksjer'}
                   </p>
                   {isExpensiveStock(selectedStock.ticker) && (
                     <p className="text-xs text-primary">
@@ -593,7 +593,7 @@ const StockTrader = ({
           <DialogHeader>
             <DialogTitle>Selg {selectedHolding?.ticker.replace('.OL', '')}</DialogTitle>
             <DialogDescription>
-              Du eier {selectedHolding ? Number(selectedHolding.quantity).toLocaleString('nb-NO') : 0} aksjer.
+              Du eier {selectedHolding ? visAntall(selectedHolding.quantity) : 0} aksjer.
               Nåværende kurs: {selectedHolding && quotes[selectedHolding.ticker] 
                 ? quotes[selectedHolding.ticker].price.toFixed(2) 
                 : '-'} kr
@@ -630,8 +630,8 @@ const StockTrader = ({
                 placeholder={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
                 value={sellQuantity}
                 onChange={(e) => setSellQuantity(e.target.value)}
-                min={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? 0.01 : 1}
-                step={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? 0.01 : 1}
+                min={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? 0 : 1}
+                step={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? "any" : 1}
                 max={selectedHolding ? Number(selectedHolding.quantity) : undefined}
                 disabled={tradingCheck && !tradingCheck.allowed}
               />
