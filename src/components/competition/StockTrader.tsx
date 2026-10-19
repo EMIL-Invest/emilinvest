@@ -11,6 +11,7 @@ import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, Alert
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
 import { KRAV_ANTALL_AKSJER, ANTALL_DESIMALER, rundAntall, visAntall } from "@/lib/konkurranseregler";
 import FlervalgFilter from "./FlervalgFilter";
+import { getExchangeFromTicker } from "@/lib/exchangeHours";
 import { sektorGruppe, aksjeMarked, markedNavn, sorterMarkeder } from "@/lib/aksjefilter";
 
 const iValgtMarked = (stock: OsloStock, valgte: string[]) =>
@@ -115,10 +116,22 @@ const StockTrader = ({
     }
   };
 
+  const erKrypto = (ticker: string): boolean => {
+    const stock = availableStocks.find(s => s.ticker === ticker);
+    return (stock ? aksjeMarked(stock) : getExchangeFromTicker(ticker)) === "CRYPTO";
+  };
+
+  // Krypto og aksjer over 30 000 kr kan handles i brøkdeler
   const isExpensiveStock = (ticker: string): boolean => {
+    if (erKrypto(ticker)) return true;
     const quote = quotes[ticker];
     return quote ? quote.price > 30000 : false;
   };
+
+  const brokdelTekst = (ticker: string, handling: "kjøpe" | "selge"): string =>
+    erKrypto(ticker)
+      ? `💡 Krypto kan du ${handling} i brøkdeler`
+      : `💡 Denne aksjen koster over 30 000 kr - du kan ${handling} deler av en aksje`;
 
   const handleBuy = async () => {
     if (!selectedStock) return;
@@ -267,9 +280,9 @@ const StockTrader = ({
     return tommerPosisjonen && stockHoldings.length <= KRAV_ANTALL_AKSJER;
   };
 
-  const getMaxBuyable = (price: number): number => {
+  const getMaxBuyable = (ticker: string, price: number): number => {
     if (price <= 0) return 0;
-    if (price > 30000) return Math.floor((cashBalance / price) * 10 ** ANTALL_DESIMALER) / 10 ** ANTALL_DESIMALER;
+    if (isExpensiveStock(ticker)) return Math.floor((cashBalance / price) * 10 ** ANTALL_DESIMALER) / 10 ** ANTALL_DESIMALER;
     return Math.floor(cashBalance / price);
   };
 
@@ -544,11 +557,11 @@ const StockTrader = ({
               {selectedStock && quotes[selectedStock.ticker] && (
                 <>
                   <p className="text-xs text-muted-foreground">
-                    Maks du kan kjøpe: {getMaxBuyable(quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: isExpensiveStock(selectedStock.ticker) ? ANTALL_DESIMALER : 0 })} {isExpensiveStock(selectedStock.ticker) ? 'enheter' : 'aksjer'}
+                    Maks du kan kjøpe: {getMaxBuyable(selectedStock.ticker, quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: isExpensiveStock(selectedStock.ticker) ? ANTALL_DESIMALER : 0 })} {isExpensiveStock(selectedStock.ticker) ? 'enheter' : 'aksjer'}
                   </p>
                   {isExpensiveStock(selectedStock.ticker) && (
                     <p className="text-xs text-primary">
-                      💡 Denne aksjen koster over 30 000 kr - du kan kjøpe deler av en aksje
+                      {brokdelTekst(selectedStock.ticker, "kjøpe")}
                     </p>
                   )}
                 </>
@@ -637,7 +650,7 @@ const StockTrader = ({
               />
               {selectedHolding && isExpensiveStock(selectedHolding.ticker) && (
                 <p className="text-xs text-primary">
-                  💡 Denne aksjen koster over 30 000 kr - du kan selge deler
+                  {brokdelTekst(selectedHolding.ticker, "selge")}
                 </p>
               )}
             </div>
