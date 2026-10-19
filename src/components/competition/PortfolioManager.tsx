@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, TrendingDown, Briefcase, Wallet } from "lucide-react";
 import { PortfolioHolding, StockQuote } from "@/hooks/useCompetition";
+import { visAntall } from "@/lib/konkurranseregler";
 
 interface PortfolioManagerProps {
   holdings: PortfolioHolding[];
@@ -218,7 +219,7 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
             const avkastKr = verdi - kostpris;
             const avkastPct = calculateReturn(detaljHolding);
             const rader = [
-              { navn: "Antall aksjer", verdi: Number(detaljHolding.quantity).toLocaleString('nb-NO') },
+              { navn: "Antall aksjer", verdi: visAntall(detaljHolding.quantity) },
               { navn: "Snitt kjøpskurs", verdi: `${Number(detaljHolding.average_purchase_price).toFixed(2)} kr` },
               { navn: "Nåværende kurs", verdi: quote ? `${quote.price.toFixed(2)} kr` : "-" },
               { navn: "Verdi", verdi: `${verdi.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr` },
@@ -270,7 +271,7 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
           <DialogHeader>
             <DialogTitle>Selg {selectedHolding?.ticker}</DialogTitle>
             <DialogDescription>
-              Du eier {selectedHolding ? Number(selectedHolding.quantity).toLocaleString('nb-NO') : 0} aksjer.
+              Du eier {selectedHolding ? visAntall(selectedHolding.quantity) : 0} aksjer.
               Nåværende kurs: {selectedHolding && quotes[selectedHolding.ticker] 
                 ? quotes[selectedHolding.ticker].price.toFixed(2) 
                 : '-'} kr
@@ -285,7 +286,8 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                 placeholder="Antall aksjer"
                 value={sellQuantity}
                 onChange={(e) => setSellQuantity(e.target.value)}
-                min={1}
+                min={0}
+                step={selectedHolding && !Number.isInteger(Number(selectedHolding.quantity)) ? "any" : 1}
                 max={selectedHolding ? Number(selectedHolding.quantity) : undefined}
               />
             </div>

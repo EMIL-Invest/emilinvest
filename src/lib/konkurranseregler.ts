@@ -15,6 +15,17 @@ export const MAKSVEKT_PROSENT = 30;
 export const MINSTE_FORSTEKJOP = 4000;
 export const MAKS_HANDLER_PER_DAG = 3;
 
+/** Dyre aksjer og krypto kan kjøpes i brøkdeler, med inntil så mange desimaler.
+ *  Seks desimaler holder også for bitcoin (0,000001 BTC er under én krone). */
+export const ANTALL_DESIMALER = 6;
+
+export const rundAntall = (antall: number): number =>
+  Math.round(antall * 10 ** ANTALL_DESIMALER) / 10 ** ANTALL_DESIMALER;
+
+/** Antall aksjer som tekst, med desimaler bare når beholdningen har det. */
+export const visAntall = (antall: number | string): string =>
+  Number(antall).toLocaleString("nb-NO", { maximumFractionDigits: ANTALL_DESIMALER });
+
 const kr = (n: number) => `${n.toLocaleString("no-NO")} kr`;
 
 export interface Regel {
