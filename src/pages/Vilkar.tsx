@@ -100,7 +100,7 @@ const Vilkar = () => {
               handler ikke ekte verdipapirer, har ingen reell risiko og kan
               ikke tape eller kreve utbetalt penger. Startkapitalen, kursene
               og porteføljen i konkurransen er en simulering basert på
-              markedsdata fra Oslo Børs.
+              markedsdata fra børsene som inngår i konkurransen.
             </p>
             <p>
               Vi kan justere konkurranseregler, nullstille perioder (for

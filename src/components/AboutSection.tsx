@@ -20,7 +20,6 @@ const AboutSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Venstre: filosofien */}
           <div>
-            <p className="eyebrow mb-6">Vår filosofi</p>
             <h2 className="font-serif text-4xl md:text-5xl leading-[1.15] text-foreground mb-8">
               Kunnskap.
               <br />
@@ -33,7 +32,7 @@ const AboutSection = () => {
               EMIL Invest er investeringskomiteen i linjeforeningen EMIL. Vi
               forvalter foreningens midler med mål om å skape langsiktig
               avkastning gjennom grundig analyse, risikostyring og åpenhet -
-              og å slå Oslo Børs over tid.
+              og å slå markedet over tid.
             </p>
           </div>
 

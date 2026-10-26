@@ -1,203 +1,199 @@
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Users, LineChart, CalendarDays } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import heroPhoto from "@/assets/hero-photo.jpg";
+import { useIndekser, INDEKS_NOEKLER, IndeksNoekkel, kursPaa, dagsendring } from "@/hooks/useIndekser";
+import Kurve, { KurvePunkt } from "@/components/forside/Kurve";
+import KursStripe, { KursPost } from "@/components/forside/KursStripe";
+import KonkurranseKolonne from "@/components/forside/KonkurranseKolonne";
+import heroPhoto from "@/assets/hero-bue.jpg";
 
 /**
- * Teller mykt opp/ned til ny verdi når den endres.
- * Bruker requestAnimationFrame med ease-out.
+ * Toppen av forsiden, i tre lag:
+ *   1) Kurslinje og intro med gruppebildet i bue (døråpningen på Hovedbygningen)
+ *   2) Kurven: overgangen fra lys bakgrunn til grønt er porteføljens utvikling
+ *   3) Grønt felt med porteføljens verdi og indeksvalg, og konkurransen ved siden av
  */
-const useCountUp = (target: number, durationMs = 1400): number => {
-  const [value, setValue] = useState(0);
-  const fromRef = useRef(0);
-  const frameRef = useRef<number>();
 
-  useEffect(() => {
-    if (!isFinite(target)) return;
-    const from = fromRef.current;
-    const start = performance.now();
-
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / durationMs, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      const current = from + (target - from) * eased;
-      setValue(current);
-      if (t < 1) {
-        frameRef.current = requestAnimationFrame(tick);
-      } else {
-        fromRef.current = target;
-      }
-    };
-
-    frameRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      fromRef.current = target;
-    };
-  }, [target, durationMs]);
-
-  return value;
-};
-
-const stats = [
-  {
-    icon: Users,
-    value: "15+",
-    label: "Aktive medlemmer",
-    description: "Engasjerte studenter med lidenskap for investeringer",
-  },
-  {
-    icon: LineChart,
-    value: "100 %",
-    label: "Åpen forvaltning",
-    description: "Full innsikt i våre investeringer og beslutninger",
-  },
-  {
-    icon: CalendarDays,
-    value: "2024",
-    label: "Etablert",
-    description: "Bygget på kunnskap, åpenhet og fellesskap",
-  },
-];
+const prosent = (n: number) => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(1).replace(".", ",")} %`;
+const kortDato = (d: string) =>
+  new Date(d + "T12:00:00").toLocaleDateString("no-NO", { day: "numeric", month: "long" });
 
 const HeroSection = () => {
-  const navigate = useNavigate();
-  const { holdings, quotes, loading, calculatePortfolioValue } = usePortfolioData();
+  const { holdings, quotes, history, loading, lastUpdated, calculatePortfolioValue } = usePortfolioData();
+  const { serier } = useIndekser();
+  const [valgt, setValgt] = useState<IndeksNoekkel>("verden");
 
-  const portfolioValue = calculatePortfolioValue(holdings, quotes);
-  const animatedValue = useCountUp(loading ? 0 : portfolioValue);
+  const verdi = calculatePortfolioValue(holdings, quotes);
 
   // Dagens bevegelse: sum av dagsendring (NOK) per aksje vi eier
-  const dayChange = holdings
+  const dagKr = holdings
     .filter((h) => h.holding_type === "stock")
     .reduce((sum, h) => {
       const q = quotes[h.ticker];
       return q ? sum + q.change * h.quantity : sum;
     }, 0);
-  const dayPositive = dayChange >= 0;
 
-  const scrollTo = (selector: string) =>
-    document.querySelector(selector)?.scrollIntoView({ behavior: "smooth" });
+  // Porteføljens historikk, med dagens live-verdi som siste punkt
+  const porteRaa = useMemo(() => {
+    const rader = history.map((h) => ({ d: h.date, v: Number(h.portfolio_value) })).filter((r) => r.v > 0);
+    if (!loading && verdi > 0 && rader.length > 0) {
+      const idag = new Date().toISOString().slice(0, 10);
+      if (rader[rader.length - 1].d === idag) rader[rader.length - 1] = { d: idag, v: verdi };
+      else rader.push({ d: idag, v: verdi });
+    }
+    return rader;
+  }, [history, loading, verdi]);
+
+  const start = porteRaa[0];
+  const porte: KurvePunkt[] = start ? porteRaa.map((r) => ({ d: r.d, v: (r.v / start.v) * 100 })) : [];
+  const porteEndring = porte.length > 1 ? porte[porte.length - 1].v - 100 : null;
+
+  // Indeksene på de samme datoene som porteføljen, normalisert til 100 ved start
+  const indeksPaaDatoer = (k: IndeksNoekkel): number[] => {
+    const s = serier[k];
+    if (!s || !start) return [];
+    const startKurs = kursPaa(s.punkter, start.d) ?? s.punkter[0]?.c;
+    if (!startKurs) return [];
+    return porteRaa.map((r) => ((kursPaa(s.punkter, r.d) ?? startKurs) / startKurs) * 100);
+  };
+  const tilgjengelige = INDEKS_NOEKLER.filter((k) => serier[k]);
+  const aktiv = tilgjengelige.includes(valgt) ? valgt : tilgjengelige[0];
+  const indeks = aktiv ? indeksPaaDatoer(aktiv) : [];
+  const indeksEndring = indeks.length > 1 ? indeks[indeks.length - 1] - 100 : null;
+
+  // Kurslinjen: våre aksjer, deretter indeksene
+  const kurser: KursPost[] = [
+    ...holdings
+      .filter((h) => h.holding_type === "stock")
+      .map((h) => ({ navn: h.ticker, endring: quotes[h.ticker]?.changePercent ?? null })),
+    ...INDEKS_NOEKLER.filter((k) => serier[k]).map((k) => ({ navn: serier[k]!.navn, endring: dagsendring(serier[k]!.punkter) })),
+  ];
+
+  const siden = start ? `siden ${kortDato(start.d)}` : "";
 
   return (
     <section id="home" className="pt-16">
-      {/* Øvre del: tekst til venstre, gruppebildet fullt ut mot høyre kant */}
-      <div className="relative overflow-hidden">
-        {/* Organisk kurve som skiller tekstflaten fra bildet.
-            clipPathUnits="objectBoundingBox" gjør kurven responsiv -
-            koordinatene er andeler av elementets egen størrelse, så den
-            holder formen uansett skjermbredde. */}
-        <svg width="0" height="0" aria-hidden="true" className="absolute">
-          <defs>
-            <clipPath id="hero-kurve" clipPathUnits="objectBoundingBox">
-              <path d="M0.16,0 C0.10,0.22 0.085,0.58 0.115,1 L1,1 L1,0 Z" />
-            </clipPath>
-          </defs>
-        </svg>
+      <KursStripe poster={loading ? [] : kurser} />
 
-        <div
-          className="hidden xl:block absolute inset-y-0 right-0 w-[56%] max-w-[860px] animate-fade-up"
-          style={{ clipPath: "url(#hero-kurve)", animationDelay: "0.15s" }}
-        >
-          <img
-            src={heroPhoto}
-            alt="EMIL Invest-komiteen foran Hovedbygningen på NTNU"
-            /* Beskjæringen ligger i selve bildefilen: gjengen har senter på
-               55 % av bredden, slik at den leses som sentrert etter at kurven
-               har dekket til venstre ~10 %. Derfor holder ren object-center. */
-            className="w-full h-full object-cover object-center"
-          />
-        </div>
-
-        <div className="section-container relative">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-14 md:py-20">
-            <div className="animate-fade-up">
-            <p className="eyebrow mb-6">Investeringskomiteen i EMIL</p>
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] text-foreground mb-7 xl:max-w-md">
-              Energi- og miljø&shy;ingeniørenes linjeforening
+      {/* 1) Intro og bilde */}
+      <div className="section-container">
+        <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-6 lg:gap-14 items-end pt-6 lg:pt-12">
+          <div className="lg:pb-9">
+            <h1 className="font-serif font-normal text-[38px] sm:text-5xl lg:text-[54px] leading-[1.03] tracking-[-0.015em] text-primary">
+              Energi- og miljøingeniørenes investeringskomité
             </h1>
-            <div className="w-10 h-px bg-foreground/30 mb-7" />
-            <p className="text-lg text-muted-foreground max-w-xl leading-relaxed mb-4">
-              Vi forvalter linjeforeningens midler med et langsiktig perspektiv.
-              Følg vår portefølje, se våre investeringer og bli kjent med oss.
+            <p className="text-[16.5px] md:text-lg leading-relaxed text-muted-foreground mt-5 mb-7 max-w-[30em]">
+              Vi er studenter ved NTNU som forvalter linjeforeningens midler med et langsiktig perspektiv. Alt vi
+              investerer i, og hvorfor, ligger åpent her.
             </p>
-
-            {/* Dagens verdi - nedtonet, som en del av beskrivelsen */}
-            <p className="text-sm text-muted-foreground tabular-nums mb-10">
-              Porteføljens verdi i dag:{" "}
-              <span className="font-semibold text-foreground">
-                {Math.round(animatedValue).toLocaleString("no-NO")} kr
-              </span>
-              {!loading && (
-                <span className={dayPositive ? "stock-positive" : "stock-negative"}>
-                  {" "}
-                  ({dayPositive ? "+" : ""}
-                  {dayChange.toLocaleString("no-NO", { maximumFractionDigits: 0 })} kr i dag)
-                </span>
-              )}
-            </p>
-
-            {/* Én knappelinje på store skjermer, stablet på mobil. */}
-            <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-nowrap sm:items-center sm:gap-3">
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-4 sm:px-5 border-foreground/25 bg-transparent text-foreground hover:bg-foreground/5"
-                onClick={() => scrollTo("#portfolio")}
-              >
-                Se porteføljen
-              </Button>
-              <Button
-                size="lg"
-                className="group px-4 sm:px-5 bg-competition text-competition-foreground hover:bg-competition/90 font-semibold"
-                onClick={() => navigate("/konkurranse")}
-              >
-                Bli med i konkurransen
-                <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
+            <a
+              href="#team"
+              className="text-foreground underline decoration-2 underline-offset-[6px]"
+              style={{ textDecorationColor: "hsl(var(--competition))" }}
+            >
+              Bli kjent med komiteen
+            </a>
           </div>
-
-            {/* Under xl ligger bildet i vanlig ramme ved siden av / under teksten.
-                Full-bleed-varianten krever bredde for at kurven skal se riktig ut. */}
-            <div className="xl:hidden animate-fade-up" style={{ animationDelay: "0.15s" }}>
-              <img
-                src={heroPhoto}
-                alt="EMIL Invest-komiteen foran Hovedbygningen på NTNU"
-                className="w-full h-auto rounded-md"
-                style={{ boxShadow: "var(--shadow-card)" }}
-              />
-            </div>
-          </div>
+          <figure className="order-first lg:order-none">
+            {/* Buen speiler døråpningen bak gjengen. Utsnittet har luft over hodene,
+                så ingen blir kuttet av buen - heller ikke de ytterste. */}
+            <img
+              src={heroPhoto}
+              alt="Investeringskomiteen foran Hovedbygningen på Gløshaugen"
+              className="w-full aspect-[1220/780] object-cover"
+              style={{ borderRadius: "50% 50% 0 0 / 30% 30% 0 0" }}
+            />
+          </figure>
         </div>
       </div>
 
-      {/* Nøkkeltall-bånd i dyp grønn */}
-      <div style={{ background: "hsl(var(--band))" }} className="text-white">
-        <div className="section-container">
-          <div className="grid md:grid-cols-3">
-            {stats.map((stat, i) => (
-              <div
-                key={stat.label}
-                className={`flex items-center gap-5 py-9 md:py-12 md:px-10 ${
-                  i > 0 ? "border-t md:border-t-0 md:border-l border-white/15" : ""
-                } ${i === 0 ? "md:pl-0" : ""}`}
-              >
-                <div className="w-14 h-14 rounded-full border border-white/25 flex items-center justify-center flex-shrink-0">
-                  <stat.icon className="w-6 h-6 text-white/80" />
-                </div>
-                <div>
-                  <p className="font-serif text-3xl md:text-4xl leading-none mb-1">{stat.value}</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/80 mb-1.5">
-                    {stat.label}
-                  </p>
-                  <p className="text-sm text-white/55 leading-snug">{stat.description}</p>
-                </div>
+      {/* 2) Kurven */}
+      {porte.length > 1 ? (
+        <Kurve
+          portefolje={porte}
+          indeks={indeks}
+          etikett={porteEndring === null ? "" : prosent(porteEndring)}
+          undertekst={`porteføljen ${siden}`}
+        />
+      ) : (
+        <div className="h-[170px] md:h-[240px] flex items-end">
+          <div className="w-full h-16" style={{ background: "hsl(var(--band))" }} />
+        </div>
+      )}
+
+      {/* 3) Grønt felt */}
+      <div id="portefolje-topp" className="text-white -mt-px" style={{ background: "hsl(var(--band))" }}>
+        <div className="section-container grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-20 pt-5 md:pt-7 pb-16 md:pb-20">
+          <div>
+            <div className="flex justify-between text-sm text-white/65">
+              <span>Porteføljens verdi nå</span>
+              {lastUpdated && (
+                <span>oppdatert {lastUpdated.toLocaleTimeString("no-NO", { hour: "2-digit", minute: "2-digit" })}</span>
+              )}
+            </div>
+            <p className="font-serif text-5xl md:text-[62px] leading-none tracking-[-0.01em] mt-3 mb-2.5 tabular-nums">
+              {loading ? "…" : Math.round(verdi).toLocaleString("no-NO")}
+              <span className="text-2xl ml-1.5 opacity-70">kr</span>
+            </p>
+            {!loading && (
+              <p className="flex flex-wrap gap-x-6 gap-y-1 text-[14.5px] text-white/65">
+                <span>
+                  I dag{" "}
+                  <b className={`font-semibold ${dagKr >= 0 ? "text-[#93D2A3]" : "text-[#F0A493]"}`}>
+                    {dagKr >= 0 ? "+" : "−"}
+                    {Math.abs(Math.round(dagKr)).toLocaleString("no-NO")} kr
+                  </b>
+                </span>
+                {porteEndring !== null && (
+                  <span>
+                    Porteføljen{" "}
+                    <b className={`font-semibold ${porteEndring >= 0 ? "text-[#93D2A3]" : "text-[#F0A493]"}`}>
+                      {prosent(porteEndring)}
+                    </b>
+                  </span>
+                )}
+                {aktiv && indeksEndring !== null && (
+                  <span>
+                    {serier[aktiv]!.navn} <b className="font-semibold text-white">{prosent(indeksEndring)}</b>
+                  </span>
+                )}
+              </p>
+            )}
+
+            {tilgjengelige.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-6 mb-2.5" role="group" aria-label="Sammenlign med indeks">
+                {tilgjengelige.map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setValgt(k)}
+                    aria-pressed={k === aktiv}
+                    className={`text-[13.5px] px-3.5 py-1.5 rounded-full border transition-[transform,background-color,border-color,color] duration-150 hover:scale-105 active:scale-95 motion-reduce:hover:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+                      k === aktiv
+                        ? "font-semibold border-transparent text-[hsl(var(--competition-foreground))]"
+                        : "border-white/25 text-white/80 hover:border-white/60 hover:bg-white/10 hover:text-white"
+                    }`}
+                    style={k === aktiv ? { background: "hsl(var(--competition))" } : undefined}
+                  >
+                    {serier[k]!.navn}
+                  </button>
+                ))}
               </div>
-            ))}
+            )}
+            <p className="text-[13.5px] text-white/55 mb-6 max-w-lg">
+              Den gule linjen er vår portefølje {siden}.
+              {aktiv ? ` Den svake grønne linjen er ${serier[aktiv]!.navn}, regnet om til kroner.` : ""}
+            </p>
+            <Link
+              to="/portefolje"
+              className="text-white underline decoration-2 underline-offset-[6px]"
+              style={{ textDecorationColor: "hsl(var(--competition))" }}
+            >
+              Se hele porteføljen
+            </Link>
           </div>
+
+          <KonkurranseKolonne />
         </div>
       </div>
     </section>
