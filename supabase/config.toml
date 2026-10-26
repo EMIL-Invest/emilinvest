@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.price-history]
 verify_jwt = false
+
+[functions.indeks-historikk]
+verify_jwt = false
