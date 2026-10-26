@@ -26,6 +26,23 @@ export const rundAntall = (antall: number): number =>
 export const visAntall = (antall: number | string): string =>
   Number(antall).toLocaleString("nb-NO", { maximumFractionDigits: ANTALL_DESIMALER });
 
+/**
+ * Er salget lov? Krypto kan selges i brøkdeler. For aksjer må beholdningen
+ * etter salget være et helt antall - har man en brøkpost (fra start-
+ * nullstillingen i september), må man selge nok til at resten blir hel.
+ * Databasen håndhever det samme i competition_sell_stock (skript 30).
+ */
+export const gyldigSalgsantall = (beholdning: number, antall: number, krypto: boolean): boolean => {
+  if (isNaN(antall) || antall <= 0 || antall > beholdning) return false;
+  if (krypto) return true;
+  const rest = rundAntall(beholdning - antall);
+  return Number.isInteger(rest);
+};
+
+/** Kurs med to desimaler og komma, slik som antall: 1 234,50. */
+export const visKurs = (kurs: number | string): string =>
+  Number(kurs).toLocaleString("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 const kr = (n: number) => `${n.toLocaleString("no-NO")} kr`;
 
 export interface Regel {

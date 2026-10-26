@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Wallet, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PortfolioHolding, StockQuote } from "@/hooks/useCompetition";
-import { visAntall } from "@/lib/konkurranseregler";
+import { visAntall, visKurs } from "@/lib/konkurranseregler";
 
 interface ParticipantPortfolioDialogProps {
   open: boolean;
@@ -119,7 +119,7 @@ const ParticipantPortfolioDialog = ({
                           {visAntall(holding.quantity)}
                         </TableCell>
                         <TableCell className="text-right font-mono">
-                          {currentPrice.toFixed(2)} kr
+                          {visKurs(currentPrice)} kr
                         </TableCell>
                         <TableCell className="text-right font-mono">
                           {value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
@@ -134,7 +134,7 @@ const ParticipantPortfolioDialog = ({
                               <TrendingDown className="w-4 h-4" />
                             )}
                             {returnPercent >= 0 ? '+' : ''}
-                            {returnPercent.toFixed(2)}%
+                            {returnPercent.toLocaleString('nb-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %
                           </div>
                         </TableCell>
                       </TableRow>
