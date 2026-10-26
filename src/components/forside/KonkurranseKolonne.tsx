@@ -11,6 +11,9 @@ import { KRAV_ANTALL_AKSJER } from "@/hooks/useCompetition";
 
 const prosent = (n: number) => `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(1).replace(".", ",")} %`;
 
+/** Samme grønn/rød som tallene i porteføljefeltet ved siden av. */
+const farge = (n: number) => (n >= 0 ? "text-[#93D2A3]" : "text-[#F0A493]");
+
 const maaned = new Date().toLocaleDateString("no-NO", { month: "long" });
 
 const KonkurranseKolonne = () => {
@@ -19,20 +22,14 @@ const KonkurranseKolonne = () => {
   const min = finnPlass(deltakerId);
   const erPaaToppen = !!deltakerId && topp.some((t) => t.id === deltakerId);
 
-  // Den innloggedes egen rad under topp 3, i samme form som listen
-  let minRad: { plass: string; tekst: string; verdi: string | null; positiv: boolean } | null = null;
+  let minRad: { tekst: string; avkastning?: number; lenke: string } | null = null;
   if (!laster) {
     if (min && min.kvalifisert && min.plass !== null && !erPaaToppen)
-      minRad = {
-        plass: String(min.plass),
-        tekst: `Din plass av ${min.antallRangerte}`,
-        verdi: prosent(min.avkastning),
-        positiv: min.avkastning >= 0,
-      };
+      minRad = { tekst: `Du er nr. ${min.plass} av ${min.antallRangerte} med `, avkastning: min.avkastning, lenke: "Se porteføljen" };
     else if (min && !min.kvalifisert) {
       const mangler = KRAV_ANTALL_AKSJER - min.antallAksjer;
-      minRad = { plass: "–", tekst: `Kjøp ${mangler} ${mangler === 1 ? "aksje" : "aksjer"} til for å bli rangert`, verdi: null, positiv: true };
-    } else if (innlogget && !deltakerId) minRad = { plass: "–", tekst: "Du er ikke med ennå", verdi: null, positiv: true };
+      minRad = { tekst: `Du mangler ${mangler} ${mangler === 1 ? "aksje" : "aksjer"} for å bli rangert`, lenke: "Fullfør porteføljen" };
+    } else if (innlogget && !deltakerId) minRad = { tekst: "Du er ikke med ennå", lenke: "Bli med" };
   }
 
   return (
@@ -43,7 +40,10 @@ const KonkurranseKolonne = () => {
         avkastning hver måned vinner premie.
       </p>
 
-      <p className="text-sm text-white/55 mb-1">Ledere i {maaned}</p>
+      <div className="flex justify-between text-sm text-white/55 mb-1">
+        <span>Ledere i {maaned}</span>
+        <span>avkastning</span>
+      </div>
       {laster ? (
         <div className="py-2">
           {[0, 1, 2].map((i) => (
@@ -60,11 +60,8 @@ const KonkurranseKolonne = () => {
       ) : (
         <ol>
           {topp.map((t, i) => (
-            <li key={t.id} className="flex items-baseline gap-4 py-2.5 border-t border-white/15 text-[15px] text-white">
-              <span
-                className="w-7 font-serif text-2xl leading-none tabular-nums"
-                style={i === 0 ? { color: "hsl(var(--competition))" } : { opacity: 0.55 }}
-              >
+            <li key={t.id} className="flex gap-3.5 py-[11px] border-t border-white/15 text-[15px] text-white">
+              <span className="w-3.5 tabular-nums" style={i === 0 ? { color: "hsl(var(--competition))" } : { opacity: 0.6 }}>
                 {i + 1}
               </span>
               <span className="flex-1 min-w-0 truncate">
@@ -75,27 +72,23 @@ const KonkurranseKolonne = () => {
                   </span>
                 )}
               </span>
-              <span className="tabular-nums">{prosent(t.avkastning)}</span>
+              <span className={`tabular-nums ${farge(t.avkastning)}`}>{prosent(t.avkastning)}</span>
             </li>
           ))}
         </ol>
       )}
       {minRad && (
-        <Link
-          to="/konkurranse"
-          className="group flex items-baseline gap-4 mt-2 py-2.5 px-3 -mx-3 border-l-2 bg-white/[0.06] text-[15px] text-white transition-colors hover:bg-white/[0.11]"
-          style={{ borderColor: "hsl(var(--competition))" }}
-        >
-          <span className="w-7 font-serif text-2xl leading-none tabular-nums">{minRad.plass}</span>
-          <span className="flex-1 min-w-0 text-white/80">{minRad.tekst}</span>
-          {minRad.verdi ? (
-            <span className={`tabular-nums ${minRad.positiv ? "text-[#93D2A3]" : "text-[#F0A493]"}`}>{minRad.verdi}</span>
-          ) : (
-            <span className="text-sm font-semibold whitespace-nowrap group-hover:underline underline-offset-4" style={{ color: "hsl(var(--competition))" }}>
-              Gå dit
-            </span>
-          )}
-        </Link>
+        <p className="flex items-center justify-between gap-4 border-t border-dashed border-white/25 pt-3 text-sm text-white">
+          <span>
+            {minRad.tekst}
+            {minRad.avkastning !== undefined && (
+              <span className={`tabular-nums ${farge(minRad.avkastning)}`}>{prosent(minRad.avkastning)}</span>
+            )}
+          </span>
+          <Link to="/konkurranse" className="font-semibold whitespace-nowrap hover:underline underline-offset-4" style={{ color: "hsl(var(--competition))" }}>
+            {minRad.lenke}
+          </Link>
+        </p>
       )}
 
       <Link
