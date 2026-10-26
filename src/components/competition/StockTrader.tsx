@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, AlertTriangle } from "lucide-react";
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
-import { KRAV_ANTALL_AKSJER, ANTALL_DESIMALER, rundAntall, visAntall } from "@/lib/konkurranseregler";
+import { KRAV_ANTALL_AKSJER, ANTALL_DESIMALER, rundAntall, visAntall, visKurs, gyldigSalgsantall } from "@/lib/konkurranseregler";
 import FlervalgFilter from "./FlervalgFilter";
 import { getExchangeFromTicker } from "@/lib/exchangeHours";
 import { sektorGruppe, aksjeMarked, markedNavn, sorterMarkeder } from "@/lib/aksjefilter";
@@ -121,22 +121,17 @@ const StockTrader = ({
     return (stock ? aksjeMarked(stock) : getExchangeFromTicker(ticker)) === "CRYPTO";
   };
 
-  // Krypto og aksjer over 30 000 kr kan handles i brøkdeler
-  const isExpensiveStock = (ticker: string): boolean => {
-    if (erKrypto(ticker)) return true;
-    const quote = quotes[ticker];
-    return quote ? quote.price > 30000 : false;
-  };
+  // Bare krypto kan handles i brøkdeler - aksjer handles i hele aksjer.
+  // Databasen håndhever det samme (supabase/manual/30_hele_aksjer.sql).
+  const kanBrokdeler = (ticker: string): boolean => erKrypto(ticker);
 
-  const brokdelTekst = (ticker: string, handling: "kjøpe" | "selge"): string =>
-    erKrypto(ticker)
-      ? `💡 Krypto kan du ${handling} i brøkdeler`
-      : `💡 Denne aksjen koster over 30 000 kr - du kan ${handling} deler av en aksje`;
+  const brokdelTekst = (handling: "kjøpe" | "selge"): string =>
+    `💡 Krypto kan du ${handling} i brøkdeler`;
 
   const handleBuy = async () => {
     if (!selectedStock) return;
 
-    const allowFractional = isExpensiveStock(selectedStock.ticker);
+    const allowFractional = kanBrokdeler(selectedStock.ticker);
     const quantity = rundAntall(parseFloat(buyQuantity));
     if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
       toast({
@@ -215,15 +210,21 @@ const StockTrader = ({
   const handleSell = async () => {
     if (!selectedHolding) return;
 
-    // Tillat desimalsalg både for dyre aksjer OG når beholdningen selv er
-    // en desimal (kjøpt som brøkdel da kursen var >30 000, men kursen har
-    // falt under grensen siden) - ellers blir slike poster usalgbare.
-    const allowFractional = isExpensiveStock(selectedHolding.ticker) || !Number.isInteger(Number(selectedHolding.quantity));
-    const quantity = parseFloat(sellQuantity);
-    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
+    const quantity = rundAntall(parseFloat(sellQuantity));
+    if (isNaN(quantity) || quantity <= 0) {
       toast({
         title: "Ugyldig antall",
         description: "Angi et gyldig antall aksjer å selge",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (quantity <= Number(selectedHolding.quantity)
+        && !gyldigSalgsantall(Number(selectedHolding.quantity), quantity, kanBrokdeler(selectedHolding.ticker))) {
+      toast({
+        title: "Ugyldig antall",
+        description: "Aksjer handles i hele antall. Selg nok til at du sitter igjen med et helt antall aksjer.",
         variant: "destructive",
       });
       return;
@@ -282,7 +283,7 @@ const StockTrader = ({
 
   const getMaxBuyable = (ticker: string, price: number): number => {
     if (price <= 0) return 0;
-    if (isExpensiveStock(ticker)) return Math.floor((cashBalance / price) * 10 ** ANTALL_DESIMALER) / 10 ** ANTALL_DESIMALER;
+    if (kanBrokdeler(ticker)) return Math.floor((cashBalance / price) * 10 ** ANTALL_DESIMALER) / 10 ** ANTALL_DESIMALER;
     return Math.floor(cashBalance / price);
   };
 
@@ -424,7 +425,7 @@ const StockTrader = ({
                       </TableCell>
                       <TableCell className="text-right font-mono">
                         {quote ? (
-                          `${quote.price.toFixed(2)} kr`
+                          `${visKurs(quote.price)} kr`
                         ) : (
                           <span className="text-muted-foreground">-</span>
                         )}
@@ -492,7 +493,7 @@ const StockTrader = ({
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
                 <span className="font-mono font-semibold text-base">
                   {quotes[selectedStock.ticker]
-                    ? `${quotes[selectedStock.ticker].price.toFixed(2)} kr`
+                    ? `${visKurs(quotes[selectedStock.ticker].price)} kr`
                     : "-"}
                 </span>
                 {quotes[selectedStock.ticker] && (
@@ -547,21 +548,21 @@ const StockTrader = ({
               <label className="text-sm font-medium">Antall aksjer</label>
               <Input
                 type="number"
-                placeholder={selectedStock && isExpensiveStock(selectedStock.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
+                placeholder={selectedStock && kanBrokdeler(selectedStock.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
                 value={buyQuantity}
                 onChange={(e) => setBuyQuantity(e.target.value)}
-                min={selectedStock && isExpensiveStock(selectedStock.ticker) ? 0 : 1}
-                step={selectedStock && isExpensiveStock(selectedStock.ticker) ? "any" : 1}
+                min={selectedStock && kanBrokdeler(selectedStock.ticker) ? 0 : 1}
+                step={selectedStock && kanBrokdeler(selectedStock.ticker) ? "any" : 1}
                 disabled={tradingCheck && !tradingCheck.allowed}
               />
               {selectedStock && quotes[selectedStock.ticker] && (
                 <>
                   <p className="text-xs text-muted-foreground">
-                    Maks du kan kjøpe: {getMaxBuyable(selectedStock.ticker, quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: isExpensiveStock(selectedStock.ticker) ? ANTALL_DESIMALER : 0 })} {isExpensiveStock(selectedStock.ticker) ? 'enheter' : 'aksjer'}
+                    Maks du kan kjøpe: {getMaxBuyable(selectedStock.ticker, quotes[selectedStock.ticker].price).toLocaleString('nb-NO', { maximumFractionDigits: kanBrokdeler(selectedStock.ticker) ? ANTALL_DESIMALER : 0 })} {kanBrokdeler(selectedStock.ticker) ? 'enheter' : 'aksjer'}
                   </p>
-                  {isExpensiveStock(selectedStock.ticker) && (
+                  {kanBrokdeler(selectedStock.ticker) && (
                     <p className="text-xs text-primary">
-                      {brokdelTekst(selectedStock.ticker, "kjøpe")}
+                      {brokdelTekst("kjøpe")}
                     </p>
                   )}
                 </>
@@ -608,7 +609,7 @@ const StockTrader = ({
             <DialogDescription>
               Du eier {selectedHolding ? visAntall(selectedHolding.quantity) : 0} aksjer.
               Nåværende kurs: {selectedHolding && quotes[selectedHolding.ticker] 
-                ? quotes[selectedHolding.ticker].price.toFixed(2) 
+                ? visKurs(quotes[selectedHolding.ticker].price) 
                 : '-'} kr
             </DialogDescription>
           </DialogHeader>
@@ -640,17 +641,23 @@ const StockTrader = ({
               <label className="text-sm font-medium">Antall å selge</label>
               <Input
                 type="number"
-                placeholder={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
+                placeholder={selectedHolding && kanBrokdeler(selectedHolding.ticker) ? "Antall (desimaler tillatt)" : "Antall aksjer"}
                 value={sellQuantity}
                 onChange={(e) => setSellQuantity(e.target.value)}
-                min={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? 0 : 1}
-                step={selectedHolding && isExpensiveStock(selectedHolding.ticker) ? "any" : 1}
+                min={0}
+                step={selectedHolding && (kanBrokdeler(selectedHolding.ticker) || !Number.isInteger(Number(selectedHolding.quantity))) ? "any" : 1}
                 max={selectedHolding ? Number(selectedHolding.quantity) : undefined}
                 disabled={tradingCheck && !tradingCheck.allowed}
               />
-              {selectedHolding && isExpensiveStock(selectedHolding.ticker) && (
+              {selectedHolding && kanBrokdeler(selectedHolding.ticker) && (
                 <p className="text-xs text-primary">
-                  {brokdelTekst(selectedHolding.ticker, "selge")}
+                  {brokdelTekst("selge")}
+                </p>
+              )}
+              {selectedHolding && !kanBrokdeler(selectedHolding.ticker) && !Number.isInteger(Number(selectedHolding.quantity)) && (
+                <p className="text-xs text-muted-foreground">
+                  Du eier en brøkdel av aksjen. Selger du, må du selge nok til at du sitter igjen med et helt antall
+                  (f.eks. {visAntall(Number(selectedHolding.quantity) % 1)} eller {visAntall(Number(selectedHolding.quantity) % 1 + 1)}), eller alt.
                 </p>
               )}
             </div>

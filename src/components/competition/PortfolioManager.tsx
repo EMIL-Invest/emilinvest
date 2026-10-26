@@ -7,7 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, TrendingDown, Briefcase, Wallet } from "lucide-react";
 import { PortfolioHolding, StockQuote } from "@/hooks/useCompetition";
-import { visAntall } from "@/lib/konkurranseregler";
+import { visAntall, visKurs, rundAntall, gyldigSalgsantall } from "@/lib/konkurranseregler";
+import { getExchangeFromTicker } from "@/lib/exchangeHours";
 
 interface PortfolioManagerProps {
   holdings: PortfolioHolding[];
@@ -37,14 +38,24 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
   const handleSell = async () => {
     if (!selectedHolding) return;
 
-    // Samme desimallogikk som i StockTrader: heltall for vanlige aksjer,
-    // desimaler tillatt når beholdningen selv er en brøkdel (dyre aksjer).
-    const allowFractional = !Number.isInteger(Number(selectedHolding.quantity));
-    const quantity = parseFloat(sellQuantity);
-    if (isNaN(quantity) || quantity <= 0 || (!allowFractional && !Number.isInteger(quantity))) {
+    // Samme regel som i StockTrader: krypto i brøkdeler, for aksjer må
+    // beholdningen etter salget være et helt antall.
+    const quantity = rundAntall(parseFloat(sellQuantity));
+    if (isNaN(quantity) || quantity <= 0) {
       toast({
         title: "Ugyldig antall",
         description: "Angi et gyldig antall aksjer å selge",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const krypto = getExchangeFromTicker(selectedHolding.ticker) === "CRYPTO";
+    if (quantity <= Number(selectedHolding.quantity)
+        && !gyldigSalgsantall(Number(selectedHolding.quantity), quantity, krypto)) {
+      toast({
+        title: "Ugyldig antall",
+        description: "Aksjer handles i hele antall. Selg nok til at du sitter igjen med et helt antall aksjer.",
         variant: "destructive",
       });
       return;
@@ -220,8 +231,8 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
             const avkastPct = calculateReturn(detaljHolding);
             const rader = [
               { navn: "Antall aksjer", verdi: visAntall(detaljHolding.quantity) },
-              { navn: "Snitt kjøpskurs", verdi: `${Number(detaljHolding.average_purchase_price).toFixed(2)} kr` },
-              { navn: "Nåværende kurs", verdi: quote ? `${quote.price.toFixed(2)} kr` : "-" },
+              { navn: "Snitt kjøpskurs", verdi: `${visKurs(detaljHolding.average_purchase_price)} kr` },
+              { navn: "Nåværende kurs", verdi: quote ? `${visKurs(quote.price)} kr` : "-" },
               { navn: "Verdi", verdi: `${verdi.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr` },
             ];
             return (
@@ -273,7 +284,7 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
             <DialogDescription>
               Du eier {selectedHolding ? visAntall(selectedHolding.quantity) : 0} aksjer.
               Nåværende kurs: {selectedHolding && quotes[selectedHolding.ticker] 
-                ? quotes[selectedHolding.ticker].price.toFixed(2) 
+                ? visKurs(quotes[selectedHolding.ticker].price) 
                 : '-'} kr
             </DialogDescription>
           </DialogHeader>
