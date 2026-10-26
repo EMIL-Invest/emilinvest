@@ -99,7 +99,7 @@ const TeamSection = () => {
               <div>
                 <a
                   href="mailto:kontakt@emilinvest.no"
-                  className="knapp-skraa inline-flex items-center gap-2 px-8 py-3.5 font-semibold hover:brightness-105 transition-[filter] focus-visible:underline"
+                  className="knapp-skraa inline-flex items-center gap-2 px-8 py-3.5 font-semibold focus-visible:underline"
                   style={{ background: "hsl(var(--competition))", color: "hsl(var(--competition-foreground))" }}
                 >
                   <Mail className="w-4 h-4" />

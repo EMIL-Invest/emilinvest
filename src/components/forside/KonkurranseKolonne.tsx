@@ -19,14 +19,20 @@ const KonkurranseKolonne = () => {
   const min = finnPlass(deltakerId);
   const erPaaToppen = !!deltakerId && topp.some((t) => t.id === deltakerId);
 
-  let minRad: { tekst: string; lenke: string } | null = null;
+  // Den innloggedes egen rad under topp 3, i samme form som listen
+  let minRad: { plass: string; tekst: string; verdi: string | null; positiv: boolean } | null = null;
   if (!laster) {
     if (min && min.kvalifisert && min.plass !== null && !erPaaToppen)
-      minRad = { tekst: `Du er nr. ${min.plass} av ${min.antallRangerte} med ${prosent(min.avkastning)}`, lenke: "Se porteføljen" };
+      minRad = {
+        plass: String(min.plass),
+        tekst: `Din plass av ${min.antallRangerte}`,
+        verdi: prosent(min.avkastning),
+        positiv: min.avkastning >= 0,
+      };
     else if (min && !min.kvalifisert) {
       const mangler = KRAV_ANTALL_AKSJER - min.antallAksjer;
-      minRad = { tekst: `Du mangler ${mangler} ${mangler === 1 ? "aksje" : "aksjer"} for å bli rangert`, lenke: "Fullfør porteføljen" };
-    } else if (innlogget && !deltakerId) minRad = { tekst: "Du er ikke med ennå", lenke: "Bli med" };
+      minRad = { plass: "–", tekst: `Kjøp ${mangler} ${mangler === 1 ? "aksje" : "aksjer"} til for å bli rangert`, verdi: null, positiv: true };
+    } else if (innlogget && !deltakerId) minRad = { plass: "–", tekst: "Du er ikke med ennå", verdi: null, positiv: true };
   }
 
   return (
@@ -37,10 +43,7 @@ const KonkurranseKolonne = () => {
         avkastning hver måned vinner premie.
       </p>
 
-      <div className="flex justify-between text-sm text-white/55 mb-1">
-        <span>Ledere i {maaned}</span>
-        <span>avkastning</span>
-      </div>
+      <p className="text-sm text-white/55 mb-1">Ledere i {maaned}</p>
       {laster ? (
         <div className="py-2">
           {[0, 1, 2].map((i) => (
@@ -57,8 +60,11 @@ const KonkurranseKolonne = () => {
       ) : (
         <ol>
           {topp.map((t, i) => (
-            <li key={t.id} className="flex gap-3.5 py-[11px] border-t border-white/15 text-[15px] text-white">
-              <span className="w-3.5 tabular-nums" style={i === 0 ? { color: "hsl(var(--competition))" } : { opacity: 0.6 }}>
+            <li key={t.id} className="flex items-baseline gap-4 py-2.5 border-t border-white/15 text-[15px] text-white">
+              <span
+                className="w-7 font-serif text-2xl leading-none tabular-nums"
+                style={i === 0 ? { color: "hsl(var(--competition))" } : { opacity: 0.55 }}
+              >
                 {i + 1}
               </span>
               <span className="flex-1 min-w-0 truncate">
@@ -75,20 +81,29 @@ const KonkurranseKolonne = () => {
         </ol>
       )}
       {minRad && (
-        <p className="flex items-center justify-between gap-4 border-t border-dashed border-white/25 pt-3 text-sm text-white/75">
-          <span>{minRad.tekst}</span>
-          <Link to="/konkurranse" className="font-semibold whitespace-nowrap hover:underline underline-offset-4" style={{ color: "hsl(var(--competition))" }}>
-            {minRad.lenke}
-          </Link>
-        </p>
+        <Link
+          to="/konkurranse"
+          className="group flex items-baseline gap-4 mt-2 py-2.5 px-3 -mx-3 border-l-2 bg-white/[0.06] text-[15px] text-white transition-colors hover:bg-white/[0.11]"
+          style={{ borderColor: "hsl(var(--competition))" }}
+        >
+          <span className="w-7 font-serif text-2xl leading-none tabular-nums">{minRad.plass}</span>
+          <span className="flex-1 min-w-0 text-white/80">{minRad.tekst}</span>
+          {minRad.verdi ? (
+            <span className={`tabular-nums ${minRad.positiv ? "text-[#93D2A3]" : "text-[#F0A493]"}`}>{minRad.verdi}</span>
+          ) : (
+            <span className="text-sm font-semibold whitespace-nowrap group-hover:underline underline-offset-4" style={{ color: "hsl(var(--competition))" }}>
+              Gå dit
+            </span>
+          )}
+        </Link>
       )}
 
       <Link
         to="/konkurranse"
-        className="knapp-skraa inline-block mt-6 px-8 py-3.5 font-semibold text-[15px] transition-[filter] hover:brightness-105 focus-visible:underline underline-offset-4"
+        className="knapp-skraa inline-block mt-6 px-8 py-3.5 font-semibold text-[15px] focus-visible:underline underline-offset-4"
         style={{ background: "hsl(var(--competition))", color: "hsl(var(--competition-foreground))" }}
       >
-        Bli med i konkurransen
+        {deltakerId ? "Gå til konkurransen" : "Bli med i konkurransen"}
       </Link>
     </div>
   );

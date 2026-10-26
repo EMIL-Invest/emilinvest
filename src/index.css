@@ -226,4 +226,21 @@
 /* Parallellogram-knapp: begge sider skrår likt. */
 .knapp-skraa {
   clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  transition: transform 180ms ease-out, filter 180ms ease-out, padding 180ms ease-out;
+}
+/* Hover: knappen vokser litt og lysner, og skråkanten «strekker seg» */
+.knapp-skraa:hover {
+  transform: scale(1.045);
+  filter: brightness(1.08) saturate(1.1);
+}
+.knapp-skraa:active {
+  transform: scale(0.98);
+}
+@media (prefers-reduced-motion: reduce) {
+  .knapp-skraa,
+  .knapp-skraa:hover,
+  .knapp-skraa:active {
+    transform: none;
+    transition: filter 180ms ease-out;
+  }
 }

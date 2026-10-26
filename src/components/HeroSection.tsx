@@ -168,10 +168,10 @@ const HeroSection = () => {
                     type="button"
                     onClick={() => setValgt(k)}
                     aria-pressed={k === aktiv}
-                    className={`text-[13.5px] px-3.5 py-1.5 rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+                    className={`text-[13.5px] px-3.5 py-1.5 rounded-full border transition-[transform,background-color,border-color,color] duration-150 hover:scale-105 active:scale-95 motion-reduce:hover:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
                       k === aktiv
                         ? "font-semibold border-transparent text-[hsl(var(--competition-foreground))]"
-                        : "border-white/25 text-white/80 hover:border-white/50"
+                        : "border-white/25 text-white/80 hover:border-white/60 hover:bg-white/10 hover:text-white"
                     }`}
                     style={k === aktiv ? { background: "hsl(var(--competition))" } : undefined}
                   >
