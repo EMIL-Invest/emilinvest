@@ -181,8 +181,8 @@ const HeroSection = () => {
               </div>
             )}
             <p className="text-[13.5px] text-white/55 mb-6 max-w-lg">
-              Den mørke kanten er porteføljen {siden}.
-              {aktiv ? ` Den svake ryggen er ${serier[aktiv]!.navn}, regnet om til kroner.` : ""}
+              Den gule linjen er vår portefølje {siden}.
+              {aktiv ? ` Den svake grønne linjen er ${serier[aktiv]!.navn}, regnet om til kroner.` : ""}
             </p>
             <Link
               to="/portefolje"
