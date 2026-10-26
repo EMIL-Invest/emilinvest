@@ -32,7 +32,7 @@ const CompetitionBanner = () => {
                   <p className="font-serif text-lg md:text-xl leading-none text-foreground">
                     {f.verdi}
                   </p>
-                  <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {f.merke}
                   </p>
                 </div>
@@ -48,7 +48,8 @@ const CompetitionBanner = () => {
           <div className="grid lg:grid-cols-[2fr_1fr] gap-12 lg:gap-16">
             {/* Hovedpremien */}
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] font-medium mb-3" style={{ color: GULL }}>
+              <p className="text-sm font-medium mb-2 text-muted-foreground">
+                <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 align-middle" style={{ background: GULL }} />
                 Hovedpremie 1. juni
               </p>
               <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-7">
@@ -59,7 +60,8 @@ const CompetitionBanner = () => {
 
             {/* Månedspremien */}
             <div className="lg:border-l lg:border-border lg:pl-12">
-              <p className="text-xs uppercase tracking-[0.22em] font-medium mb-3" style={{ color: GULL }}>
+              <p className="text-sm font-medium mb-2 text-muted-foreground">
+                <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 align-middle" style={{ background: GULL }} />
                 Månedspremie
               </p>
               <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-7">

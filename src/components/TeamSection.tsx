@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Mail } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
-import teamPhoto from "@/assets/team-photo.jpg";
 import joinPhoto from "@/assets/join-photo.jpg";
 
 interface TeamMember {
@@ -44,28 +43,17 @@ const TeamSection = () => {
   return (
     <section id="team" className="py-24">
       <div className="section-container">
-        <div className="text-center mb-16">
-          <p className="eyebrow mb-5">Komiteen</p>
-          <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4">
+        <div className="mb-14">
+          <h2 className="text-4xl md:text-5xl font-serif font-normal text-primary mb-4">
             Møt komiteen
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl">
             Vi er rundt 15 engasjerte studenter som forvalter linjeforeningens
             midler sammen - og lærer finans i praksis mens vi gjør det.
           </p>
         </div>
 
-        {/* Team Photo */}
-        <div className="mb-16">
-          <div className="max-w-4xl mx-auto rounded-md overflow-hidden" style={{ boxShadow: "var(--shadow-card)" }}>
-            <img
-              src={teamPhoto}
-              alt="EMIL Invest-komiteen samlet"
-              className="w-full h-auto object-cover"
-            />
-          </div>
-        </div>
-
+        {/* Gruppebildet står allerede øverst på forsiden, så her vises bare medlemmene. */}
         {/* Medlemmene - rolige kort i ett samlet rutenett */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
           {members.map((member) => (
@@ -89,21 +77,19 @@ const TeamSection = () => {
           ))}
         </div>
 
-        {/* Bli med-boksen - som før: avrundet felt med gradient fra logoen */}
-        <div
-          className="mt-16 rounded-2xl overflow-hidden text-primary-foreground shadow-card"
-          style={{ background: "var(--gradient-brand)" }}
-        >
+        {/* Bli med-feltet: samme mørkegrønne flate som toppen, bilde med bue */}
+        <div className="mt-16 overflow-hidden text-primary-foreground" style={{ background: "hsl(var(--band))" }}>
           <div className="grid md:grid-cols-2 items-stretch">
             <div className="md:max-h-[420px] overflow-hidden">
               <img
                 src={joinPhoto}
                 alt="EMIL Invest-komiteen - den uformelle varianten"
                 className="w-full h-full object-cover"
+                style={{ borderRadius: "0 50% 50% 0 / 0 34% 34% 0" }}
               />
             </div>
             <div className="p-8 md:p-12 flex flex-col justify-center text-center md:text-left">
-              <h3 className="text-2xl md:text-3xl font-serif font-bold mb-3">
+              <h3 className="text-3xl md:text-4xl font-serif font-normal mb-3">
                 Vil du bli med?
               </h3>
               <p className="text-primary-foreground/80 mb-6 max-w-xl mx-auto md:mx-0">
@@ -113,7 +99,8 @@ const TeamSection = () => {
               <div>
                 <a
                   href="mailto:kontakt@emilinvest.no"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-primary font-medium hover:bg-white/90 transition-colors"
+                  className="knapp-skraa inline-flex items-center gap-2 px-8 py-3.5 font-semibold hover:brightness-105 transition-[filter] focus-visible:underline"
+                  style={{ background: "hsl(var(--competition))", color: "hsl(var(--competition-foreground))" }}
                 >
                   <Mail className="w-4 h-4" />
                   Kontakt oss

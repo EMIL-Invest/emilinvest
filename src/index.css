@@ -155,9 +155,9 @@
     box-shadow: var(--shadow-soft);
   }
 
-  /* Liten overlinje i versaler - brukes over alle seksjonstitler */
+  /* Liten overlinje over en tittel. Vanlig skrift, ikke versaler - roligere. */
   .eyebrow {
-    @apply text-xs md:text-sm uppercase tracking-[0.22em] text-muted-foreground font-medium;
+    @apply text-sm text-muted-foreground font-medium;
   }
 
   .stock-positive {

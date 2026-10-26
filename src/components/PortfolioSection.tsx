@@ -45,12 +45,11 @@ const PortfolioSection = () => {
   return (
     <section id="portfolio" className="py-20 md:py-24 bg-card border-y border-border">
       <div className="section-container">
-        <div className="text-center mb-16">
-          <p className="eyebrow mb-5">Portefølje</p>
-          <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4">
+        <div className="mb-14">
+          <h2 className="text-4xl md:text-5xl font-serif font-normal text-primary mb-4">
             Våre investeringer
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl">
             Slik er porteføljen fordelt - live. Pek på et felt for detaljer.
           </p>
         </div>

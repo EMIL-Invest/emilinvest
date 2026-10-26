@@ -114,7 +114,7 @@ export const AllocationSection = ({
                     <fact.Ikon className="w-6 h-6 text-primary" strokeWidth={1.6} />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
+                    <p className="text-sm text-muted-foreground mb-1.5">
                       {fact.label}
                     </p>
                     <p className="font-serif text-3xl md:text-4xl text-foreground tabular-nums leading-none">
@@ -175,7 +175,7 @@ export const AllocationSection = ({
               </ResponsiveContainer>
               {/* Senterteksten */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.22em] text-muted-foreground mb-1">
+                <p className="text-xs md:text-sm text-muted-foreground mb-1">
                   Aksjeandel
                 </p>
                 <p className="font-serif text-3xl md:text-4xl text-foreground tabular-nums">
@@ -290,7 +290,7 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
           <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
             <div className="flex gap-8">
               <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1">
                   Størst bidrag
                 </p>
                 <p className="font-serif text-2xl text-foreground">
@@ -301,7 +301,7 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
                 </p>
               </div>
               <div className="border-l border-border pl-8">
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1">
                   Svakest bidrag
                 </p>
                 <p className="font-serif text-2xl text-foreground">
@@ -389,7 +389,7 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
           )}
           <p className="text-xs text-muted-foreground mt-4">
             Urealisert gevinst/tap målt mot kostpris, altså kursen porteføljen
-            ble nullstilt til. Live-kurser fra Oslo Børs.
+            ble nullstilt til. Live-kurser fra børsene vi handler på.
           </p>
         </div>
       </div>

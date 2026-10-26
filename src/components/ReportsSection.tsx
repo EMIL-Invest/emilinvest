@@ -197,12 +197,11 @@ const ReportsSection = () => {
   return (
     <section id="reports" className="py-24">
       <div className="section-container">
-        <div className="text-center mb-16">
-          <p className="eyebrow mb-5">Rapporter</p>
-          <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-4">
+        <div className="mb-14">
+          <h2 className="text-4xl md:text-5xl font-serif font-normal text-primary mb-4">
             Kvartalsrapporter
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl">
             Last ned våre kvartalsrapporter for innsikt i porteføljeutviklingen
           </p>
         </div>
