@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { hentKontanter } from "@/lib/handelslogg";
 
 export interface Holding {
   id: string;
@@ -50,8 +51,27 @@ export const usePortfolioData = () => {
       return [];
     }
     
-    setHoldings(data || []);
-    return data || [];
+    // Kontanter (innskutt kapital + handelsloggen) vises som en egen linje,
+    // slik at totalverdi og fordeling tar med ubrukte penger.
+    const kontanter = await hentKontanter();
+    const liste: Holding[] = [...(data || [])];
+    if (kontanter !== null && kontanter >= 1) {
+      liste.push({
+        id: "kontanter",
+        ticker: "KONTANTER",
+        name: "Kontanter",
+        quantity: 1,
+        purchase_price: kontanter,
+        cost_basis: kontanter,
+        holding_type: "cash",
+        sector: null,
+        exchange: null,
+        purchase_date: null,
+      });
+    }
+
+    setHoldings(liste);
+    return liste;
   }, []);
 
   const fetchHistory = useCallback(async () => {

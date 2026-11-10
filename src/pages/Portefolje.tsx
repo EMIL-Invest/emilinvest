@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PerformanceSection from "@/components/PerformanceSection";
+import SpolTilbake from "@/components/SpolTilbake";
+import { visTicker } from "@/lib/utils";
 import { AllocationSection, ContributionSection } from "@/components/PortfolioVisuals";
 import { usePortfolioData, StockQuote } from "@/hooks/usePortfolioData";
 
@@ -166,7 +168,7 @@ const Portefolje = () => {
                         >
                           {holding.name}
                         </Link>
-                        <p className="text-xs text-muted-foreground">{holding.ticker}</p>
+                        <p className="text-xs text-muted-foreground">{visTicker(holding.ticker)}</p>
                       </td>
                       <td className="py-4 px-4 text-sm text-muted-foreground">{holding.sector || "-"}</td>
                       <td className="py-4 px-4 text-sm text-right tabular-nums">{holding.quantity.toLocaleString("no-NO")}</td>
@@ -217,6 +219,9 @@ const Portefolje = () => {
 
         {/* Bidrag per posisjon */}
         {!loading && <ContributionSection stocks={stocks} />}
+
+        {/* Spol tilbake: porteføljen slik den var en valgt dag */}
+        <SpolTilbake />
 
         {/* Utviklingsgrafen - samme som på forsiden */}
         <PerformanceSection />

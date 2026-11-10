@@ -1,3 +1,4 @@
+import { visTicker } from "@/lib/utils";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { TrendingUp, Coins, Users } from "lucide-react";
@@ -201,7 +202,7 @@ export const AllocationSection = ({
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ background: slice.color }}
                     />
-                    <span className="text-sm font-medium text-foreground truncate">{slice.ticker}</span>
+                    <span className="text-sm font-medium text-foreground truncate">{visTicker(slice.ticker)}</span>
                   </span>
                   <span className="text-sm text-muted-foreground tabular-nums">
                     {slice.share.toFixed(1).replace(".", ",")} %
@@ -294,7 +295,7 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
                   Størst bidrag
                 </p>
                 <p className="font-serif text-2xl text-foreground">
-                  {best.ticker}{" "}
+                  {visTicker(best.ticker)}{" "}
                   <span className="text-sm font-sans text-muted-foreground tabular-nums">
                     {mode === "kr" ? formatKr(best.gain) : `${best.pct >= 0 ? "+" : ""}${best.pct.toFixed(1)} %`}
                   </span>
@@ -305,7 +306,7 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
                   Svakest bidrag
                 </p>
                 <p className="font-serif text-2xl text-foreground">
-                  {worst.ticker}{" "}
+                  {visTicker(worst.ticker)}{" "}
                   <span className="text-sm font-sans text-muted-foreground tabular-nums">
                     {mode === "kr" ? formatKr(worst.gain) : `${worst.pct >= 0 ? "+" : ""}${worst.pct.toFixed(1)} %`}
                   </span>

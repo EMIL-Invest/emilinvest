@@ -4,11 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, Shield, Briefcase, LineChart, FileSpreadsheet, BookOpen, Calculator } from "lucide-react";
+import { ArrowLeft, Users, Shield, Briefcase, LineChart, FileSpreadsheet, BookOpen, Calculator, ArrowLeftRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import PortfolioAdmin from "@/components/admin/PortfolioAdmin";
 import HistoryAdmin from "@/components/admin/HistoryAdmin";
+import HandelsloggAdmin from "@/components/admin/HandelsloggAdmin";
 import UsersAdmin from "@/components/admin/UsersAdmin";
 import TeamAdmin from "@/components/admin/TeamAdmin";
 import StockProfilesAdmin from "@/components/admin/StockProfilesAdmin";
@@ -116,10 +117,14 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               Portefølje
+            </TabsTrigger>
+            <TabsTrigger value="handler" className="flex items-center gap-2">
+              <ArrowLeftRight className="w-4 h-4" />
+              Handelslogg
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <LineChart className="w-4 h-4" />
@@ -153,6 +158,10 @@ const Admin = () => {
               quotes={portfolioData.quotes}
               onRefresh={portfolioData.refresh}
             />
+          </TabsContent>
+
+          <TabsContent value="handler">
+            <HandelsloggAdmin holdings={portfolioData.holdings} onRefresh={portfolioData.refresh} />
           </TabsContent>
 
           <TabsContent value="history">
