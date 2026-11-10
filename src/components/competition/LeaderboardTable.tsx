@@ -54,7 +54,7 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="font-serif font-normal flex items-center gap-2">
             <Trophy className="w-5 h-5" />
             Top 10 {periodLabel}
           </CardTitle>
@@ -85,12 +85,12 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
                         <Badge variant="secondary" className="text-xs flex-shrink-0">Deg</Badge>
                       )}
                     </span>
-                    <span className="block text-xs text-muted-foreground font-mono">
+                    <span className="block text-xs text-muted-foreground tabular-nums">
                       {entry.portfolio_value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                     </span>
                   </span>
                   <span className={`flex items-center gap-1 font-semibold flex-shrink-0 tabular-nums ${
-                    entry.return_percentage >= 0 ? 'text-green-600' : 'text-red-600'
+                    entry.return_percentage >= 0 ? 'text-opp' : 'text-ned'
                   }`}>
                     {entry.return_percentage >= 0 ? (
                       <TrendingUp className="w-4 h-4" />
@@ -123,12 +123,12 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
                         <span className="font-medium truncate">{ownEntryOutsideTop10.display_name}</span>
                         <Badge variant="secondary" className="text-xs flex-shrink-0">Deg</Badge>
                       </span>
-                      <span className="block text-xs text-muted-foreground font-mono">
+                      <span className="block text-xs text-muted-foreground tabular-nums">
                         {ownEntryOutsideTop10.portfolio_value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                       </span>
                     </span>
                     <span className={`flex items-center gap-1 font-semibold flex-shrink-0 tabular-nums ${
-                      ownEntryOutsideTop10.return_percentage >= 0 ? 'text-green-600' : 'text-red-600'
+                      ownEntryOutsideTop10.return_percentage >= 0 ? 'text-opp' : 'text-ned'
                     }`}>
                       {ownEntryOutsideTop10.return_percentage >= 0 ? (
                         <TrendingUp className="w-4 h-4" />
@@ -179,12 +179,12 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-right tabular-nums">
                     {entry.portfolio_value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                   </TableCell>
                   <TableCell className="text-right">
                     <div className={`flex items-center justify-end gap-1 font-medium ${
-                      entry.return_percentage >= 0 ? 'text-green-600' : 'text-red-600'
+                      entry.return_percentage >= 0 ? 'text-opp' : 'text-ned'
                     }`}>
                       {entry.return_percentage >= 0 ? (
                         <TrendingUp className="w-4 h-4" />
@@ -223,12 +223,12 @@ const LeaderboardTable = ({ entries, currentParticipantId, periodLabel, quotes }
                         <Badge variant="secondary" className="text-xs">Deg</Badge>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right font-mono">
+                    <TableCell className="text-right tabular-nums">
                       {ownEntryOutsideTop10.portfolio_value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                     </TableCell>
                     <TableCell className="text-right">
                       <div className={`flex items-center justify-end gap-1 font-medium ${
-                        ownEntryOutsideTop10.return_percentage >= 0 ? 'text-green-600' : 'text-red-600'
+                        ownEntryOutsideTop10.return_percentage >= 0 ? 'text-opp' : 'text-ned'
                       }`}>
                         {ownEntryOutsideTop10.return_percentage >= 0 ? (
                           <TrendingUp className="w-4 h-4" />

@@ -267,10 +267,9 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
           </h2>
           <div className="w-10 h-px bg-foreground/30 mb-6" />
           <p className="text-muted-foreground leading-relaxed">
-            Stolpene viser urealisert gevinst og tap per posisjon - hvem som
-            drar lasset, og hvem som skuffer. Målt fra kursen da komiteen tok
-            over porteføljen dette semesteret, samme utgangspunkt som grafen
-            lenger ned. Bytt mellom kroner og prosentvis avkastning.
+            Stolpene viser gevinst og tap per aksje siden vi kjøpte dem - hvem
+            som drar lasset, og hvem som skuffer. Bytt mellom kroner og
+            prosentvis avkastning.
           </p>
         </div>
 
@@ -281,7 +280,7 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
         >
           {alleNull ? (
             <p className="text-muted-foreground leading-relaxed py-6">
-              Kostprisene er nettopp nullstilt, så alle posisjonene står på
+              Aksjene er nettopp kjøpt, så alle posisjonene står på
               null. Stolpene begynner å bevege seg fra neste kursoppdatering,
               og etter noen dager ser du hvilke selskaper som trekker
               porteføljen opp og ned.
@@ -348,14 +347,17 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
                   axisLine={false}
                   tickFormatter={(v: number) =>
                     mode === "kr"
-                      ? `${Math.round(v / 1000).toLocaleString("no-NO")}k`
-                      : `${v} %`
+                      ? Math.abs(v) >= 1000
+                        ? `${(v / 1000).toLocaleString("no-NO", { maximumFractionDigits: 1 })}k`
+                        : v.toLocaleString("no-NO", { maximumFractionDigits: 0 })
+                      : `${v.toLocaleString("no-NO", { maximumFractionDigits: 1 })} %`
                   }
                 />
                 <YAxis
                   type="category"
                   dataKey="ticker"
                   width={64}
+                  tickFormatter={(t: string) => visTicker(t)}
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                   tickLine={false}
@@ -389,8 +391,8 @@ export const ContributionSection = ({ stocks }: { stocks: StockRow[] }) => {
           </>
           )}
           <p className="text-xs text-muted-foreground mt-4">
-            Urealisert gevinst/tap målt mot kostpris, altså kursen porteføljen
-            ble nullstilt til. Live-kurser fra børsene vi handler på.
+            Gevinst og tap som ikke er realisert ennå, målt mot det vi betalte.
+            Live-kurser fra børsene vi handler på.
           </p>
         </div>
       </div>

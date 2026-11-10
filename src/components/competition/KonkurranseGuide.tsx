@@ -32,15 +32,26 @@ import {
  * Erstatter de gamle tekstbannerne, som tok mye plass på siden.
  */
 
-export const ReglerKnapp = ({ variant }: { variant?: "outline" | "default" }) => {
+export const ReglerKnapp = ({ variant, moerk }: { variant?: "outline" | "default"; moerk?: boolean }) => {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant || "outline"} size="sm">
-          <BookOpen className="w-4 h-4 mr-2" />
-          Reglene
-        </Button>
+        {moerk ? (
+          // På det grønne båndet: en lenke med gul strek, som på forsiden
+          <button
+            type="button"
+            className="text-white underline decoration-2 underline-offset-[6px] hover:decoration-[3px]"
+            style={{ textDecorationColor: "hsl(var(--competition))" }}
+          >
+            Les reglene
+          </button>
+        ) : (
+          <Button variant={variant || "outline"} size="sm">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Reglene
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
@@ -91,7 +102,7 @@ interface StatusProps {
   holdings: PortfolioHolding[];
 }
 
-export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
+export const PorteforljeStatus = ({ participant, holdings, moerk }: StatusProps & { moerk?: boolean }) => {
   const [open, setOpen] = useState(false);
   const antall = holdings.filter((h) => h.ticker !== "ASK").length;
   const gyldig = antall >= KRAV_ANTALL_AKSJER || !!participant.qualified_at;
@@ -113,15 +124,29 @@ export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
   ];
 
   return (
-    <div className="flex flex-col items-center mb-8">
+    <div className={moerk ? "" : "flex flex-col items-center mb-8"}>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
+          {moerk ? (
+            // På det grønne båndet: en liten statuslinje med farget prikk
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white underline-offset-4 hover:underline"
+            >
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ background: gyldig ? "#93D2A3" : "#F0A493" }}
+                aria-hidden
+              />
+              {gyldig ? "Porteføljen er gyldig" : `Mangler ${mangler} aksje${mangler === 1 ? "" : "r"} for å bli rangert`}
+            </button>
+          ) : (
           <Button
             size="sm"
             className={
               gyldig
-                ? "bg-green-600 hover:bg-green-700 text-white"
-                : "bg-red-600 hover:bg-red-700 text-white"
+                ? "bg-opp hover:bg-opp/90 text-white"
+                : "bg-ned hover:bg-ned/90 text-white"
             }
           >
             {gyldig ? (
@@ -131,6 +156,7 @@ export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
             )}
             {gyldig ? "Porteføljen er gyldig" : "Porteføljen er ikke gyldig"}
           </Button>
+          )}
         </DialogTrigger>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -144,9 +170,9 @@ export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
             {krav.map((k) => (
               <li key={k.tekst} className="flex items-start gap-2.5 text-sm">
                 {k.ok ? (
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-opp flex-shrink-0 mt-0.5" />
                 ) : (
-                  <X className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <X className="w-4 h-4 text-ned flex-shrink-0 mt-0.5" />
                 )}
                 <span className={k.ok ? "text-muted-foreground" : "text-foreground"}>
                   {k.tekst}
@@ -182,10 +208,10 @@ export const PorteforljeStatus = ({ participant, holdings }: StatusProps) => {
       </Dialog>
 
       {/* Rød status: hva som mangler, i punkter rett under knappen */}
-      {!gyldig && (
+      {!gyldig && !moerk && (
         <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
           <li className="flex items-center gap-2">
-            <X className="w-4 h-4 text-red-600 flex-shrink-0" />
+            <X className="w-4 h-4 text-ned flex-shrink-0" />
             <span>
               Du eier {antall} av {KRAV_ANTALL_AKSJER} aksjer - kjøp{" "}
               <span className="font-medium text-foreground">

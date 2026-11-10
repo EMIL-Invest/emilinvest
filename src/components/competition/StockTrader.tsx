@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Search, TrendingUp, TrendingDown, RefreshCw, ShoppingCart, Clock, Alert
 import { OsloStock, StockQuote, PortfolioHolding } from "@/hooks/useCompetition";
 import { KRAV_ANTALL_AKSJER, ANTALL_DESIMALER, rundAntall, visAntall, visKurs, gyldigSalgsantall } from "@/lib/konkurranseregler";
 import FlervalgFilter from "./FlervalgFilter";
+import { KJOEP } from "@/lib/konkurranseStil";
 import { getExchangeFromTicker } from "@/lib/exchangeHours";
 import { sektorGruppe, aksjeMarked, markedNavn, sorterMarkeder } from "@/lib/aksjefilter";
 
@@ -30,6 +31,10 @@ interface StockTraderProps {
   maxDailyTransactions?: number;
   /** Har porteføljen vært gyldig? Da kan den ikke selges under 5 aksjer. */
   erKvalifisert?: boolean;
+  /** Ticker å åpne kjøpsdialogen for med en gang (Kjøp-knappen i Min portefølje). */
+  forhandsvalgtKjoep?: string | null;
+  /** Kalles når den forhåndsvalgte kjøpsdialogen lukkes, kjøpt eller ikke. */
+  onForhandsvalgFerdig?: () => void;
 }
 
 const StockTrader = ({ 
@@ -44,6 +49,8 @@ const StockTrader = ({
   checkTradingAllowed,
   maxDailyTransactions = 3,
   erKvalifisert = false,
+  forhandsvalgtKjoep = null,
+  onForhandsvalgFerdig,
 }: StockTraderProps) => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,6 +122,32 @@ const StockTrader = ({
       setCheckingTrading(false);
     }
   };
+
+  // Kjøp-knappen i Min portefølje sender oss hit med en ticker: åpne
+  // samme kjøpsdialog som her, så alle reglene og sjekkene gjelder likt.
+  const fraForhandsvalg = useRef(false);
+  useEffect(() => {
+    if (!forhandsvalgtKjoep) return;
+    const stock = availableStocks.find((s) => s.ticker === forhandsvalgtKjoep);
+    if (!stock) return;
+    fraForhandsvalg.current = true;
+    handleBuyClick(stock);
+    // handleBuyClick er en vanlig funksjon og endres hver render - bevisst utelatt
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forhandsvalgtKjoep, availableStocks]);
+  // Meld fra først når dialogen faktisk har vært åpen og så lukkes -
+  // ikke i samme runde som den åpnes (da er buyDialogOpen ennå false).
+  const forhandsvalgAapnet = useRef(false);
+  useEffect(() => {
+    if (!fraForhandsvalg.current) return;
+    if (buyDialogOpen) {
+      forhandsvalgAapnet.current = true;
+    } else if (forhandsvalgAapnet.current) {
+      fraForhandsvalg.current = false;
+      forhandsvalgAapnet.current = false;
+      onForhandsvalgFerdig?.();
+    }
+  }, [buyDialogOpen, onForhandsvalgFerdig]);
 
   const erKrypto = (ticker: string): boolean => {
     const stock = availableStocks.find(s => s.ticker === ticker);
@@ -293,30 +326,17 @@ const StockTrader = ({
           bak «Reglene»-knappen på forsiden av konkurransen, og håndheves
           uansett automatisk i databasen når man handler. */}
 
-      {/* Cash balance reminder */}
-      <Card className="bg-primary/5 border-primary/20">
-        <CardContent className="py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Tilgjengelig kapital</p>
-              <p className="text-2xl font-bold">{cashBalance.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr</p>
-            </div>
-            <Badge variant="outline">
-              {stockHoldings.length}/10 aksjer i porteføljen
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="font-serif font-normal flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
             Kjøp aksjer
           </CardTitle>
           <CardDescription>
-            Velg aksjer fra Oslo Børs og de store internasjonale børsene
+            Velg aksjer fra Oslo Børs og de store internasjonale børsene. Du har{" "}
+            {cashBalance.toLocaleString("nb-NO", { maximumFractionDigits: 0 })} kr tilgjengelig og{" "}
+            {stockHoldings.length} av 10 aksjer i porteføljen.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -385,7 +405,7 @@ const StockTrader = ({
                       size="sm"
                       onClick={() => handleBuyClick(stock)}
                       disabled={!quote}
-                      className="flex-shrink-0"
+                      className={`flex-shrink-0 ${KJOEP}`}
                     >
                       Kjøp
                     </Button>
@@ -423,7 +443,7 @@ const StockTrader = ({
                           {sektorGruppe(stock.sector)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right font-mono">
+                      <TableCell className="text-right tabular-nums">
                         {quote ? (
                           `${visKurs(quote.price)} kr`
                         ) : (
@@ -433,7 +453,7 @@ const StockTrader = ({
                       <TableCell className="text-right">
                         {quote ? (
                           <div className={`flex items-center justify-end gap-1 ${
-                            quote.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+                            quote.changePercent >= 0 ? 'text-opp' : 'text-ned'
                           }`}>
                             {quote.changePercent >= 0 ? (
                               <TrendingUp className="w-4 h-4" />
@@ -459,8 +479,8 @@ const StockTrader = ({
                             </Button>
                           )}
                           <Button 
-                            variant="default" 
                             size="sm"
+                            className={KJOEP}
                             onClick={() => handleBuyClick(stock)}
                             disabled={!quote}
                           >
@@ -491,14 +511,14 @@ const StockTrader = ({
                 kurs og utvikling (listen viser kun navn og kjøpsknapp) */}
             {selectedStock && (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
-                <span className="font-mono font-semibold text-base">
+                <span className="tabular-nums font-semibold text-base">
                   {quotes[selectedStock.ticker]
                     ? `${visKurs(quotes[selectedStock.ticker].price)} kr`
                     : "-"}
                 </span>
                 {quotes[selectedStock.ticker] && (
                   <span className={`flex items-center gap-1 font-medium ${
-                    quotes[selectedStock.ticker].changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+                    quotes[selectedStock.ticker].changePercent >= 0 ? 'text-opp' : 'text-ned'
                   }`}>
                     {quotes[selectedStock.ticker].changePercent >= 0 ? (
                       <TrendingUp className="w-4 h-4" />
@@ -593,6 +613,7 @@ const StockTrader = ({
             </Button>
             <Button
               onClick={handleBuy}
+              className={KJOEP}
               disabled={isBuying || checkingTrading || !!(tradingCheck && !tradingCheck.allowed)}
             >
               {isBuying ? "Kjøper..." : "Bekreft kjøp"}

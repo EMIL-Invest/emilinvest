@@ -86,7 +86,7 @@ const ParticipantPortfolioDialog = ({
                 <Wallet className="w-5 h-5 text-muted-foreground" />
                 <span className="font-medium">Kontanter (ASK)</span>
               </div>
-              <span className="font-mono font-bold">
+              <span className="tabular-nums font-bold">
                 {cashBalance.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
               </span>
             </div>
@@ -115,18 +115,18 @@ const ParticipantPortfolioDialog = ({
                         <TableCell>
                           <div className="font-medium">{holding.ticker.replace('.OL', '')}</div>
                         </TableCell>
-                        <TableCell className="text-right font-mono">
+                        <TableCell className="text-right tabular-nums">
                           {visAntall(holding.quantity)}
                         </TableCell>
-                        <TableCell className="text-right font-mono">
+                        <TableCell className="text-right tabular-nums">
                           {visKurs(currentPrice)} kr
                         </TableCell>
-                        <TableCell className="text-right font-mono">
+                        <TableCell className="text-right tabular-nums">
                           {value.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                         </TableCell>
                         <TableCell className="text-right">
                           <div className={`flex items-center justify-end gap-1 ${
-                            returnPercent >= 0 ? 'text-green-600' : 'text-red-600'
+                            returnPercent >= 0 ? 'text-opp' : 'text-ned'
                           }`}>
                             {returnPercent >= 0 ? (
                               <TrendingUp className="w-4 h-4" />

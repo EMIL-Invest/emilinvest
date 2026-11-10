@@ -63,6 +63,26 @@ const hentYahoo = async (yahoo: string): Promise<Serie | null> => {
   return { yahoo, currency: result.meta?.currency ?? "", points };
 };
 
+/**
+ * Fjerner åpenbart feile kurser fra Yahoo. Rett etter børsåpning kan Yahoo gi
+ * et «live»-punkt som er helt feil (6. nov. 2026 kom OSEBX som 1 389 069 i stedet
+ * for ~2080, og forsiden viste +66 495 %). En indeks flytter seg aldri 25 % fra
+ * dagene rundt, så et punkt som avviker så mye fra medianen av naboene, droppes.
+ */
+const ROBUST_VINDU = 5;
+const MAKS_AVVIK = 0.25;
+const fjernFeilkurser = (punkter: Punkt[]): Punkt[] =>
+  punkter.filter((p, i) => {
+    const naboer = punkter
+      .slice(Math.max(0, i - ROBUST_VINDU), i + ROBUST_VINDU + 1)
+      .filter((_, j) => j !== Math.min(i, ROBUST_VINDU))
+      .map((n) => n.c)
+      .sort((a, b) => a - b);
+    if (naboer.length === 0) return true;
+    const median = naboer[Math.floor(naboer.length / 2)];
+    return Math.abs(p.c / median - 1) <= MAKS_AVVIK;
+  });
+
 /** Kurs på dato d, eller siste kjente før d (helger og helligdager). */
 const kursPaa = (punkter: Punkt[], d: string): number | null => {
   let svar: number | null = null;
@@ -103,10 +123,12 @@ serve(async (req) => {
     Object.entries(INDEKSER).forEach(([noekkel, info], i) => {
       const s = serier[i];
       if (!s) return;
-      let punkter = s.points;
+      // Filtreres her og ikke ved henting, så også feil som alt ligger i cachen fanges
+      let punkter = fjernFeilkurser(s.points);
       if (s.currency === "USD") {
         if (!usdnok) return; // uten valutakurs blir sammenligningen feil - dropp heller indeksen
-        punkter = punkter.map((p) => ({ d: p.d, c: p.c * (kursPaa(usdnok.points, p.d) ?? 0) })).filter((p) => p.c > 0);
+        const valuta = fjernFeilkurser(usdnok.points);
+        punkter = punkter.map((p) => ({ d: p.d, c: p.c * (kursPaa(valuta, p.d) ?? 0) })).filter((p) => p.c > 0);
       }
       ut[noekkel] = { navn: info.navn, punkter };
     });
