@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ExcelJS from "exceljs";
+import { HANDELSTYPER, hentHandler } from "@/lib/handelslogg";
 
 interface StockSnapshot {
   date: string;
@@ -35,7 +36,7 @@ const ExcelExport = () => {
       if (!snapshots || snapshots.length === 0) {
         toast({
           title: "Ingen data",
-          description: "Det finnes ingen historiske snapshots ennå. Data samles automatisk hver dag kl. 09:00.",
+          description: "Det finnes ingen historiske snapshots ennå. Data samles automatisk hver hverdag kl. 17.",
           variant: "destructive",
         });
         setLoading(false);
@@ -81,6 +82,27 @@ const ExcelExport = () => {
       addSheet("Verdier (NOK)", (s) => s.value_nok);
       addSheet("Antall", (s) => s.quantity);
 
+      // Hele porteføljen per dag
+      const { data: historikk } = await supabase
+        .from("portfolio_history")
+        .select("date, portfolio_value, invested_capital, osebx_value")
+        .order("date", { ascending: true });
+      const wsTotal = wb.addWorksheet("Portefølje");
+      wsTotal.addRow(["Dato", "Totalverdi (NOK)", "Innskutt kapital (NOK)", "OSEBX"]);
+      wsTotal.getRow(1).font = { bold: true };
+      for (const h of historikk ?? []) {
+        wsTotal.addRow([h.date, Number(h.portfolio_value), Number(h.invested_capital ?? 0), Number(h.osebx_value ?? 0)]);
+      }
+
+      // Handelsloggen: alle kjøp, salg, utbytter og gebyrer
+      const handler = (await hentHandler()).reverse();
+      const wsHandel = wb.addWorksheet("Handelslogg");
+      wsHandel.addRow(["Dato", "Type", "Ticker", "Navn", "Antall", "Kurs (NOK)", "Kurtasje (NOK)", "Kontanteffekt (NOK)", "Notat"]);
+      wsHandel.getRow(1).font = { bold: true };
+      for (const h of handler) {
+        wsHandel.addRow([h.trade_date, HANDELSTYPER[h.type], h.ticker ?? "", h.name ?? "", h.quantity ?? "", h.price_nok ?? "", h.fees_nok, h.belop_nok, h.note ?? ""]);
+      }
+
       // Generate and download
       const buffer = await wb.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
@@ -120,7 +142,7 @@ const ExcelExport = () => {
               Excel-eksport
             </CardTitle>
             <CardDescription>
-              Last ned historiske porteføljedata som Excel. Data oppdateres automatisk daglig kl. 09:00.
+              Last ned historiske porteføljedata som Excel. Data oppdateres automatisk hver hverdag kl. 17.
             </CardDescription>
           </div>
           <Button onClick={handleExport} disabled={loading}>
@@ -135,13 +157,15 @@ const ExcelExport = () => {
       </CardHeader>
       <CardContent>
         <div className="text-sm text-muted-foreground space-y-2">
-          <p>Excel-filen inneholder tre ark:</p>
+          <p>Excel-filen inneholder fem ark:</p>
           <ul className="list-disc list-inside space-y-1 ml-2">
             <li><strong>Aksjekurser</strong> - kurs per aksje per dato (i originalvaluta)</li>
             <li><strong>Verdier (NOK)</strong> - total verdi per aksje per dato (kurs × antall × valutakurs)</li>
             <li><strong>Antall</strong> - antall aksjer per dato</li>
+            <li><strong>Portefølje</strong> - totalverdi, innskutt kapital og OSEBX per dato</li>
+            <li><strong>Handelslogg</strong> - alle kjøp, salg, utbytter og gebyrer</li>
           </ul>
-          <p className="mt-3">Oslo Børs (OSEBX) er inkludert som en egen rad i alle ark.</p>
+          <p className="mt-3">Oslo Børs (OSEBX) og kontanter er egne rader i de tre første arkene.</p>
         </div>
       </CardContent>
     </Card>
