@@ -393,6 +393,42 @@ Deno.serve(async (req) => {
       console.log(`Invested capital from capital_flows: ${totalInvestedCapital}`);
     }
 
+    // Fond og andre beholdninger uten live-kurs teller med kostpris,
+    // slik som på nettsiden.
+    const { data: andre } = await supabase
+      .from('portfolio_holdings')
+      .select('cost_basis')
+      .neq('holding_type', 'stock');
+    for (const a of andre || []) portfolioValue += Number(a.cost_basis) || 0;
+
+    // Kontanter = innskutt kapital + handelsloggen (kjøp < 0, salg/utbytte > 0).
+    // Mangler handelsloggen (32_handelslogg.sql ikke kjørt), hoppes dette over.
+    const { data: handler, error: handelError } = await supabase
+      .from('portfolio_transactions')
+      .select('belop_nok')
+      .lte('trade_date', today);
+    if (!handelError && !flowsError && capitalFlows && capitalFlows.length > 0) {
+      const innskutt = capitalFlows.reduce((sum: number, f: { amount: number }) => sum + Number(f.amount), 0);
+      const kontanter = innskutt + (handler || []).reduce(
+        (sum: number, h: { belop_nok: number }) => sum + Number(h.belop_nok),
+        0
+      );
+      portfolioValue += kontanter;
+      console.log(`Kontanter: ${kontanter.toFixed(0)} NOK`);
+      stockSnapshots.push({
+        date: today,
+        ticker: 'KONTANTER',
+        name: 'Kontanter',
+        price: 1,
+        currency: 'NOK',
+        exchange_rate: 1,
+        quantity: Math.round(kontanter * 100) / 100,
+        value_nok: Math.round(kontanter),
+      });
+    } else if (handelError) {
+      console.warn('Handelslogg utilgjengelig:', handelError.message);
+    }
+
     // Also add OSEBX as a snapshot row
     const osebxValue = await fetchOSEBX();
     console.log(`OSEBX value: ${osebxValue}`);
