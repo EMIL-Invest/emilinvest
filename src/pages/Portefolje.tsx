@@ -1,58 +1,25 @@
-import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PerformanceSection from "@/components/PerformanceSection";
 import SpolTilbake from "@/components/SpolTilbake";
-import { visTicker } from "@/lib/utils";
-import { AllocationSection, ContributionSection } from "@/components/PortfolioVisuals";
+import { ContributionSection } from "@/components/PortfolioVisuals";
+import Porteforljekart from "@/components/portefolje/Porteforljekart";
+import Beholdning from "@/components/portefolje/Beholdning";
 import { usePortfolioData, StockQuote } from "@/hooks/usePortfolioData";
 
 /**
- * Dedikert porteføljeside - viser alle plasseringene med vekting,
- * inspirert av profesjonelle fondssider. Aksjer med live-kurs,
- * fond og bankinnskudd med bokført verdi.
+ * Porteføljesiden: grønt bånd med nøkkeltall (samme stil som forsiden),
+ * kartet over alle aksjene, beholdningstabellen med valgfri periode,
+ * fond og kontanter, bidrag per aksje og «Spol tilbake».
  */
 
 const formatKr = (n: number) =>
   `${Math.round(n).toLocaleString("no-NO")} kr`;
 
-/** Tidsvektet avkastning siden årsskiftet (samme metode som grafen). */
-const useYtdReturn = (
-  history: { date: string; portfolio_value: number; invested_capital: number | null; osebx_value: number | null }[]
-) =>
-  useMemo(() => {
-    const startOfYear = new Date(new Date().getFullYear(), 0, 1);
-    const pts = history.filter((h) => new Date(h.date) >= startOfYear);
-    if (pts.length < 2) return { portfolio: null as number | null, osebx: null as number | null };
-
-    let index = 1;
-    for (let i = 1; i < pts.length; i++) {
-      const prev = pts[i - 1];
-      const cur = pts[i];
-      const flow =
-        cur.invested_capital != null && prev.invested_capital != null
-          ? Number(cur.invested_capital) - Number(prev.invested_capital)
-          : 0;
-      const denom = Number(prev.portfolio_value) + flow;
-      if (denom > 0) index *= Number(cur.portfolio_value) / denom;
-    }
-
-    const firstOsebx = pts.find((p) => p.osebx_value)?.osebx_value ?? null;
-    const lastOsebx = [...pts].reverse().find((p) => p.osebx_value)?.osebx_value ?? null;
-    const osebx =
-      firstOsebx && lastOsebx ? (Number(lastOsebx) / Number(firstOsebx) - 1) * 100 : null;
-
-    return { portfolio: (index - 1) * 100, osebx };
-  }, [history]);
-
 const Portefolje = () => {
-  const navigate = useNavigate();
-  const { holdings, quotes, history, loading, lastUpdated, calculatePortfolioValue, calculateHoldingValue } =
+  const { holdings, quotes, loading, lastUpdated, calculatePortfolioValue, calculateHoldingValue } =
     usePortfolioData();
 
   const totalValue = calculatePortfolioValue(holdings, quotes);
-  const ytd = useYtdReturn(history);
 
   const stocks = holdings
     .filter((h) => h.holding_type === "stock")
@@ -72,140 +39,102 @@ const Portefolje = () => {
     .sort((a, b) => b.value - a.value);
 
   const weight = (value: number) => (totalValue > 0 ? (value / totalValue) * 100 : 0);
+  const sidenKjop = stocks.reduce(
+    (s, r) => s + r.value - (r.holding.cost_basis || r.holding.purchase_price * r.holding.quantity),
+    0,
+  );
+  const kontanter = other.filter((o) => o.holding.holding_type === "cash").reduce((s, o) => s + o.value, 0);
+  const kjopsdato = stocks
+    .map((r) => r.holding.purchase_date)
+    .filter(Boolean)
+    .sort()[0];
 
   return (
     <div className="min-h-screen">
       <Navbar />
 
       <main className="pt-16">
-        {/* Topp: tittel + nøkkeltall */}
-        <div className="section-container py-14 md:py-20">
-          <p className="eyebrow mb-6">Portefølje</p>
-          <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-6 max-w-2xl">
-            Våre plasseringer
-          </h1>
-          <div className="w-10 h-px bg-foreground/30 mb-7" />
-          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Hele porteføljen, helt åpent - hver aksje, hvert fond og hver krone.
-            Kursene oppdateres automatisk gjennom børsdagen.
-          </p>
+        {/* Grønt bånd, samme som på forsiden og i konkurransen */}
+        <section className="text-white" style={{ background: "hsl(var(--band))" }}>
+          <div className="section-container grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-20 pt-10 pb-12 md:pt-16 md:pb-16">
+            <div>
+              <h1 className="font-serif font-normal text-[40px] md:text-6xl leading-[1.02] tracking-[-0.015em]">
+                Porteføljen vår
+              </h1>
+              <p className="text-white/75 text-base md:text-lg leading-relaxed mt-4 max-w-[32em]">
+                Hver aksje komiteen eier, med kurser som oppdateres gjennom børsdagen.
+                {kjopsdato &&
+                  ` Kjøpt for ekte penger ${new Date(kjopsdato).toLocaleDateString("no-NO", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}.`}
+              </p>
+            </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-md overflow-hidden mt-10">
-            {[
-              { label: "Markedsverdi", value: loading ? "-" : formatKr(totalValue) },
-              {
-                label: "Avkastning i år",
-                value: ytd.portfolio == null ? "-" : `${ytd.portfolio >= 0 ? "+" : ""}${ytd.portfolio.toFixed(1)} %`,
-                positive: (ytd.portfolio ?? 0) >= 0,
-                colored: ytd.portfolio != null,
-              },
-              {
-                label: "OSEBX i år",
-                value: ytd.osebx == null ? "-" : `${ytd.osebx >= 0 ? "+" : ""}${ytd.osebx.toFixed(1)} %`,
-              },
-              { label: "Plasseringer", value: loading ? "-" : String(holdings.length) },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-card p-6">
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">
-                  {stat.label}
-                </p>
-                <p
-                  className={`font-serif text-2xl md:text-3xl tabular-nums ${
-                    stat.colored ? (stat.positive ? "stock-positive" : "stock-negative") : "text-foreground"
-                  }`}
-                >
-                  {stat.value}
-                </p>
+            <div className="border-t-2 pt-6 self-end" style={{ borderColor: "hsl(var(--competition))" }}>
+              <div className="flex items-baseline justify-between gap-4">
+                <p className="text-sm text-white/70">Markedsverdi nå</p>
+                {lastUpdated && (
+                  <p className="text-xs text-white/50">
+                    oppdatert {lastUpdated.toLocaleTimeString("no-NO", { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                )}
               </div>
-            ))}
+              <p className="font-serif text-5xl md:text-7xl leading-none tabular-nums mt-2">
+                {loading ? "–" : Math.round(totalValue).toLocaleString("no-NO")}
+                <span className="text-2xl md:text-3xl text-white/70 ml-2">kr</span>
+              </p>
+              {!loading && (
+                <p className="flex flex-wrap gap-x-7 gap-y-1 mt-4 text-sm text-white/70 tabular-nums">
+                  <span>
+                    Siden kjøp{" "}
+                    <span className="font-semibold" style={{ color: sidenKjop >= 0 ? "#93D2A3" : "#F0A493" }}>
+                      {sidenKjop >= 0 ? "+" : "−"}
+                      {formatKr(Math.abs(sidenKjop))}
+                    </span>
+                  </span>
+                  <span>{stocks.length} aksjer</span>
+                  {kontanter > 0 && (
+                    <span>
+                      Kontanter <span className="font-semibold text-white">{formatKr(kontanter)}</span>
+                    </span>
+                  )}
+                </p>
+              )}
+            </div>
           </div>
-          {lastUpdated && (
-            <p className="text-xs text-muted-foreground mt-3">
-              Kurser oppdatert {lastUpdated.toLocaleTimeString("no-NO", { hour: "2-digit", minute: "2-digit" })}.
-              Avkastning måles tidsvektet - innskudd og uttak påvirker ikke prosenten.
-            </p>
-          )}
-        </div>
+        </section>
 
-        {/* Fordeling: smultring, fakta og posisjonsbrikker */}
-        {!loading && <AllocationSection stocks={stocks} other={other} totalValue={totalValue} />}
+        {loading ? (
+          <p className="text-muted-foreground text-center py-24">Laster porteføljen…</p>
+        ) : stocks.length === 0 ? (
+          <p className="text-muted-foreground text-center py-24">Ingen aksjer i porteføljen akkurat nå.</p>
+        ) : (
+          <>
+            <Porteforljekart stocks={stocks} totalVerdi={totalValue} />
+            <Beholdning stocks={stocks} totalVerdi={totalValue} />
+          </>
+        )}
 
-        {/* Aksjer */}
-        <div className="section-container pb-16">
-          <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-6">Aksjer</h2>
-          <div className="rounded-md border border-border bg-card overflow-x-auto" style={{ boxShadow: "var(--shadow-soft)" }}>
-            {loading ? (
-              <p className="text-muted-foreground text-center py-12">Laster porteføljen…</p>
-            ) : stocks.length === 0 ? (
-              <p className="text-muted-foreground text-center py-12">Ingen aksjer i porteføljen akkurat nå.</p>
-            ) : (
-              <table className="w-full min-w-[720px]">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-4 px-6 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Selskap</th>
-                    <th className="text-left py-4 px-4 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Sektor</th>
-                    <th className="text-right py-4 px-4 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Antall</th>
-                    <th className="text-right py-4 px-4 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">I dag</th>
-                    <th className="text-right py-4 px-4 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Verdi</th>
-                    <th className="text-right py-4 px-6 text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium w-24">Andel</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stocks.map(({ holding, quote, value }) => (
-                    <tr
-                      key={holding.id}
-                      onClick={() => navigate(`/aksje/${holding.ticker}`)}
-                      className="border-b border-border/60 last:border-0 hover:bg-secondary/40 transition-colors cursor-pointer"
-                    >
-                      <td className="py-4 px-6">
-                        {/* Lenken gjør raden tilgjengelig med tastatur og
-                            skjermleser; onClick på raden gjør hele flaten
-                            klikkbar for mus. */}
-                        <Link
-                          to={`/aksje/${holding.ticker}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="font-medium text-foreground hover:underline underline-offset-2"
-                        >
-                          {holding.name}
-                        </Link>
-                        <p className="text-xs text-muted-foreground">{visTicker(holding.ticker)}</p>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-muted-foreground">{holding.sector || "-"}</td>
-                      <td className="py-4 px-4 text-sm text-right tabular-nums">{holding.quantity.toLocaleString("no-NO")}</td>
-                      <td className={`py-4 px-4 text-sm text-right tabular-nums ${
-                        quote ? (quote.changePercent >= 0 ? "stock-positive" : "stock-negative") : "text-muted-foreground"
-                      }`}>
-                        {quote ? `${quote.changePercent >= 0 ? "+" : ""}${quote.changePercent.toFixed(2)} %` : "-"}
-                      </td>
-                      <td className="py-4 px-4 text-sm text-right font-medium tabular-nums">{formatKr(value)}</td>
-                      {/* Bare tallet - stolpen ga samme informasjon to ganger,
-                          og smultringen over tabellen viser fordelingen bedre. */}
-                      <td className="py-4 px-6 text-sm text-right text-muted-foreground tabular-nums">
-                        {weight(value).toFixed(1).replace(".", ",")} %
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          {/* Fond og bankinnskudd */}
-          {other.length > 0 && (
-            <>
-              <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-6 mt-14">Fond og bankinnskudd</h2>
-              <div className="rounded-md border border-border bg-card" style={{ boxShadow: "var(--shadow-soft)" }}>
+        {/* Fond og kontanter */}
+        {other.length > 0 && (
+          <div className="section-container pb-16">
+              <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-6">Fond og kontanter</h2>
+              <div className="border-y border-border">
                 {other.map(({ holding, value }, i) => (
                   <div
                     key={holding.id}
-                    className={`flex items-center justify-between gap-4 py-4 px-6 ${i > 0 ? "border-t border-border/60" : ""}`}
+                    className={`flex items-center justify-between gap-4 py-4 ${i > 0 ? "border-t border-border/60" : ""}`}
                   >
                     <div>
-                      <p className="font-medium text-foreground">{holding.name}</p>
-                      <p className="text-xs text-muted-foreground">Bokført verdi</p>
+                      <p className="font-serif text-lg text-foreground">{holding.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {holding.holding_type === "cash" ? "Penger som ikke er investert ennå" : "Bokført verdi"}
+                      </p>
                     </div>
                     <div className="flex items-center gap-6">
-                      <p className="text-sm font-medium tabular-nums">{formatKr(value)}</p>
+                      <p className="tabular-nums">{formatKr(value)}</p>
                       <span className="text-xs text-muted-foreground tabular-nums w-12 text-right">
                         {weight(value).toFixed(1).replace(".", ",")} %
                       </span>
@@ -213,9 +142,8 @@ const Portefolje = () => {
                   </div>
                 ))}
               </div>
-            </>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Bidrag per posisjon */}
         {!loading && <ContributionSection stocks={stocks} />}
@@ -223,8 +151,6 @@ const Portefolje = () => {
         {/* Spol tilbake: porteføljen slik den var en valgt dag */}
         <SpolTilbake />
 
-        {/* Utviklingsgrafen - samme som på forsiden */}
-        <PerformanceSection />
       </main>
 
       <Footer />

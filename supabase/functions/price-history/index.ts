@@ -12,6 +12,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  *
  * Krever innlogget administrator (JWT i Authorization-headeren).
  *
+ * Unntak: { portefolje: true } er åpent for alle. Da velger funksjonen
+ * selv tickerne (aksjene i portfolio_holdings) med daglige kurser for
+ * siste år, så porteføljesiden kan vise utvikling for 1 uke til 1 år.
+ * Klienten kan ikke be om andre tickere i denne modusen.
+ *
  * Body: { tickers: string[], interval?: "1d"|"1wk"|"1mo", range?: "1y"|"2y"|"3y"|"5y"|"10y" }
  * Svar: { series: { [ticker]: { yahoo, currency, points: [{ d, c }] } }, fx: { [valuta]: [{ d, c }] } }
  */
@@ -100,29 +105,49 @@ serve(async (req) => {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "ukjent";
     if (rateLimited(ip)) return json({ error: "For mange forespørsler - prøv igjen om et minutt." }, 429);
 
-    // --- Autentisering: må være innlogget administrator ---
-    const auth = req.headers.get("Authorization") ?? "";
-    const jwt = auth.replace(/^Bearer\s+/i, "");
-    if (!jwt) return json({ error: "Ikke innlogget." }, 401);
-
     const url = Deno.env.get("SUPABASE_URL")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
     const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const brukerklient = createClient(url, anon, { global: { headers: { Authorization: `Bearer ${jwt}` } } });
-    const { data: userData, error: userErr } = await brukerklient.auth.getUser(jwt);
-    if (userErr || !userData?.user) return json({ error: "Ugyldig innlogging." }, 401);
-
     const admin = createClient(url, service);
-    const { data: roller } = await admin.from("user_roles").select("role").eq("user_id", userData.user.id);
-    if (!roller?.some((r: { role: string }) => r.role === "admin")) {
-      return json({ error: "Krever administratortilgang." }, 403);
+    const body = await req.json().catch(() => ({}));
+    const offentlig = body.portefolje === true;
+
+    let interval: string;
+    let range: string;
+    let tickers: unknown;
+
+    if (offentlig) {
+      // --- Åpen modus: porteføljens egne aksjer, daglig, siste år ---
+      const { data: beholdning, error } = await admin
+        .from("portfolio_holdings")
+        .select("ticker")
+        .eq("holding_type", "stock");
+      if (error) return json({ error: "Kunne ikke lese porteføljen." }, 500);
+      interval = "1d";
+      range = "1y";
+      tickers = [...new Set((beholdning ?? []).map((r: { ticker: string }) => r.ticker))];
+      if ((tickers as string[]).length === 0) return json({ series: {}, fx: {}, interval, range });
+    } else {
+      // --- Autentisering: må være innlogget administrator ---
+      const auth = req.headers.get("Authorization") ?? "";
+      const jwt = auth.replace(/^Bearer\s+/i, "");
+      if (!jwt) return json({ error: "Ikke innlogget." }, 401);
+
+      const brukerklient = createClient(url, anon, { global: { headers: { Authorization: `Bearer ${jwt}` } } });
+      const { data: userData, error: userErr } = await brukerklient.auth.getUser(jwt);
+      if (userErr || !userData?.user) return json({ error: "Ugyldig innlogging." }, 401);
+
+      const { data: roller } = await admin.from("user_roles").select("role").eq("user_id", userData.user.id);
+      if (!roller?.some((r: { role: string }) => r.role === "admin")) {
+        return json({ error: "Krever administratortilgang." }, 403);
+      }
+
+      interval = INTERVALLER.has(body.interval) ? body.interval : "1wk";
+      range = RANGER.has(body.range) ? body.range : "3y";
+      tickers = body.tickers;
     }
 
     // --- Validering ---
-    const body = await req.json().catch(() => ({}));
-    const interval = INTERVALLER.has(body.interval) ? body.interval : "1wk";
-    const range = RANGER.has(body.range) ? body.range : "3y";
-    const tickers: unknown = body.tickers;
     if (!Array.isArray(tickers) || tickers.length === 0) return json({ error: "tickers mangler." }, 400);
     if (tickers.length > MAX_TICKERS) return json({ error: `Maks ${MAX_TICKERS} tickere per kall.` }, 400);
     const gyldige: string[] = [];
