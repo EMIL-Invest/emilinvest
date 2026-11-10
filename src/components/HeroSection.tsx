@@ -1,3 +1,4 @@
+import { visTicker } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
@@ -65,7 +66,7 @@ const HeroSection = () => {
   const kurser: KursPost[] = [
     ...holdings
       .filter((h) => h.holding_type === "stock")
-      .map((h) => ({ navn: h.ticker, endring: quotes[h.ticker]?.changePercent ?? null })),
+      .map((h) => ({ navn: visTicker(h.ticker), endring: quotes[h.ticker]?.changePercent ?? null })),
     ...INDEKS_NOEKLER.filter((k) => serier[k]).map((k) => ({ navn: serier[k]!.navn, endring: dagsendring(serier[k]!.punkter) })),
   ];
 

@@ -1,3 +1,4 @@
+import { visTicker } from "@/lib/utils";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AlertTriangle, ArrowLeft, ExternalLink, Info } from "lucide-react";
@@ -139,7 +140,7 @@ const Aksje = () => {
               <p className="eyebrow mb-4">{profil?.sector || holding?.sector || "Aksje"}</p>
               <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-3">{navn}</h1>
               <p className="text-sm text-muted-foreground">
-                {ticker}
+                {visTicker(ticker)}
                 {profil?.exchange || holding?.exchange
                   ? ` · ${profil?.exchange || holding?.exchange}`
                   : ""}
