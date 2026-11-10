@@ -57,6 +57,10 @@ export default {
           negative: "hsl(var(--stock-negative))",
           neutral: "hsl(var(--stock-neutral))",
         },
+        band: "hsl(var(--band))",
+        // Opp og ned i kurser: dempet grønn og rød som passer paletten
+        opp: "hsl(var(--opp))",
+        ned: "hsl(var(--ned))",
         competition: {
           DEFAULT: "hsl(var(--competition))",
           foreground: "hsl(var(--competition-foreground))",

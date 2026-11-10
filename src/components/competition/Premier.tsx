@@ -144,15 +144,25 @@ export const HovedpremieBilder = ({
  * Gullknappen «Premie» på konkurransesiden - alt premieinnholdet i en
  * dialog, så det ikke tar plass i selve konkurransen.
  */
-export const PremieKnapp = () => {
+export const PremieKnapp = ({ moerk }: { moerk?: boolean }) => {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-competition text-competition-foreground hover:bg-competition/90">
-          <Gift className="w-4 h-4 mr-2" />
-          Premie
-        </Button>
+        {moerk ? (
+          <button
+            type="button"
+            className="text-white underline decoration-2 underline-offset-[6px] hover:decoration-[3px]"
+            style={{ textDecorationColor: "hsl(var(--competition))" }}
+          >
+            Se premiene
+          </button>
+        ) : (
+          <Button size="sm" className="bg-competition text-competition-foreground hover:bg-competition/90">
+            <Gift className="w-4 h-4 mr-2" />
+            Premie
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>

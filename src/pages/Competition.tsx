@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCompetition } from "@/hooks/useCompetition";
-import { Trophy, Wallet, ArrowUpRight, ArrowDownRight, ArrowLeftRight, RefreshCw, LogIn } from "lucide-react";
+import { FANE, BRIKKE } from "@/lib/konkurranseStil";
+import { Trophy, Wallet, ArrowLeftRight, RefreshCw, LogIn } from "lucide-react";
 import LeaderboardTable from "@/components/competition/LeaderboardTable";
 import PortfolioManager from "@/components/competition/PortfolioManager";
 import StockTrader from "@/components/competition/StockTrader";
@@ -54,6 +53,17 @@ const Competition = () => {
    */
   const [aktivFane, setAktivFane] = useState("leaderboard");
   const [faneAutovalgt, setFaneAutovalgt] = useState(false);
+  // Kjøp fra Min portefølje: bytt til handelsfanen med kjøpsdialogen åpen,
+  // og gå tilbake til porteføljen når dialogen lukkes.
+  const [kjoepTicker, setKjoepTicker] = useState<string | null>(null);
+  const kjoepFraPortefolje = (ticker: string) => {
+    setKjoepTicker(ticker);
+    setAktivFane("trade");
+  };
+  const kjoepFerdig = useCallback(() => {
+    setKjoepTicker(null);
+    setAktivFane("portfolio");
+  }, []);
 
   const handleJoin = async () => {
     if (!displayName.trim()) {
@@ -141,194 +151,127 @@ const Competition = () => {
       <Navbar />
       
       {/* Mobil: plass i bunnen til den faste navigasjonslinjen */}
-      <main className="pt-16 pb-28 md:py-24">
-        <div className="section-container">
-          {/* Header - kompaktere på mobil så innholdet kommer raskere frem */}
-          <div className="text-center mb-8 md:mb-12">
-            <Badge className="mb-3 md:mb-4 bg-competition text-competition-foreground">
-              <Trophy className="w-3 h-3 mr-1" />
-              Aksjekonkurranse
-            </Badge>
-            <h1 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-3 md:mb-4">
-              Investeringskonkurranse
-            </h1>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Start med {STARTING_CAPITAL.toLocaleString('nb-NO')} kr - høyest avkastning vinner.
-            </p>
-            {/* Regler og premier: ett trykk unna, uten å ta plass på siden */}
-            <div className="mt-5 flex items-center justify-center gap-3">
-              <ReglerKnapp />
-              <PremieKnapp />
+      <main className="pt-16 pb-28 md:pb-24">
+        {/* Grønt toppfelt, samme bånd som på forsiden: invitasjon til venstre,
+            dine tall (eller påmelding) til høyre under en gul strek */}
+        <section className="text-white" style={{ background: "hsl(var(--band))" }}>
+          <div className="section-container grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-20 pt-8 pb-10 md:pt-14 md:pb-16">
+            <div>
+              <h1 className="font-serif font-normal text-[40px] md:text-6xl leading-[1.02] tracking-[-0.015em]">
+                Aksjekonkurransen
+              </h1>
+              <p className="text-white/75 text-base md:text-lg leading-relaxed mt-4 max-w-[32em]">
+                Start med {STARTING_CAPITAL.toLocaleString("nb-NO")} kr i virtuell kapital, bygg din egen portefølje
+                og se om du slår oss. Beste avkastning hver måned vinner premie.
+              </p>
+              {/* Regler og premier: ett trykk unna, uten å ta plass på siden */}
+              <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-3">
+                <ReglerKnapp moerk />
+                <PremieKnapp moerk />
+              </div>
             </div>
-          </div>
 
-          {/* Not logged in */}
-          {!user && (
-            <Card className="max-w-md mx-auto mb-12">
-              <CardHeader className="text-center">
-                <CardTitle>Logg inn for å delta</CardTitle>
-                <CardDescription>
-                  Du må være innlogget for å delta i konkurransen
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                <Button asChild>
-                  <Link to="/auth">
-                    <LogIn className="w-4 h-4 mr-2" />
+            <div className="border-t-2 pt-6 self-end" style={{ borderColor: "hsl(var(--competition))" }}>
+              {!user && (
+                <>
+                  <p className="font-serif text-2xl md:text-3xl leading-tight">Logg inn for å være med</p>
+                  <p className="text-white/70 mt-2 mb-6">Det er gratis og åpent for alle studenter.</p>
+                  <Link
+                    to="/auth"
+                    className="knapp-skraa inline-flex items-center gap-2 px-8 py-3.5 font-semibold focus-visible:underline underline-offset-4"
+                    style={{ background: "hsl(var(--competition))", color: "hsl(var(--competition-foreground))" }}
+                  >
+                    <LogIn className="w-4 h-4" />
                     Logg inn
                   </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+                </>
+              )}
 
-          {/* Logged in but not participating */}
-          {user && !participant && (
-            <Card className="max-w-md mx-auto mb-12">
-              <CardHeader className="text-center">
-                <CardTitle>Delta i konkurransen</CardTitle>
-                <CardDescription>
-                  Meld deg på og få {STARTING_CAPITAL.toLocaleString('nb-NO')} kr i virtuell kapital
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Det viktigste fra reglene, synlig FØR man melder seg på */}
-                <div className="rounded-md bg-secondary/50 border border-border p-3 text-sm text-muted-foreground space-y-1">
-                  <p className="font-medium text-foreground">Slik blir porteføljen din gyldig:</p>
-                  <p>
-                    Kjøp minst {KRAV_ANTALL_AKSJER} ulike aksjer (minst{" "}
-                    {MINSTE_FORSTEKJOP.toLocaleString("nb-NO")} kr per førstekjøp,
-                    maks {MAKSVEKT_PROSENT} % i én aksje). Avkastningen din måles
-                    fra porteføljen er gyldig.
+              {user && !participant && (
+                <>
+                  <p className="font-serif text-2xl md:text-3xl leading-tight">Meld deg på</p>
+                  {/* Det viktigste fra reglene, synlig FØR man melder seg på */}
+                  <p className="text-white/70 text-sm leading-relaxed mt-2 mb-5 max-w-md">
+                    Porteføljen din blir gyldig når du eier minst {KRAV_ANTALL_AKSJER} ulike aksjer (minst{" "}
+                    {MINSTE_FORSTEKJOP.toLocaleString("nb-NO")} kr per førstekjøp, maks {MAKSVEKT_PROSENT} % i én
+                    aksje). Avkastningen måles fra da.
                   </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="displayName">Visningsnavn</Label>
-                  <Input
-                    id="displayName"
-                    placeholder="Ditt navn på leaderboard"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    maxLength={50}
-                  />
-                </div>
-                <Button
-                  onClick={handleJoin}
-                  disabled={isJoining}
-                  className="w-full bg-competition hover:bg-competition/90 text-competition-foreground"
-                >
-                  {isJoining ? "Melder på..." : "Meld meg på"}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Guiden: fra påmeldt til gyldig portefølje */}
-          {participant && (
-            <PorteforljeStatus participant={participant} holdings={holdings} />
-          )}
-
-          {/* Mobil: ett kompakt statuskort i stedet for tre store kort,
-              slik at topplisten/handelen er synlig uten å scrolle en hel skjerm */}
-          {participant && (
-            <Card className="mb-6 md:hidden">
-              <CardContent className="pt-4 pb-4">
-                <div className="flex items-end justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground mb-0.5">Porteføljeverdi</p>
-                    <p className="text-2xl font-bold leading-tight">
-                      {portfolioValue.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
-                    </p>
+                  <Label htmlFor="displayName" className="text-white/80">
+                    Visningsnavn
+                  </Label>
+                  <div className="mt-2 flex flex-col sm:flex-row gap-3">
+                    <Input
+                      id="displayName"
+                      placeholder="Navnet ditt på ledertavlen"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleJoin()}
+                      maxLength={50}
+                      className="h-12 bg-white/10 border-white/25 text-white placeholder:text-white/40 focus-visible:ring-competition"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleJoin}
+                      disabled={isJoining}
+                      className="knapp-skraa shrink-0 px-8 h-12 font-semibold disabled:opacity-60 focus-visible:underline underline-offset-4"
+                      style={{ background: "hsl(var(--competition))", color: "hsl(var(--competition-foreground))" }}
+                    >
+                      {isJoining ? "Melder på …" : "Meld meg på"}
+                    </button>
                   </div>
-                  <div className={`flex items-center gap-1 text-lg font-bold flex-shrink-0 ${
-                    totalReturn >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {totalReturn >= 0 ? (
-                      <ArrowUpRight className="w-5 h-5" />
-                    ) : (
-                      <ArrowDownRight className="w-5 h-5" />
-                    )}
-                    {totalReturn.toFixed(2)}%
+                </>
+              )}
+
+              {participant && (
+                <>
+                  <div className="flex flex-wrap justify-between gap-x-4 gap-y-1 text-sm text-white/65">
+                    <span>Porteføljen din</span>
+                    <PorteforljeStatus participant={participant} holdings={holdings} moerk />
                   </div>
-                </div>
-                <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
-                  <Wallet className="w-4 h-4 flex-shrink-0" />
-                  <span>
-                    Tilgjengelig:{" "}
-                    <span className="font-medium text-foreground">
-                      {getCashBalance().toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
+                  <p className="font-serif text-5xl md:text-[62px] leading-none tracking-[-0.01em] mt-3 mb-3 tabular-nums">
+                    {portfolioValue.toLocaleString("nb-NO", { maximumFractionDigits: 0 })}
+                    <span className="text-2xl ml-1.5 opacity-70">kr</span>
+                  </p>
+                  <p className="flex flex-wrap gap-x-6 gap-y-1 text-[14.5px] text-white/65">
+                    <span>
+                      Avkastning{" "}
+                      <b className={`font-semibold tabular-nums ${totalReturn >= 0 ? "text-[#93D2A3]" : "text-[#F0A493]"}`}>
+                        {totalReturn >= 0 ? "+" : "−"}
+                        {Math.abs(totalReturn).toFixed(2).replace(".", ",")} %
+                      </b>
                     </span>
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Desktop: de tre store kortene som før */}
-          {participant && (
-            <div className="hidden md:grid grid-cols-3 gap-6 mb-12">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Porteføljeverdi</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">
-                    {portfolioValue.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Total avkastning</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className={`text-3xl font-bold flex items-center gap-2 ${
-                    totalReturn >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {totalReturn >= 0 ? (
-                      <ArrowUpRight className="w-6 h-6" />
-                    ) : (
-                      <ArrowDownRight className="w-6 h-6" />
-                    )}
-                    {totalReturn.toFixed(2)}%
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Tilgjengelig (ASK)</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold flex items-center gap-2">
-                    <Wallet className="w-6 h-6 text-muted-foreground" />
-                    {getCashBalance().toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
-                  </div>
-                </CardContent>
-              </Card>
+                    <span>
+                      Tilgjengelig{" "}
+                      <b className="font-semibold text-white tabular-nums">
+                        {getCashBalance().toLocaleString("nb-NO", { maximumFractionDigits: 0 })} kr
+                      </b>
+                    </span>
+                  </p>
+                </>
+              )}
             </div>
-          )}
+          </div>
+        </section>
 
+        <div className="section-container pt-8 md:pt-12">
           {/* Main content tabs - nye deltakere lander rett i handelen,
               slik at veien til gyldig portefølje er kortest mulig */}
           <Tabs value={aktivFane} onValueChange={setAktivFane} className="space-y-6">
             {/* Fanelisten øverst vises bare på desktop - på mobil overtar
                 den faste navigasjonslinjen i bunnen (tommelavstand) */}
-            <TabsList className="hidden md:grid w-full max-w-md mx-auto grid-cols-3">
-              <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-              {participant && (
-                <>
-                  <TabsTrigger value="portfolio">Min portefølje</TabsTrigger>
-                  <TabsTrigger value="trade">Kjøp/Selg</TabsTrigger>
-                </>
-              )}
+{/* Uten deltakelse finnes bare ledertavlen, og da trengs ingen faner */}
+            {participant && (
+            <TabsList className="hidden md:flex h-auto w-full justify-start gap-9 rounded-none bg-transparent p-0 border-b border-border">
+              <TabsTrigger value="leaderboard" className={FANE}>Ledertavle</TabsTrigger>
+              <TabsTrigger value="portfolio" className={FANE}>Min portefølje</TabsTrigger>
+              <TabsTrigger value="trade" className={FANE}>Kjøp og selg</TabsTrigger>
             </TabsList>
+            )}
 
             <TabsContent value="leaderboard">
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-serif font-bold">Topplister</h2>
+                  <h2 className="text-3xl md:text-4xl font-serif font-normal text-primary">Ledertavlen</h2>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -341,10 +284,10 @@ const Competition = () => {
                 </div>
 
                 <Tabs defaultValue="monthly" className="space-y-4">
-                  <TabsList className="grid w-full grid-cols-3 sm:w-auto sm:inline-flex">
-                    <TabsTrigger value="monthly">Denne måneden</TabsTrigger>
-                    <TabsTrigger value="yearly">I år</TabsTrigger>
-                    <TabsTrigger value="all_time">All-time</TabsTrigger>
+                  <TabsList className="h-auto flex flex-wrap justify-start gap-2 bg-transparent p-0">
+                    <TabsTrigger value="monthly" className={BRIKKE}>Denne måneden</TabsTrigger>
+                    <TabsTrigger value="yearly" className={BRIKKE}>I år</TabsTrigger>
+                    <TabsTrigger value="all_time" className={BRIKKE}>Hele perioden</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="monthly">
@@ -384,6 +327,7 @@ const Competition = () => {
                     holdings={holdings}
                     quotes={quotes}
                     onSell={sellStock}
+                    onKjoep={kjoepFraPortefolje}
                   />
                 </TabsContent>
 
@@ -400,6 +344,8 @@ const Competition = () => {
                     quotesLoading={quotesLoading}
                     checkTradingAllowed={checkTradingAllowed}
                     maxDailyTransactions={MAX_DAILY_TRANSACTIONS_PER_STOCK}
+                    forhandsvalgtKjoep={kjoepTicker}
+                    onForhandsvalgFerdig={kjoepFerdig}
                   />
                 </TabsContent>
               </>
@@ -418,7 +364,7 @@ const Competition = () => {
         >
           <div className="grid grid-cols-3">
             {[
-              { id: "leaderboard", label: "Toppliste", Ikon: Trophy },
+              { id: "leaderboard", label: "Ledertavle", Ikon: Trophy },
               { id: "portfolio", label: "Portefølje", Ikon: Wallet },
               { id: "trade", label: "Handle", Ikon: ArrowLeftRight },
             ].map(({ id, label, Ikon }) => (

@@ -60,6 +60,8 @@
     /* Konkurransefarge - varm gull/rav som skiller seg fra resten av paletten
        og gir premie-/konkurransefølelse. Mørk tekst for god kontrast. */
     --competition: 42 70% 51%;
+    --opp: 146 42% 32%;
+    --ned: 8 58% 46%;
     --competition-foreground: 156 18% 13%;
 
     /* Logo-grønn som egne tokens + dyp grønn gradient til CTA-flater */
@@ -78,6 +80,8 @@
   }
 
   .dark {
+    --opp: 146 45% 55%;
+    --ned: 8 70% 65%;
     --background: 213 60% 7%;
     --foreground: 210 30% 95%;
 

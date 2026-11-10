@@ -5,18 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, TrendingDown, Briefcase, Wallet } from "lucide-react";
+import { TrendingUp, TrendingDown, Briefcase } from "lucide-react";
 import { PortfolioHolding, StockQuote } from "@/hooks/useCompetition";
 import { visAntall, visKurs, rundAntall, gyldigSalgsantall } from "@/lib/konkurranseregler";
 import { getExchangeFromTicker } from "@/lib/exchangeHours";
+import { KJOEP } from "@/lib/konkurranseStil";
 
 interface PortfolioManagerProps {
   holdings: PortfolioHolding[];
   quotes: Record<string, StockQuote>;
   onSell: (ticker: string, quantity: number, price: number) => Promise<{ error: Error | null }>;
+  /** Åpner kjøpsdialogen for en aksje du allerede eier. */
+  onKjoep: (ticker: string) => void;
 }
 
-const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) => {
+const PortfolioManager = ({ holdings, quotes, onSell, onKjoep }: PortfolioManagerProps) => {
   const { toast } = useToast();
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [selectedHolding, setSelectedHolding] = useState<PortfolioHolding | null>(null);
@@ -27,7 +30,6 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
   const [detaljHolding, setDetaljHolding] = useState<PortfolioHolding | null>(null);
 
   const stockHoldings = holdings.filter(h => h.ticker !== "ASK");
-  const cashHolding = holdings.find(h => h.ticker === "ASK");
 
   const handleSellClick = (holding: PortfolioHolding) => {
     setSelectedHolding(holding);
@@ -118,28 +120,10 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
 
   return (
     <div className="space-y-6">
-      {/* Cash balance card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Wallet className="w-5 h-5" />
-            ASK-konto (kontanter)
-          </CardTitle>
-          <CardDescription>
-            Penger som ikke er investert i aksjer
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">
-            {(cashHolding ? Number(cashHolding.quantity) : 0).toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Stock holdings */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="font-serif font-normal flex items-center gap-2">
             <Briefcase className="w-5 h-5" />
             Mine aksjer
           </CardTitle>
@@ -152,7 +136,7 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
             <div className="text-center py-8 text-muted-foreground">
               <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p>Du har ingen aksjer ennå.</p>
-              <p className="text-sm">Gå til "Kjøp/Selg" for å handle aksjer.</p>
+              <p className="text-sm">Gå til «Kjøp og selg» for å handle aksjer.</p>
             </div>
           ) : (
             <>
@@ -179,12 +163,12 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                       <TableCell className="px-2">
                         <div className="font-medium">{holding.ticker.replace('.OL', '')}</div>
                       </TableCell>
-                      <TableCell className="text-right font-mono px-2 whitespace-nowrap">
+                      <TableCell className="text-right tabular-nums px-2 whitespace-nowrap">
                         {currentValue.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                       </TableCell>
                       <TableCell className="text-right px-2">
                         <div className={`flex items-center justify-end gap-1 whitespace-nowrap ${
-                          returnPct >= 0 ? 'text-green-600' : 'text-red-600'
+                          returnPct >= 0 ? 'text-opp' : 'text-ned'
                         }`}>
                           {returnPct >= 0 ? (
                             <TrendingUp className="w-4 h-4" />
@@ -195,17 +179,29 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                         </div>
                       </TableCell>
                       <TableCell className="text-right px-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="px-3"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSellClick(holding);
-                          }}
-                        >
-                          Selg
-                        </Button>
+                        <div className="flex justify-end gap-1.5">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="px-3"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSellClick(holding);
+                            }}
+                          >
+                            Selg
+                          </Button>
+                          <Button
+                            size="sm"
+                            className={`px-3 ${KJOEP}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onKjoep(holding.ticker);
+                            }}
+                          >
+                            Kjøp
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -245,12 +241,12 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                   {rader.map((r) => (
                     <div key={r.navn} className="flex items-center justify-between py-2.5">
                       <span className="text-muted-foreground">{r.navn}</span>
-                      <span className="font-mono text-foreground">{r.verdi}</span>
+                      <span className="tabular-nums text-foreground">{r.verdi}</span>
                     </div>
                   ))}
                   <div className="flex items-center justify-between py-2.5">
                     <span className="text-muted-foreground">Avkastning</span>
-                    <span className={`font-mono font-medium ${avkastKr >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`tabular-nums font-medium ${avkastKr >= 0 ? 'text-opp' : 'text-ned'}`}>
                       {avkastKr >= 0 ? '+' : ''}{avkastKr.toLocaleString('nb-NO', { maximumFractionDigits: 0 })} kr
                       {' '}({avkastPct >= 0 ? '+' : ''}{avkastPct.toFixed(2)} %)
                     </span>
@@ -261,6 +257,7 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                     Lukk
                   </Button>
                   <Button
+                    variant="outline"
                     onClick={() => {
                       const h = detaljHolding;
                       setDetaljHolding(null);
@@ -268,6 +265,16 @@ const PortfolioManager = ({ holdings, quotes, onSell }: PortfolioManagerProps) =
                     }}
                   >
                     Selg
+                  </Button>
+                  <Button
+                    className={KJOEP}
+                    onClick={() => {
+                      const t = detaljHolding.ticker;
+                      setDetaljHolding(null);
+                      onKjoep(t);
+                    }}
+                  >
+                    Kjøp mer
                   </Button>
                 </DialogFooter>
               </>
