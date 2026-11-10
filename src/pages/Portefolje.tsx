@@ -1,7 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SpolTilbake from "@/components/SpolTilbake";
-import { ContributionSection } from "@/components/PortfolioVisuals";
 import Porteforljekart from "@/components/portefolje/Porteforljekart";
 import Beholdning from "@/components/portefolje/Beholdning";
 import { usePortfolioData, StockQuote } from "@/hooks/usePortfolioData";
@@ -9,7 +8,7 @@ import { usePortfolioData, StockQuote } from "@/hooks/usePortfolioData";
 /**
  * Porteføljesiden: grønt bånd med nøkkeltall (samme stil som forsiden),
  * kartet over alle aksjene, beholdningstabellen med valgfri periode,
- * fond og kontanter, bidrag per aksje og «Spol tilbake».
+ * fond og kontanter og «Spol tilbake».
  */
 
 const formatKr = (n: number) =>
@@ -145,8 +144,6 @@ const Portefolje = () => {
           </div>
         )}
 
-        {/* Bidrag per posisjon */}
-        {!loading && <ContributionSection stocks={stocks} />}
 
         {/* Spol tilbake: porteføljen slik den var en valgt dag */}
         <SpolTilbake />
