@@ -8,7 +8,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  * under er fast, så funksjonen kan ikke brukes som en generell Yahoo-proxy.
  * Alt regnes om til NOK med daglig valutakurs, slik at indeksene kan sammenlignes
  * rett mot porteføljen. Svar caches i market_history_cache (samme tabell som
- * price-history) i én time.
+ * price-history) i 10 minutter.
  *
  * Svar: { serier: { [nøkkel]: { navn, punkter: [{ d, c }] } }, hentet }
  */
