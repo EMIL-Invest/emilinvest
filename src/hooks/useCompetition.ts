@@ -59,6 +59,8 @@ export interface StockQuote {
   change: number;
   changePercent: number;
   currency: string;
+  /** Siste kjente pris fra priscachen, vist til live-kursen er hentet. Dagsendring er ukjent. */
+  fraCache?: boolean;
 }
 
 const STARTING_CAPITAL = 100000;
@@ -521,6 +523,44 @@ export const useCompetition = () => {
 
     loadData();
   }, [fetchStocks, fetchParticipant]);
+
+  // Vis siste kjente priser med en gang (ett raskt databasekall), så
+  // porteføljeverdi og avkastning er riktige før live-kursene er hentet.
+  // Uten dette faller verdiene tilbake til kjøpskurs i flere sekunder.
+  useEffect(() => {
+    supabase
+      .from("stock_price_cache")
+      .select("ticker, price")
+      .then(({ data }) => {
+        if (!data) return;
+        setQuotes((prev) => {
+          const neste = { ...prev };
+          for (const r of data as { ticker: string; price: number }[]) {
+            if (!neste[r.ticker] && Number(r.price) > 0) {
+              neste[r.ticker] = {
+                ticker: r.ticker,
+                price: Number(r.price),
+                change: 0,
+                changePercent: 0,
+                currency: "NOK",
+                fraCache: true,
+              };
+            }
+          }
+          return neste;
+        });
+      });
+  }, []);
+
+  // Egne aksjer først: et lite kall som er ferdig lenge før hele kurslisten
+  const egneTickere = holdings
+    .filter((h) => h.ticker !== "ASK")
+    .map((h) => h.ticker)
+    .sort()
+    .join(",");
+  useEffect(() => {
+    if (egneTickere) fetchQuotes(egneTickere.split(","));
+  }, [egneTickere, fetchQuotes]);
 
   // Fetch quotes when stocks are loaded, then every 30 seconds
   useEffect(() => {

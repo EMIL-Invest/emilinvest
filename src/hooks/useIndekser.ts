@@ -26,16 +26,27 @@ export const useIndekser = () => {
 
   useEffect(() => {
     let aktiv = true;
-    supabase.functions
-      .invoke("indeks-historikk", { body: {} })
-      .then(({ data, error }) => {
-        if (!aktiv) return;
-        if (error || !data?.serier) console.error("Kunne ikke hente indekser:", error);
-        else setSerier(data.serier);
-      })
-      .finally(() => aktiv && setLaster(false));
+    const hent = () =>
+      supabase.functions
+        .invoke("indeks-historikk", { body: {} })
+        .then(({ data, error }) => {
+          if (!aktiv) return;
+          if (error || !data?.serier) console.error("Kunne ikke hente indekser:", error);
+          else setSerier(data.serier);
+        })
+        .finally(() => aktiv && setLaster(false));
+
+    hent();
+    // Hentes på nytt hvert 5. minutt, samme takt som aksjekursene. Ellers
+    // står indeksen fast på gårsdagens sluttkurs hvis siden ble åpnet før
+    // børsen åpnet, mens porteføljen oppdateres live.
+    const intervall = setInterval(hent, 5 * 60 * 1000);
+    const vedFokus = () => document.visibilityState === "visible" && hent();
+    document.addEventListener("visibilitychange", vedFokus);
     return () => {
       aktiv = false;
+      clearInterval(intervall);
+      document.removeEventListener("visibilitychange", vedFokus);
     };
   }, []);
 
