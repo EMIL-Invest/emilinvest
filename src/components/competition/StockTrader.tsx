@@ -451,7 +451,7 @@ const StockTrader = ({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {quote ? (
+                        {quote && !quote.fraCache ? (
                           <div className={`flex items-center justify-end gap-1 ${
                             quote.changePercent >= 0 ? 'text-opp' : 'text-ned'
                           }`}>
@@ -516,7 +516,7 @@ const StockTrader = ({
                     ? `${visKurs(quotes[selectedStock.ticker].price)} kr`
                     : "-"}
                 </span>
-                {quotes[selectedStock.ticker] && (
+                {quotes[selectedStock.ticker] && !quotes[selectedStock.ticker].fraCache && (
                   <span className={`flex items-center gap-1 font-medium ${
                     quotes[selectedStock.ticker].changePercent >= 0 ? 'text-opp' : 'text-ned'
                   }`}>
