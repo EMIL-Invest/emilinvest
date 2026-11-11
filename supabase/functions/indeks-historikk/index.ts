@@ -28,7 +28,9 @@ const INDEKSER: Record<string, { yahoo: string; navn: string }> = {
 
 const INTERVAL = "1d";
 const RANGE = "2y";
-const CACHE_TTL_MS = 60 * 60 * 1000;
+// Kort levetid, så dagens kurs følger børsen gjennom dagen. Ett kall gir
+// fem Yahoo-oppslag, så selv med mange besøkende blir det få kall.
+const CACHE_TTL_MS = 10 * 60 * 1000;
 
 interface Punkt { d: string; c: number }
 interface Serie { yahoo: string; currency: string; points: Punkt[] }
@@ -36,7 +38,7 @@ interface Serie { yahoo: string; currency: string; points: Punkt[] }
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=900" },
+    headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=300" },
   });
 
 const hentYahoo = async (yahoo: string): Promise<Serie | null> => {
